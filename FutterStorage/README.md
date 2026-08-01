@@ -52,6 +52,8 @@ entsteht daraus neu.
 | `rendern.py` | Blender-Szenen mit automatischer Kamerarahmung |
 | `schilder.py` | Ein Schild je Futtersorte, als STL und als Bild |
 | `symbole-pruefen.py` | Misst jedes Sortensymbol auf Zentrierung und Größe |
+| `webbilder.py` | Verkleinert die Renderings zu JPEG für die Seiten |
+| `abgleich.py` | Hält Modell, STL, Zeichnungen und Bilder gegeneinander |
 | `seiten.py` | Baut die HTML-Dokumentation und das ZIP |
 
 ### Alles neu bauen
@@ -66,7 +68,9 @@ for s in front mitte end schieber schild kanal explosion gefuellt ebene gesamt \
          entnahme greifraum; do
     blender -b -P werkzeuge/rendern.py -- $s bilder/b_$s.png
 done
+python3 werkzeuge/webbilder.py    # verkleinerte JPEG für die Seiten
 python3 werkzeuge/seiten.py
+python3 werkzeuge/abgleich.py     # prüft alles gegeneinander
 ```
 
 ---
