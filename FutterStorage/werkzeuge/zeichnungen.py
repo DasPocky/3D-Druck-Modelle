@@ -301,3 +301,269 @@ class Blatt:
         return datei, self._kollisionen()
 
 
+# =====================================================================
+def blatt1():
+    K = 1.7
+    b = Blatt(1300, 940)
+    ax, az, ay = M["aussen_x"] * K, M["aussen_z"] * K, M["ay_front"] * K
+    W, BO = M["wand"] * K, M["boden"] * K
+
+    # ---------- Vorderansicht ----------
+    ox, oy = 118, 96
+    b.ansicht(ox, oy - 78, "VORDERANSICHT")
+    b.rect(ox, oy, ax, az, FLAECHE)
+    # Innenraum
+    b.rect(ox + W, oy + BO, M["innen_x"] * K, M["innen_z"] * K, PAPIER, HILF, 0.9, "5 3")
+    # Frontwand: alles unterhalb dieser Linie ist Wand
+    wy = oy + az - (M["anschlag"] + M["boden"]) * K
+    b.rect(ox, wy, ax, (M["anschlag"] + M["boden"]) * K, FLAECHE, LINIE, 1.2)
+    # Griffmulde
+    mb, fa = M["mulde_b"] * K, 11 * K
+    mx = ox + ax / 2 - mb / 2
+    my = oy + az - (M["mulde_bis"] + M["boden"]) * K
+    b.poly([(mx, wy), (mx, my - fa), (mx + fa, my), (mx + mb - fa, my),
+            (mx + mb, my - fa), (mx + mb, wy)], PAPIER, LINIE, 1.2)
+    # Schildtasche
+    sb, sh = M["schild_b"] * K, (M["schild_h"] + 4) * K
+    sx, sy = ox + ax / 2 - sb / 2, oy + az - (6 + M["schild_h"] + 4) * K
+    b.rect(sx - 1.6 * K, sy, sb + 3.2 * K, sh, "none", MASSL, 1.4)
+
+    b.pos(1, ox + ax - 14, wy + 8, ox + ax + 66, wy - 16)
+    b.pos(2, mx + mb / 2, my - fa / 2, ox + ax + 66, my - 30)
+    b.pos(3, sx + sb - 10, sy + sh / 2, ox + ax + 66, sy + sh / 2)
+
+    b.mh(ox + W, ox + ax - W, oy + az + 40, f'{M["innen_x"]:.0f}', "Innenbreite für den Beutel",
+         von=oy + az)
+    b.mh(ox, ox + ax, oy + az + 74, f'{M["aussen_x"]:.1f}'.replace(".", ","), "Außenbreite = Spaltenmaß", von=oy + az)
+    b.mv(oy, oy + az, ox - 34, f'{M["aussen_z"]:.1f}'.replace(".", ","), "Außenhöhe = Ebenenmaß", von=ox)
+    b.mv(wy, oy + az, ox - 78, f'{M["anschlag"]:.0f}', "Frontwand", von=ox)
+    b.mh(mx, mx + mb, oy - 34, "52", "Griffmulde", von=my - fa, oben=True)
+
+    # ---------- Seitenansicht ----------
+    ox2 = ox + ax + 210
+    b.ansicht(ox2, oy - 78, "SEITENANSICHT")
+    b.rect(ox2, oy, ay, az, FLAECHE)
+    b.rect(ox2, oy + az - BO, ay, BO, "#d8d3cb", LINIE, 1.0)          # Boden
+    b.rect(ox2, wy - oy + oy, 3 * K, (M["anschlag"] + M["boden"]) * K, "#3d3d43")  # Frontwand
+    fh = (M["innen_z"] - 26) * K
+    b.rect(ox2 + 17 * K, oy + az - (M["boden"] + 14) * K - fh,
+           (M["segL"] - 28) * K, fh, PAPIER, HILF, 1.0, "5 3")       # Fenster
+    b.rect(ox2 + ay, oy + az - BO, M["zunge_l"] * K, M["zunge_h"] * K, MASSL, MASSL, 1.0)
+
+    b.pos(4, ox2 + 17 * K + 40, oy + az - (M["boden"] + 14) * K - fh + 20,
+          ox2 - 44, oy + 30)
+    b.pos(5, ox2 + ay + 4, oy + az - BO + 2, ox2 + ay + 60, oy + az - 44)
+    b.pos(6, ox2 + ay - 26, oy + az - BO / 2, ox2 + ay + 58, oy + az + 14)
+
+    b.mh(ox2, ox2 + ay, oy + az + 40, "163", "Bauteillänge", von=oy + az)
+    b.mh(ox2 + ay, ox2 + ay + M["zunge_l"] * K, oy + az + 74, "9", "Zungenüberstand",
+         von=oy + az)
+    b.mv(oy, oy + az, ox2 + ay + 96, f'{M["aussen_z"]:.1f}'.replace(".", ","), "Außenhöhe", von=ox2 + ay)
+
+    # ---------- Draufsicht ----------
+    oy3 = oy + az + 212
+    b.ansicht(ox, oy3 - 78, "DRAUFSICHT")
+    b.rect(ox, oy3, ax, ay, FLAECHE)
+    b.rect(ox + W, oy3 + 3 * K, M["innen_x"] * K, (M["ay_front"] - 3) * K,
+           PAPIER, HILF, 0.9, "5 3")
+    nb = M["nut_b"] * K
+    b.rect(ox + ax / 2 - nb / 2, oy3, nb, ay, "#f0d9c8", MASSL, 1.3)
+    b.pos(7, ox + ax / 2 + nb / 2, oy3 + ay * 0.4, ox + ax + 66, oy3 + ay * 0.4)
+    b.mh(ox + ax / 2 - nb / 2, ox + ax / 2 + nb / 2, oy3 - 34, "18", "Bandnut",
+         von=oy3, oben=True)
+    b.mv(oy3, oy3 + ay, ox - 34, "163", "Bauteillänge", von=ox)
+
+    b.legende(ox2, oy3 + 30, [
+        (1, "Frontwand, hält den Beutel", "92 hoch"),
+        (2, "Griffmulde zum Anfassen", "52 breit"),
+        (3, "Tasche für das Schild", "74 x 18"),
+        (4, "Fenster in der Seitenwand", "132 x 114"),
+        (5, "Bodenzunge zum Nachbarsegment", "9 lang"),
+        (6, "Bodenstärke mit Nut", "4,8"),
+        (7, "Bandnut für die Feder", "18 x 1,6"),
+    ], spalten=1)
+
+    b.titel("Frontsegment", "Vorderstes Kanalstück mit Frontwand, Griffmulde, "
+            "Schildtasche und Bandhaken", "TEIL 01")
+    return b.save("01-frontsegment.svg")
+
+
+# =====================================================================
+def blatt2():
+    K = 1.6
+    b = Blatt(1340, 860)
+    ax, az = M["aussen_x"] * K, M["aussen_z"] * K
+    W, BO = M["wand"] * K, M["boden"] * K
+
+    for i, (typ, ayv, nr) in enumerate([("MITTELSEGMENT", M["ay_mitte"], 1),
+                                        ("ENDSEGMENT", M["ay_end"], 4)]):
+        ox, oy = 118 + i * 640, 96
+        ay = ayv * K
+        b.ansicht(ox, oy - 78, typ + " — SEITENANSICHT")
+        b.rect(ox, oy, ay, az, FLAECHE)
+        b.rect(ox, oy + az - BO, ay, BO, "#d8d3cb", LINIE, 1.0)
+        fh = (M["innen_z"] - 26) * K
+        b.rect(ox + 14 * K, oy + az - (M["boden"] + 14) * K - fh,
+               (M["segL"] - 28) * K, fh, PAPIER, HILF, 1.0, "5 3")
+        if i == 0:
+            b.rect(ox + ay, oy + az - BO, M["zunge_l"] * K, M["zunge_h"] * K, MASSL, MASSL)
+            b.rect(ox - M["zunge_l"] * K, oy + az - BO, M["zunge_l"] * K,
+                   M["zunge_h"] * K, "none", MASSL, 1.0, "3 2")
+            b.pos(1, ox + ay + 4, oy + az - BO, ox + ay + 56, oy + az - 50)
+            b.pos(2, ox - 4, oy + az - BO, ox - 56, oy + az - 50)
+            b.pos(3, ox + 14 * K + 30, oy + az - (M["boden"] + 14) * K - fh + 18,
+                  ox + 30, oy - 40)
+        else:
+            b.rect(ox + ay - W, oy, W, az, "#3d3d43")
+            sw, shh = (M["innen_x"] - 24) * K, (M["innen_z"] - 34) * K
+            b.rect(ox + ay - W - 6, oy + az - (M["boden"] + 16) * K - shh, 6, shh,
+                   PAPIER, HILF, 1.0, "5 3")
+            b.pos(4, ox + ay - W, oy + 40, ox + ay + 56, oy + 20)
+            b.pos(5, ox + ay - W - 6, oy + az - 130, ox + ay + 56, oy + az - 150)
+        b.mh(ox, ox + ay, oy + az + 40, f'{ayv:.1f}'.replace(".", ","), "Bauteillänge",
+             von=oy + az)
+        b.mv(oy, oy + az, ox - 34, f'{M["aussen_z"]:.1f}'.replace(".", ","), "Außenhöhe", von=ox)
+
+    # Querschnitt gemeinsam
+    ox, oy2 = 118, 96 + az + 176
+    b.ansicht(ox, oy2 - 78, "QUERSCHNITT — gilt für alle Segmente")
+    b.rect(ox, oy2, ax, az, FLAECHE)
+    b.rect(ox + W, oy2 + BO, M["innen_x"] * K, M["innen_z"] * K, PAPIER, HILF, 0.9, "5 3")
+    nb = M["nut_b"] * K
+    b.rect(ox + ax / 2 - nb / 2, oy2 + az - BO, nb, M["nut_t"] * K, "#f0d9c8", MASSL, 1.2)
+    # Beutel eingezeichnet
+    bb, bh = M["beutel_b"] * K, M["beutel_h"] * K
+    b.rect(ox + W + 2 * K, oy2 + BO, bb, bh, "#cdd0d6", "#9aa0a8", 1.0)
+    b.txt(ox + W + 2 * K + bb / 2, oy2 + BO + bh / 2, "Beutel", 10, "middle", "#5a6068")
+    b.mh(ox, ox + ax, oy2 + az + 40, f'{M["aussen_x"]:.1f}'.replace(".", ","), "Außenbreite", von=oy2 + az)
+    b.mh(ox + W, ox + W + 2 * K, oy2 - 34, "Luft 2", "", von=oy2, oben=True)
+    b.mh(ox + W + 2 * K + bb, ox + ax - W, oy2 - 34, "Luft 2", "", von=oy2, oben=True)
+    b.mv(oy2 + BO, oy2 + BO + bh, ox + ax + 40, f'{M["beutel_h"]:.0f}', "Beutelhöhe", von=ox + ax)
+    b.mv(oy2 + BO + bh, oy2 + az, ox + ax + 40, f'{M["innen_z"] - M["beutel_h"]:.0f}', "Luft oben", von=ox + ax)
+    b.mv(oy2 + az - BO, oy2 + az, ox - 34, f'{M["boden"]:.1f}'.replace(".", ","), "Boden", von=ox)
+
+    b.legende(ox + ax + 150, oy2 + 20, [
+        (1, "Bodenzunge nach hinten", "9 lang"),
+        (2, "Aufnahme für die Zunge des Vordermanns", "9 tief"),
+        (3, "Fenster, spart Material und zeigt den Füllstand", "132 x 114"),
+        (4, "Rückwand, schließt den Kanal", "1,6 dick"),
+        (5, "Sichtschlitz in der Rückwand", "68 x 106"),
+    ], spalten=1)
+
+    b.titel("Mittel- und Endsegment", "Mittelstück beliebig oft wiederholbar, "
+            "Endstück schließt hinten ab", "TEIL 02 / 03")
+    return b.save("02-mittel-endsegment.svg")
+
+
+# =====================================================================
+def blatt3():
+    K = 2.0
+    b = Blatt(1300, 860)
+    bb = (M["innen_x"] - 1.2) * K
+    hh = (M["beutel_h"] - 8) * K
+    fu = 36 * K
+
+    ox, oy = 118, 96
+    b.ansicht(ox, oy - 78, "SCHIEBER — SEITENANSICHT")
+    b.rect(ox, oy, fu, hh, FLAECHE)
+    b.rect(ox, oy, 2.6 * K, hh, "#3d3d43")                     # Stuetzplatte
+    b.rect(ox, oy + hh - 3 * K, fu, 3 * K, "#d8d3cb")          # Fuss
+    ay_ = 4 * K + M["feder_d"] * K / 2
+    axh = M["feder_d"] * K / 2 + 4 * K
+    b.kreis(ox + ay_, oy + hh - axh, M["feder_d"] * K / 2, "#f0d9c8", MASSL, 1.5)
+    b.kreis(ox + ay_, oy + hh - axh, M["achse"] * K / 2, MASSL, MASSL, 1.0)
+    b.rect(ox, oy + hh - 3 * K - 3 * K, 2.6 * K + 4, 3 * K, "none", MASSL, 1.3)
+
+    b.pos(1, ox + ay_ + M["feder_d"] * K / 2 - 6, oy + hh - axh - 14,
+          ox + fu + 66, oy + 44)
+    b.pos(2, ox + ay_, oy + hh - axh, ox + fu + 66, oy + 92)
+    b.pos(3, ox + 4, oy + hh - 5 * K, ox - 62, oy + hh + 34)
+    b.pos(4, ox + fu / 2, oy + 14, ox + fu / 2, oy - 44)
+
+    b.mh(ox, ox + fu, oy + hh + 44, "36", "Fußlänge", von=oy + hh)
+    b.mv(oy, oy + hh, ox - 34, "128", "Schieberhöhe", von=ox)
+    b.mv(oy + hh - axh - M["feder_d"] * K / 2, oy + hh - axh + M["feder_d"] * K / 2,
+         ox + fu + 150, "26", "max Rollendurchmesser")
+
+    ox2 = ox + fu + 250
+    b.ansicht(ox2, oy - 78, "SCHIEBER — VORDERANSICHT")
+    b.rect(ox2, oy, bb, hh, FLAECHE)
+    kb = (M["feder_b"] + 1.6) * K
+    b.rect(ox2 + bb / 2 - kb / 2, oy + hh - (axh + M["feder_d"] * K / 2) - 4 * K,
+           kb, axh + M["feder_d"] * K / 2, PAPIER, MASSL, 1.3, "5 3")
+    b.mh(ox2, ox2 + bb, oy + hh + 44, "90,8", "Breite, gleitet im Kanal", von=oy + hh)
+    b.mh(ox2 + bb / 2 - kb / 2, ox2 + bb / 2 + kb / 2, oy - 34, "17,6", "Federkammer",
+         von=oy + hh - (axh + M["feder_d"] * K / 2) - 4 * K, oben=True)
+
+    # Schild
+    oy3 = oy + hh + 118
+    Ks = 3.0
+    b.ansicht(ox, oy3 - 22, "SCHILD — Aufteilung der Fläche")
+    Ks2 = 2.6
+    sb, sh = M["schild_b"] * Ks2, M["schild_h"] * Ks2
+    rand = 4 * Ks2
+    text_h = M["schild_h"] * 0.30 * Ks2
+    sym_h = sh - text_h - 2 * rand
+    b.rect(ox, oy3, sb, sh, "#f0d9c8", MASSL, 1.4)
+    # Symbolfeld oben, quadratisch und fuer alle Sorten gleich
+    sf = min(M["schild_h"] * 0.70 - 8, M["schild_b"] - 8) * 0.94 * Ks2
+    b.rect(ox + sb / 2 - sf / 2, oy3 + rand + sym_h / 2 - sf / 2, sf, sf,
+           "none", LINIE, 1.0, "5 3")
+    b.txt(ox + sb / 2, oy3 + rand + sym_h / 2 + 4, "SYMBOL",
+          11, "middle", GRAU, "700")
+    # Namenszeile darunter
+    b.rect(ox + rand, oy3 + rand + sym_h, sb - 2 * rand, text_h,
+           "none", LINIE, 1.0, "5 3")
+    b.txt(ox + sb / 2, oy3 + rand + sym_h + text_h / 2 + 4, "NAME",
+          11, "middle", GRAU, "700")
+
+    b.mh(ox, ox + sb, oy3 + sh + 40, f'{M["schild_b"]:.0f}', "Schildbreite",
+         von=oy3 + sh)
+    b.mv(oy3, oy3 + sh, ox - 34, f'{M["schild_h"]:.0f}', "Schildhöhe", von=ox)
+    b.mv(oy3 + rand + sym_h, oy3 + rand + sym_h + text_h, ox + sb + 40,
+         f'{M["schild_h"] * 0.30:.0f}', "Namenszeile", von=ox + sb)
+    b.mv(oy3 + rand + sym_h / 2 - sf / 2,
+         oy3 + rand + sym_h / 2 + sf / 2, ox + sb + 100,
+         f'{min(M["schild_h"] * 0.70 - 8, M["schild_b"] - 8) * 0.94:.0f}',
+         "Symbolfeld", von=ox + sb)
+    b.txt(ox, oy3 + sh + 78, "Symbolfeld und Schriftgröße sind bei jeder Sorte "
+          "gleich — die Zeichnungen werden auf dasselbe Feld skaliert,",
+          10.5, "start")
+    b.txt(ox, oy3 + sh + 96, "die Schrift richtet sich nach dem längsten Namen "
+          "(KANINCHEN). So wirken die Tafeln nebeneinander einheitlich.",
+          10.5, "start", GRAU)
+    b.txt(ox, oy3 + sh + 118, "Platte orange, Symbol und Name 0,6 mm vertieft — "
+          "wer zwei Farben hat, druckt den Schriftkörper schwarz dazu.",
+          10.5, "start", GRAU)
+
+    # Achse
+    ox4 = ox + 520
+    b.ansicht(ox4, oy3 - 22, "ACHSE — Zukaufteil")
+    b.rect(ox4, oy3 + 12, 210, M["achse"] * Ks, "#d8d3cb")
+    b.mh(ox4, ox4 + 210, oy3 + 58, "ca. 90", "Länge, bündig kürzen", von=oy3 + 12 + M["achse"] * Ks)
+    b.txt(ox4, oy3 + 88, "Rundstab 3 mm: Stahldraht, Messing", 10.5, "start")
+    b.txt(ox4, oy3 + 106, "oder ein Stück 3-mm-Filament", 10.5, "start", GRAU)
+
+    b.legende(ox + 810, oy3 - 22, [
+        (1, "Kammer nimmt die Federrolle auf", "17,6 breit"),
+        (2, "Achsbohrung durch beide Wangen", "3,2"),
+        (3, "Austritt des Federbands nach vorne", "16,8 x 3"),
+        (4, "Grifflasche zum Zurückziehen", "32 breit"),
+    ], spalten=1)
+
+    b.titel("Schieber, Schild und Achse", "Der Schieber trägt die Feder, das Schild "
+            "sitzt in der Frontwand", "TEIL 04 / 05 / 06")
+    return b.save("03-schieber-schild.svg")
+
+
+
+warnungen = []
+for f, k in (blatt1(), blatt2(), blatt3()):
+    print("  " + f)
+    warnungen += k
+if warnungen:
+    print("\nUEBERLAPPUNGEN:")
+    for w in warnungen:
+        print("  ! " + w)
+else:
+    print("\nkeine Ueberlappungen")
