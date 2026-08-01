@@ -117,6 +117,9 @@ rast_h = 0.45;         // wie weit sie vorsteht
 
 /* [Beschriftung] */
 schild_text = "HUHN";
+// Symbol über dem Text: huhn, rind, lachs, kaninchen, ente, truthahn,
+// lamm, thunfisch, wild, gefluegel, leer
+schild_symbol = "huhn";
 schild_breite = 78;
 schild_hoehe = 62;
 // Laengster vorkommender Sortenname in Zeichen. Danach richtet sich die
@@ -481,23 +484,197 @@ module schild_platte() {
                 translate([px, py]) circle(r = 1.4);
 }
 
-// Der Name mittig auf der Tafel. Lange Sortennamen wie KANINCHEN werden
-// schmaler gesetzt, damit sie nicht über den Rand laufen.
+// ---------------------------------------------------------------------
+//  Sortensymbole
+// ---------------------------------------------------------------------
+// Jedes Symbol zeichnet in ein Feld von 20 x 20 um den Nullpunkt. Sie
+// sind aus Kreisen und Polygonen zusammengesetzt statt aus einer langen
+// Punktliste - so bleibt jede Form einzeln nachvollziehbar und änderbar.
+module sym_huhn() {
+    union() {
+        scale([1.0, 0.85]) circle(r = 6.2);              // Rumpf
+        translate([3.6, 6.2]) circle(r = 3.3);           // Kopf
+        hull() { translate([3.6, 6.2]) circle(r = 2.6);
+                 translate([1.6, 1.0]) circle(r = 3.4); }// Hals
+        translate([6.4, 6.8]) polygon([[0,1.6],[3.9,0],[0,-1.6]]);   // Schnabel
+        for (k = [0, 1, 2])                              // Kamm
+            translate([2.2 + k * 1.5, 9.2 + (k == 1 ? 0.7 : 0)]) circle(r = 1.25);
+        translate([1.0, 3.4]) circle(r = 1.0);           // Kehllappen
+        hull() { translate([-5.2, 1.4]) circle(r = 2.2);  // Schwanzfedern
+                 translate([-9.4, 7.6]) circle(r = 1.0);
+                 translate([-8.6, 3.0]) circle(r = 1.0); }
+        for (bx = [-1.8, 1.8])                           // Beine
+            translate([bx - 0.7, -9.4]) square([1.5, 5.0]);
+        for (bx = [-2.5, 1.1])
+            translate([bx, -9.8]) square([3.0, 1.4]);
+    }
+}
+
+module sym_rind() {
+    union() {
+        translate([-0.5, 0.6]) scale([1.25, 0.78]) circle(r = 6.4);  // Rumpf
+        translate([6.0, 3.4]) scale([0.95, 1.0]) circle(r = 3.5);    // Kopf
+        translate([7.4, 0.6]) scale([0.8, 1.0]) circle(r = 2.3);     // Maul
+        for (s = [-1, 1])                                            // Hörner
+            translate([5.2, 6.4]) rotate(s * 34)
+                hull() { circle(r = 1.15); translate([0, 3.6]) circle(r = 0.62); }
+        for (bx = [-6.2, -3.0, 2.4, 5.2])                            // Beine
+            translate([bx, -10.2]) square([2.1, 6.2]);
+        hull() { translate([-7.4, 3.6]) circle(r = 1.0);             // Schwanz
+                 translate([-9.6, -3.4]) circle(r = 0.55); }
+        translate([-9.9, -4.6]) circle(r = 1.25);                    // Quaste
+    }
+}
+
+module sym_fisch() {
+    union() {
+        // Rumpf: vorne rund, hinten spitz zulaufend
+        hull() { translate([-1.0, 0]) scale([1.0, 0.92]) circle(r = 6.0);
+                 translate([8.6, 0]) circle(r = 1.6); }
+        hull() { translate([-1.0, 0]) scale([1.0, 0.92]) circle(r = 5.8);
+                 translate([-7.4, 0]) circle(r = 1.4); }
+        translate([-7.0, 0])                                          // Schwanzflosse
+            polygon([[0,1.8],[-4.8,5.6],[-3.6,0],[-4.8,-5.6],[0,-1.8]]);
+        translate([-1.2, 4.4]) polygon([[-3.4,0.6],[1.2,4.6],[4.0,0.2]]);  // Rücken
+        translate([-0.6, -4.4]) polygon([[-2.6,-0.4],[0.6,-3.6],[3.2,-0.2]]); // Bauch
+        translate([5.6, 1.6]) circle(r = 1.05);                      // Auge
+    }
+}
+
+module sym_kaninchen() {
+    union() {
+        // Sitzendes Kaninchen im Profil: runder Rumpf, Kopf deutlich höher
+        // abgesetzt, darüber zwei senkrechte Ohren mit sichtbarer Lücke.
+        translate([-2.4, -3.4]) scale([1.1, 1.0]) circle(r = 5.4);   // Rumpf
+        translate([3.8, 3.0]) circle(r = 3.1);                       // Kopf
+        hull() { translate([3.8, 3.0]) circle(r = 2.4);              // Hals
+                 translate([0.6, -1.6]) circle(r = 3.0); }
+        for (s = [0, 1])                                             // Ohren
+            translate([2.4 + s * 3.4, 5.4])
+                hull() { scale([0.58, 1]) circle(r = 1.2);
+                         translate([s ? 0.9 : -0.9, 6.6])
+                             scale([0.46, 1]) circle(r = 0.85); }
+        translate([6.6, 2.0]) scale([1.0, 0.82]) circle(r = 1.5);    // Schnauze
+        translate([-8.0, -2.6]) circle(r = 2.1);                     // Blume
+        for (bx = [-5.0, -0.6])                                      // Läufe
+            translate([bx, -9.6]) scale([1.7, 0.62]) circle(r = 2.2);
+    }
+}
+
+module sym_ente() {
+    union() {
+        translate([-1.0, -1.4]) scale([1.35, 0.8]) circle(r = 6.0);  // Rumpf
+        translate([4.4, 5.0]) circle(r = 3.0);                       // Kopf
+        hull() { translate([4.4, 5.0]) circle(r = 2.4);
+                 translate([2.4, -0.6]) circle(r = 3.0); }           // Hals
+        translate([6.8, 4.6]) polygon([[0,1.5],[4.6,0.4],[4.6,-0.8],[0,-1.5]]); // Schnabel
+        hull() { translate([-6.0, 0.4]) circle(r = 2.0);             // Schwanz
+                 translate([-10.2, 3.2]) circle(r = 0.7); }
+        translate([-1.0, -1.0]) rotate(-16) scale([1.0, 0.45]) circle(r = 4.0); // Flügel
+    }
+}
+
+module sym_truthahn() {
+    union() {
+        // Radschlagender Schwanz: ein Halbkreis hinter dem Körper, aus dem
+        // schmale Kerben die einzelnen Federn schneiden
+        translate([-1.8, 0.6]) difference() {
+            scale([0.92, 1.0]) circle(r = 10.4);
+            for (k = [-3 : 3]) rotate(96 + k * 24)
+                translate([5.0, 0]) square([12, 1.5], center = true);
+            translate([0, -12]) square([26, 12], center = true);
+            circle(r = 4.2);
+        }
+        translate([2.0, -1.6]) scale([1.0, 0.92]) circle(r = 5.2);   // Rumpf
+        translate([5.8, 3.8]) circle(r = 2.6);                       // Kopf
+        hull() { translate([5.8, 3.8]) circle(r = 2.1);
+                 translate([3.4, -1.0]) circle(r = 2.8); }           // Hals
+        translate([8.0, 4.0]) polygon([[0,1.3],[3.2,0],[0,-1.3]]);   // Schnabel
+        hull() { translate([7.4, 2.4]) circle(r = 0.85);             // Stirnlappen
+                 translate([8.6, -1.0]) circle(r = 0.62); }
+        for (bx = [0.6, 3.4]) translate([bx, -9.8]) square([1.5, 4.2]);
+    }
+}
+
+module sym_lamm() {
+    union() {
+        for (p = [[-4.6,1.4],[-1.4,3.4],[2.0,2.6],[-3.0,-1.6],[0.4,-0.8]])
+            translate(p) circle(r = 3.5);                            // Wollrücken
+        translate([5.6, 2.6]) scale([0.86, 1.0]) circle(r = 3.0);    // Kopf
+        for (s = [-1, 1])                                            // Ohren
+            translate([5.0, 4.4 * s + 1.0]) rotate(s * 26)
+                scale([1.0, 0.44]) circle(r = 2.6);
+        translate([7.2, 0.6]) circle(r = 1.5);                       // Schnauze
+        for (bx = [-4.4, -1.2, 2.0, 4.6])
+            translate([bx, -9.0]) square([1.7, 5.0]);
+    }
+}
+
+module sym_wild() {                                                   // Hirsch
+    union() {
+        translate([-0.8, 0]) scale([1.2, 0.8]) circle(r = 5.8);      // Rumpf
+        translate([5.6, 4.2]) scale([0.8, 1.0]) circle(r = 2.8);     // Kopf
+        hull() { translate([5.6, 4.2]) circle(r = 2.2);
+                 translate([3.0, -0.6]) circle(r = 3.0); }           // Hals
+        translate([7.4, 2.0]) scale([0.9, 0.7]) circle(r = 1.8);     // Nase
+        for (s = [0, 1])                                             // Geweih
+            translate([4.6 + s * 2.2, 6.6]) rotate(s ? 22 : -16) {
+                hull() { circle(r = 0.85); translate([0, 4.2]) circle(r = 0.5); }
+                translate([0, 2.0]) rotate(s ? 42 : -42)
+                    hull() { circle(r = 0.7); translate([0, 2.6]) circle(r = 0.42); }
+            }
+        for (bx = [-5.4, -2.4, 1.8, 4.4])
+            translate([bx, -9.8]) square([1.7, 6.0]);
+        hull() { translate([-6.4, 2.6]) circle(r = 1.4);
+                 translate([-7.6, 5.0]) circle(r = 0.8); }           // Wedel
+    }
+}
+
+// Sortensymbol nach Name. Unbekannte Namen ergeben kein Symbol.
+module schild_sym(name) {
+    if      (name == "huhn"      || name == "gefluegel") sym_huhn();
+    else if (name == "rind")                             sym_rind();
+    else if (name == "lachs"     || name == "thunfisch"
+          || name == "fisch"     || name == "forelle")   sym_fisch();
+    else if (name == "kaninchen")                        sym_kaninchen();
+    else if (name == "ente")                             sym_ente();
+    else if (name == "truthahn")                         sym_truthahn();
+    else if (name == "lamm")                             sym_lamm();
+    else if (name == "wild")                             sym_wild();
+}
+
+// Symbol oben, Name darunter - beides mittig. So füllt das Schild die
+// Frontwand über die ganze Höhe aus und ist schon von weitem zu erkennen.
+// Lange Sortennamen wie KANINCHEN werden schmaler gesetzt, damit sie nicht
+// über den Rand laufen.
 module schild_schrift(h = schild_gravur) {
+    hat_sym = schild_symbol != "leer" && schild_symbol != "";
     rand    = 4;
     breite  = schild_breite - 2 * rand;
-    text_h  = schild_hoehe - 2 * rand;
+    // untere Zone für den Namen, der Rest gehört dem Symbol
+    text_h  = hat_sym ? schild_hoehe * 0.30 : schild_hoehe - 2 * rand;
+    sym_h   = schild_hoehe - text_h - 2 * rand;
     // Die Schriftgröße richtet sich nach dem längsten vorkommenden Namen,
     // nicht nach dem gerade gesetzten. Sonst stünde auf jedem Schild eine
     // andere Größe und die Tafeln wirkten uneinheitlich.
     // Versalien in Helvetica Bold sind rund 0,78 em breit.
     groesse = min(text_h * 0.92, breite / (schild_namen_max * 0.78));
     translate([0, 0, schild_dicke - schild_gravur]) linear_extrude(height = h) {
+        if (hat_sym)
+            // resize bringt jedes Symbol auf dasselbe Feld. Ohne das wäre
+            // der breite Fisch groß und das schmale Huhn klein, weil die
+            // Zeichnungen unterschiedliche Eigenmaße haben.
+            translate([schild_breite / 2, rand + text_h + sym_h / 2])
+                resize([sym_feld(), sym_feld()], auto = true)
+                    schild_sym(schild_symbol);
         translate([schild_breite / 2, rand + text_h / 2])
             text(schild_text, size = groesse, halign = "center",
                  valign = "center", font = "Helvetica:style=Bold");
     }
 }
+
+// Kantenlänge des quadratischen Symbolfelds - für alle Sorten gleich
+function sym_feld() = min(schild_hoehe * 0.70 - 8, schild_breite - 8) * 0.94;
 
 module schild() {
     difference() {
