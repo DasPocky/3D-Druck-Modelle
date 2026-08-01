@@ -24,9 +24,10 @@
 
 /* [Was soll gerendert werden] */
 // segment = Kanalsegment (Typ über segment_typ), schieber, schild,
-// probe = Passprobe, layout = Vorschau im Schrank, schnitt = Längsschnitt,
+// trommel = Wickeltrommel für die Feder, probe = Passprobe,
+// layout = Vorschau im Schrank, schnitt = Längsschnitt,
 // test = Kollisionsprüfung gestapelter Ebenen (Ergebnis muss leer sein)
-TEIL = "segment";  // [segment, schieber, schild, schild_text, verbinder, probe, layout, schnitt, test]
+TEIL = "segment";  // [segment, schieber, schild, schild_text, verbinder, trommel, probe, layout, schnitt, test]
 
 // front = vorderstes Segment mit Anschlagkante und Schildhalter
 // mitte = beidseitig offenes Zwischenstück, beliebig oft
@@ -93,12 +94,27 @@ boden_offen = true;
 // das Bandende hängt vorne im Haken des Frontsegments.
 bandnut = true;
 // Nut im Boden, in der das Federband läuft
-bandnut_breite = 18;
+bandnut_breite = 17;
 bandnut_tiefe = 1.6;
-// Maße der Federrolle - nach dem Kauf hier eintragen
-feder_rolle_d = 26;    // Durchmesser der aufgerollten Feder
-feder_band_b  = 16;    // Bandbreite
-feder_achse_d = 3.2;   // Bohrung für die Achse (3 mm Stab oder Filament)
+
+// Gewählte Feder: Sodemann/Febrotec CF030-0237
+//   10,5 N | Auszug 610 mm | Band 14,99 mm | Rolle 22,0 mm außen
+// Band mit 16 mm bei 8-12 N gibt es nicht ab Lager: die Kraft wächst mit
+// Bandbreite mal Banddicke im Quadrat, bei 15,87 mm Band liegt die
+// Standardfeder schon bei 14,7 N. 15 mm Band ist das nächstliegende Maß.
+feder_rolle_d = 22.0;  // Außendurchmesser der aufgerollten Feder
+feder_band_b  = 15.0;  // Bandbreite
+feder_achse_d = 3.2;   // Bohrung für die Achse: 3-mm-Rundstab, Spielpassung
+feder_auszug  = 610;   // Lmax laut Datenblatt - darüber reißt die Feder
+
+// Die Feder wickelt NICHT auf der 3-mm-Achse: ihr natürlicher
+// Innendurchmesser liegt bei 11-17 mm. Der Hersteller verlangt eine
+// Trommel 10-20 % über diesem Maß, für die CF030-0237 sind das 20,7 mm.
+// Zu klein heißt höhere Biegespannung und kürzere Lebensdauer.
+// Die Trommel wird mitgedruckt (TEIL="trommel") und läuft frei auf der Achse.
+trommel_d = 20.7;      // Wickeldurchmesser
+trommel_b = 17.0;      // Breite - etwas mehr als das Band
+trommel_spiel = 0.25;  // Luft auf der Achse, damit sie frei dreht
 
 /* [Verbindungen] */
 // Die Ebenen stehen aufeinander, die Spalten nebeneinander. Beides wird
@@ -411,21 +427,61 @@ module schildhalter() {
 }
 
 // ---------------------------------------------------------------------
+//  Wickeltrommel für die Konstantkraftfeder
+//
+//  Die Feder darf nicht auf der 3-mm-Achse aufwickeln - ihr natürlicher
+//  Innendurchmesser ist um ein Vielfaches größer, und ein zu enger Wickel
+//  erhöht die Biegespannung im Band. Diese Trommel bringt sie auf das vom
+//  Hersteller verlangte Maß und läuft frei auf der Achse.
+//
+//  Liegend drucken (Achse senkrecht): dann ist die Bohrung rund und es
+//  braucht keine Stützen.
+// ---------------------------------------------------------------------
+function trommel_bord_d() = trommel_d + 3.0;   // Bordscheiben-Durchmesser
+function trommel_bord_b() = 1.2;               // Dicke einer Bordscheibe
+function trommel_ganz_b() = trommel_b + 2 * trommel_bord_b();
+
+module trommel() {
+    bohrung = 3.0 + 2 * trommel_spiel;
+    difference() {
+        union() {
+            // Wickelkörper
+            translate([0, 0, trommel_bord_b()])
+                cylinder(d = trommel_d, h = trommel_b);
+            // Bordscheiben, damit das Band nicht seitlich von der Rolle läuft
+            for (zp = [0, trommel_bord_b() + trommel_b])
+                translate([0, 0, zp])
+                    cylinder(d = trommel_bord_d(), h = trommel_bord_b());
+        }
+        // Achsbohrung, durchgehend
+        translate([0, 0, -1])
+            cylinder(d = bohrung, h = trommel_ganz_b() + 2);
+        // Fase an beiden Enden, damit sie sich auf die Achse fädeln lässt
+        for (zp = [0, trommel_ganz_b()])
+            translate([0, 0, zp])
+                rotate([zp > 0 ? 0 : 180, 0, 0])
+                    cylinder(d1 = bohrung + 1.2, d2 = bohrung, h = 0.6);
+    }
+}
+
+// ---------------------------------------------------------------------
 //  Schieber
 //
-//  Drückt die Beutel nach vorne. Unten ein Haken für ein Gummiband, das
-//  in der Bodennut nach vorne läuft; die Grifflasche erlaubt zusätzlich
-//  das Nachschieben von Hand.
+//  Drückt die Beutel nach vorne. Im Fuß sitzt die Federtrommel auf einer
+//  3-mm-Achse; das Band läuft unten nach vorne in die Bodennut. Die
+//  Grifflasche erlaubt zusätzlich das Nachschieben von Hand.
 // ---------------------------------------------------------------------
 module schieber() {
     b   = innen_x - 1.2;
     h   = beutel_hoch - 8;
     d   = 2.6;
     fu  = 36;                         // Fußlänge, nimmt die Federrolle auf
-    kb  = feder_band_b + 1.6;         // lichte Breite der Federkammer
+    kb  = trommel_ganz_b() + 1.2;     // lichte Breite der Federkammer
     kx  = (b - kb) / 2;               // Kammer mittig
-    ax  = feder_rolle_d / 2 + 4;      // Achshöhe über dem Boden
-    ay  = 4 + feder_rolle_d / 2;      // Achsposition in der Tiefe
+    // Achse so hoch, dass Trommel und aufgewickelte Feder frei laufen
+    rmax = max(feder_rolle_d, trommel_bord_d()) / 2;
+    ax  = rmax + 4;                   // Achshöhe über dem Boden
+    ay  = 4 + rmax;                   // Achsposition in der Tiefe
 
     difference() {
         union() {
@@ -439,7 +495,7 @@ module schieber() {
             // Wangen der Federkammer, tragen die Achse
             for (xp = [kx - 3.2, kx + kb])
                 translate([xp, d, 0])
-                    cube([3.2, fu - d, ax + feder_rolle_d / 2 + 4]);
+                    cube([3.2, fu - d, ax + rmax + 4]);
             // Aussteifungen außerhalb der Kammer. Sie greifen 0,6 mm in die
             // Stützfläche hinein - eine bloße Berührung ergäbe zwei Flächen
             // auf derselben Ebene und damit ein undichtes Netz.
@@ -460,8 +516,8 @@ module schieber() {
         translate([(b - feder_band_b - 0.8) / 2, -1, 3.2])
             cube([feder_band_b + 0.8, d + 2, 3.0]);
         // Gewicht sparen, oberhalb der Kammer
-        translate([10, -1, ax + feder_rolle_d / 2 + 10])
-            cube([b - 20, d + 2, h - ax - feder_rolle_d / 2 - 24]);
+        translate([10, -1, ax + rmax + 10])
+            cube([b - 20, d + 2, h - ax - rmax - 24]);
     }
 }
 
@@ -808,6 +864,7 @@ if (TEIL == "segment")       segment();
 else if (TEIL == "schieber") schieber();
 else if (TEIL == "schild")   schild();
 else if (TEIL == "verbinder") verbinder();
+else if (TEIL == "trommel")  trommel();
 else if (TEIL == "schild_text") schild_schrift();
 else if (TEIL == "probe")    probe();
 else if (TEIL == "schnitt")  schnitt();
