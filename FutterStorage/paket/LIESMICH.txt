@@ -1,0 +1,19 @@
+FUTTERSTORAGE
+=============
+
+Oeffne index.html im Browser - von dort aus ist alles verlinkt.
+
+  index.html          Uebersicht und Einstieg
+  bauanleitung.html   Was gedruckt und gekauft wird, wie es zusammengeht
+  technik.html        Wie das Modell entstanden ist, Code und Werkzeuge
+  zeichnungen.html    Die fuenf bemassten Blaetter zum Durchblaettern
+  galerie.html        Alle zehn Renderings, klickbar in voller Groesse
+
+  stl/                Sieben druckfertige Dateien fuer den Slicer
+  zeichnungen/        Sieben bemasste Blaetter (SVG, beliebig skalierbar)
+  bilder/             Zehn Renderings in voller Aufloesung (PNG)
+  web/                Dieselben Bilder klein - werden von den Seiten geladen
+  modell/             Die OpenSCAD-Quelldatei, alle Masse parametrisch
+
+Die Seiten laufen ohne Internet: einfach index.html doppelklicken.
+Alle Masse in Millimetern.

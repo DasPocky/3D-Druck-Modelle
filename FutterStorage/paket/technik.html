@@ -1,0 +1,519 @@
+<title>Technische Umsetzung &mdash; FutterStorage</title>
+<style>
+:root{--ink:#17171b;--ink2:#3d3d43;--paper:#f7f5f2;--paper2:#fff;--akzent:#bd4d0a;
+--grau:#6e6a65;--linie:#e3ded7;--code:#eee9e2;--bild:#d7d8dc;
+--schatten:0 1px 2px rgba(23,23,27,.05),0 10px 28px rgba(23,23,27,.05);
+--sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+--mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--ink:#eceae6;--ink2:#bcb8b1;--paper:#131316;
+--paper2:#1c1c21;--akzent:#ff8a47;--grau:#918c85;--linie:#2d2d33;--code:#232329;
+--bild:#25252a;--schatten:0 1px 2px rgba(0,0,0,.45),0 10px 28px rgba(0,0,0,.32)}}
+:root[data-theme=dark]{--ink:#eceae6;--ink2:#bcb8b1;--paper:#131316;--paper2:#1c1c21;
+--akzent:#ff8a47;--grau:#918c85;--linie:#2d2d33;--code:#232329;--bild:#25252a;
+--schatten:0 1px 2px rgba(0,0,0,.45),0 10px 28px rgba(0,0,0,.32)}
+:root[data-theme=light]{--ink:#17171b;--ink2:#3d3d43;--paper:#f7f5f2;--paper2:#fff;
+--akzent:#bd4d0a;--grau:#6e6a65;--linie:#e3ded7;--code:#eee9e2;--bild:#d7d8dc;
+--schatten:0 1px 2px rgba(23,23,27,.05),0 10px 28px rgba(23,23,27,.05)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+font-size:16.5px;line-height:1.68;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1160px;margin:0 auto;padding:0 26px 110px}
+.text{max-width:70ch}
+nav{border-bottom:1px solid var(--linie);margin-bottom:0}
+nav .in{max-width:1160px;margin:0 auto;padding:14px 26px;display:flex;gap:26px;
+align-items:baseline;flex-wrap:wrap}
+nav a{color:var(--grau);text-decoration:none;font-size:.92rem}
+nav a:hover{color:var(--akzent)}
+nav a.hier{color:var(--ink);font-weight:600}
+nav .marke{font-family:var(--mono);font-size:.8rem;letter-spacing:.12em;
+text-transform:uppercase;color:var(--akzent);margin-right:auto}
+header{padding:66px 0 32px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.15em;
+text-transform:uppercase;color:var(--akzent);margin:0 0 14px}
+h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.06;margin:0 0 18px;
+letter-spacing:-.026em;font-weight:780;text-wrap:balance;max-width:17ch}
+.lead{font-size:1.12rem;color:var(--ink2);margin:0;max-width:62ch}
+.kz-reihe{display:grid;grid-template-columns:repeat(auto-fit,minmax(124px,1fr));
+gap:1px;background:var(--linie);border:1px solid var(--linie);margin:40px 0 0}
+.kz{background:var(--paper);padding:16px 18px}
+.kz b{display:block;font-family:var(--mono);font-size:1.5rem;font-weight:600;
+letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.kz span{font-size:12.5px;color:var(--grau)}
+section{padding-top:70px}
+h2{font-size:1.58rem;letter-spacing:-.02em;margin:0 0 6px;font-weight:720;
+display:flex;align-items:baseline;gap:14px}
+h2::before{content:attr(data-nr);font-family:var(--mono);font-size:.8rem;
+color:var(--akzent);font-weight:500}
+h3{font-size:1.07rem;margin:34px 0 8px;font-weight:670}
+h4{font-size:.99rem;margin:20px 0 6px;font-weight:660}
+.unter{color:var(--grau);margin:0 0 22px;font-size:.96rem;max-width:66ch}
+p{margin:0 0 15px}
+ul,ol{margin:0 0 15px;padding-left:20px}
+li{margin-bottom:7px}
+a{color:var(--akzent);text-underline-offset:2px}
+.karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(288px,1fr));gap:22px}
+.karten{align-items:stretch}
+.karte{background:var(--paper2);border:1px solid var(--linie);
+box-shadow:var(--schatten);display:flex;flex-direction:column}
+.karte figure{aspect-ratio:4/3;overflow:hidden;display:flex}
+.karte img{object-fit:contain;height:100%}
+.karte figure{margin:0;background:var(--bild)}
+.karte img{display:block;width:100%;height:auto}
+.karte .txt{padding:16px 18px 19px;display:flex;flex-direction:column;gap:9px;flex:1}
+.karte h4{margin:0;font-size:1.02rem;font-weight:690}
+.dat{font-family:var(--mono);font-size:12.5px;color:var(--grau);
+font-variant-numeric:tabular-nums}
+.karte p{margin:0;font-size:.93rem;color:var(--ink2)}
+.anz{align-self:flex-start;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;
+text-transform:uppercase;background:var(--akzent);color:#fff;padding:3px 9px}
+:root[data-theme=dark] .anz{color:#17171b}
+@media(prefers-color-scheme:dark){.anz{color:#17171b}}
+figure.gross{margin:26px 0 6px;background:var(--bild);border:1px solid var(--linie)}
+figure.gross img{display:block;width:100%;height:auto}
+figure.plan{margin:26px 0 6px;background:#f7f5f2;border:1px solid var(--linie);padding:0}
+figure.plan img{display:block;width:100%;height:auto}
+figcaption{font-size:.89rem;color:var(--grau);padding:10px 2px 0;max-width:78ch}
+.kauf{border:2px solid var(--akzent);background:var(--paper2);padding:24px 26px;
+margin:22px 0 8px}
+.kauf h3{margin-top:0}
+.kauf dl{display:grid;grid-template-columns:max-content 1fr;gap:8px 22px;margin:0}
+.kauf dt{font-family:var(--mono);font-size:12.5px;color:var(--grau)}
+.kauf dd{margin:0}
+.tab{overflow-x:auto;margin:20px 0;border:1px solid var(--linie)}
+table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--paper2)}
+th,td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--linie);
+white-space:nowrap}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
+color:var(--grau);font-weight:500;background:var(--code)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+td.w{white-space:normal;min-width:210px}
+tbody tr:last-child td{border-bottom:none}
+tfoot td{font-weight:650;background:var(--code);border-bottom:none}
+ol.schritte{list-style:none;counter-reset:s;padding:0;margin:24px 0 0;max-width:74ch}
+ol.schritte>li{counter-increment:s;position:relative;padding:0 0 26px 52px;
+border-left:1px solid var(--linie);margin-left:15px}
+ol.schritte>li:last-child{border-left-color:transparent;padding-bottom:0}
+ol.schritte>li::before{content:counter(s);position:absolute;left:-15px;top:-3px;
+width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);
+font-family:var(--mono);font-size:13px;font-weight:600;display:grid;place-items:center}
+ol.schritte h4{margin:3px 0 6px;font-size:1.03rem;font-weight:680}
+ol.schritte p{font-size:.96rem;color:var(--ink2)}
+.hinweis{border-left:3px solid var(--akzent);padding:2px 0 2px 17px;margin:18px 0;
+color:var(--ink2);font-size:.96rem;max-width:70ch}
+code{font-family:var(--mono);font-size:.89em;background:var(--code);padding:1px 5px}
+pre{background:var(--code);padding:16px 18px;overflow-x:auto;font-family:var(--mono);
+font-size:.84rem;line-height:1.55;margin:14px 0;border-left:3px solid var(--linie)}
+pre code{background:none;padding:0}
+.kachel{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;
+margin:30px 0 0}
+.kachel{align-items:stretch}
+.kachel a{display:flex;flex-direction:column;background:var(--paper2);
+border:1px solid var(--linie);padding:22px 24px;text-decoration:none;
+color:var(--ink);box-shadow:var(--schatten)}
+.kachel a p{margin-bottom:0}
+.kachel a:hover{border-color:var(--akzent)}
+.kachel .nr{font-family:var(--mono);font-size:.76rem;letter-spacing:.1em;
+color:var(--akzent);text-transform:uppercase}
+.kachel h3{margin:8px 0 6px;font-size:1.12rem}
+.kachel p{margin:0;font-size:.93rem;color:var(--grau)}
+footer{margin-top:80px;padding-top:20px;border-top:1px solid var(--linie);
+font-size:.87rem;color:var(--grau)}
+/* Codeblock: eigener dunkler Grund, damit die Hervorhebung in beiden
+   Themes identisch und kontraststark bleibt. */
+figure.cd{margin:22px 0 6px;border-radius:8px;overflow:hidden;
+background:#1b1d23;border:1px solid #2b2e37;box-shadow:var(--schatten)}
+figure.cd .kopf{display:flex;align-items:center;gap:9px;padding:9px 14px;
+background:#22252d;border-bottom:1px solid #2b2e37}
+figure.cd .punkt{width:9px;height:9px;border-radius:50%;background:#3a3e49;flex:none}
+figure.cd .spr{margin-left:4px;font-family:var(--mono);font-size:11px;
+letter-spacing:.1em;text-transform:uppercase;color:#8b91a1}
+figure.cd pre{margin:0;padding:16px 18px;background:none;border:none;
+font-size:.85rem;line-height:1.62;color:#d6dae4;overflow-x:auto}
+figure.cd code{background:none;padding:0;color:inherit}
+.c-kom{color:#6b7385;font-style:italic}
+.c-str{color:#9ecb8a}
+.c-zahl{color:#e0a458}
+.c-key{color:#c98cf1;font-weight:600}
+.c-fn{color:#78b8f0}
+figure.dia{margin:26px 0 6px;padding:22px 18px;background:var(--paper2);
+border:1px solid var(--linie);overflow-x:auto}
+figure.dia svg{display:block;margin:0 auto}
+figure.dia figcaption{padding-top:14px;text-align:center}
+nav.toc{margin:38px 0 0;padding:22px 26px;background:var(--paper2);
+border:1px solid var(--linie);box-shadow:var(--schatten)}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2px 30px}
+nav.toc li{margin:0}
+nav.toc a{display:flex;gap:12px;align-items:baseline;padding:6px 0;
+text-decoration:none;color:var(--ink);font-size:.95rem;border-bottom:1px solid transparent}
+nav.toc a:hover{color:var(--akzent)}
+nav.toc .tnr{font-family:var(--mono);font-size:.78rem;color:var(--akzent);
+min-width:1.6em;font-variant-numeric:tabular-nums}
+h2{scroll-margin-top:22px}
+.klein{font-size:.86em;color:var(--grau)}
+ul.quellen{list-style:none;padding:0;margin:14px 0 18px}
+ul.quellen li{margin-bottom:9px;display:flex;gap:12px;align-items:baseline;
+flex-wrap:wrap}
+ul.quellen a{font-weight:600;text-decoration:none;border-bottom:1px solid var(--linie)}
+ul.quellen a:hover{border-color:var(--akzent)}
+td.w strong{font-weight:660}
+.baum{margin:18px 0;border:1px solid var(--linie);overflow-x:auto}
+.baum table{border-collapse:collapse;width:100%;background:var(--paper2);
+font-size:.88rem}
+.baum th{font-family:var(--mono);font-size:11px;letter-spacing:.07em;
+text-transform:uppercase;color:var(--grau);font-weight:500;background:var(--code);
+text-align:left;padding:9px 14px;white-space:nowrap}
+.baum td{padding:5px 14px;border-bottom:1px solid var(--linie);vertical-align:top}
+.baum tbody tr:last-child td{border-bottom:none}
+.baum tr:hover td{background:var(--code)}
+.baum .pf{font-family:var(--mono);white-space:pre;color:var(--ink);
+font-size:.86rem;width:1%}
+.baum .gr{font-family:var(--mono);font-size:.8rem;color:var(--grau);
+text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;width:1%}
+.baum .be{color:var(--ink2);font-size:.88rem;line-height:1.5;min-width:16ch}
+.baum table{table-layout:auto}
+.baum .ord{color:var(--akzent);font-weight:600}
+.baum .rest{color:var(--grau);font-style:italic}
+.blaettern{display:flex;justify-content:space-between;gap:18px;margin-top:76px;
+padding-top:22px;border-top:1px solid var(--linie)}
+.blaettern a{text-decoration:none;color:var(--ink);font-weight:620;font-size:.97rem}
+.blaettern a:hover{color:var(--akzent)}
+.blaettern .weiter{margin-left:auto;text-align:right}
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:26px;
+margin-top:34px}
+.gal figure{margin:0;background:var(--paper2);border:1px solid var(--linie);
+box-shadow:var(--schatten);display:flex;flex-direction:column}
+.gal .bild{background:var(--bild);cursor:zoom-in;display:block;border:none;padding:0;
+width:100%;aspect-ratio:4/3;overflow:hidden}
+.gal img{display:block;width:100%;height:100%;object-fit:contain}
+.gal figcaption{padding:14px 17px 17px;flex:1;display:flex;flex-direction:column}
+.gal .roh{margin-top:auto;align-self:flex-start}
+.gal h4{margin:0 0 4px;font-size:1.02rem;font-weight:680;color:var(--ink)}
+.gal p{margin:0 0 9px;font-size:.92rem;color:var(--ink2)}
+.gal .roh{font-family:var(--mono);font-size:12px;color:var(--grau);text-decoration:none;
+border-bottom:1px solid var(--linie)}
+.gal .roh:hover{color:var(--akzent);border-color:var(--akzent)}
+.plaene{display:grid;gap:34px;margin-top:34px}
+.plaene figure{margin:0}
+.plaene .blatt{background:#f7f5f2;border:1px solid var(--linie);box-shadow:var(--schatten);
+cursor:zoom-in;display:block;padding:0;width:100%;border-radius:0}
+.plaene img{display:block;width:100%;height:auto}
+.plaene figcaption{display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;
+padding:12px 2px 0;color:var(--grau);font-size:.9rem}
+.plaene b{color:var(--ink);font-size:1rem}
+/* Lightbox: der Dialog fuellt den Bildschirm, das Bild wird darin zentriert.
+   Ein am Inhalt bemessener Dialog haette je nach Bildformat versetzt gesessen. */
+dialog.lupe{border:none;padding:0;background:transparent;width:100vw;height:100vh;
+max-width:100vw;max-height:100vh;overflow:hidden}
+dialog.lupe::backdrop{background:rgba(10,10,12,.9)}
+dialog.lupe .rahmen{width:100vw;height:100vh;display:flex;flex-direction:column;
+align-items:center;justify-content:center;gap:14px;padding:56px 32px 40px}
+dialog.lupe img{display:block;max-width:calc(100vw - 64px);max-height:calc(100vh - 130px);
+width:auto;height:auto;object-fit:contain}
+dialog.lupe .bu{color:#e8e5e0;font-size:.92rem;text-align:center;max-width:70ch}
+dialog.lupe .zu{position:fixed;top:14px;right:20px;background:none;border:none;
+color:#f2efea;font-size:32px;line-height:1;cursor:pointer;font-family:var(--mono);
+padding:4px 10px}
+dialog.lupe .zu:hover{color:var(--akzent)}
+.gal.eng{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
+.gal.eng .bild{aspect-ratio:16/7}
+.gal.eng figcaption{padding:10px 13px 13px}
+.gal.eng h4{font-size:.92rem;font-family:var(--mono);letter-spacing:.04em}
+section.block{padding-top:56px}
+@media(max-width:640px){.wrap{padding:0 17px 70px}ol.schritte>li{padding-left:42px}
+.gal{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<nav><div class="in"><a href="index.html" class="marke">FutterStorage</a><a href="index.html">&Uuml;bersicht</a><a href="bauanleitung.html">Bauanleitung</a><a href="technik.html" class="hier">Technische Umsetzung</a><a href="projekt.html">Projektaufbau</a><a href="zeichnungen.html">Zeichnungen</a><a href="galerie.html">Bilder</a></div></nav>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Dokument 2</p>
+  <h1>Technische Umsetzung</h1>
+  <p class="lead">Wie das Modell entstanden ist: welche Programme, welche Sprachen,
+  wie sie zusammenspielen und woran die Qualit&auml;t h&auml;ngt.</p>
+</header>
+<nav class="toc" aria-label="Inhalt"><ol><li><a href="#k-die-werkzeugkette"><span class="tnr">01</span>Die Werkzeugkette</a></li><li><a href="#k-openscad-geometrie-als-programm"><span class="tnr">02</span>OpenSCAD: Geometrie als Programm</a></li><li><a href="#k-stl-was-dabei-verloren-geht"><span class="tnr">03</span>STL: was dabei verloren geht</a></li><li><a href="#k-blender-bilder-ueber-python"><span class="tnr">04</span>Blender: Bilder &uuml;ber Python</a></li><li><a href="#k-python-die-pruefinstanz"><span class="tnr">05</span>Python: die Pr&uuml;finstanz</a></li><li><a href="#k-die-bruchstellen-zwischen-den-programmen"><span class="tnr">06</span>Die Bruchstellen zwischen den Programmen</a></li><li><a href="#k-die-technischen-zeichnungen"><span class="tnr">07</span>Die technischen Zeichnungen</a></li><li><a href="#k-was-dieser-weg-nicht-kann"><span class="tnr">08</span>Was dieser Weg nicht kann</a></li></ol></nav>
+
+<section>
+  <h2 id="k-die-werkzeugkette" data-nr="01">Die Werkzeugkette</h2>
+  <div class="text">
+    <p>Drei Programme, jedes f&uuml;r eine Aufgabe. Keines wird per Maus bedient &mdash;
+    alle drei werden geschrieben und &uuml;ber die Kommandozeile aufgerufen. Das ist der
+    Grund, warum sich das Modell in Minuten umbauen l&auml;sst.</p>
+  </div>
+
+  <div class="tab"><table>
+    <thead><tr><th>Programm</th><th>Sprache</th><th>Aufgabe</th><th>Ergebnis</th></tr></thead>
+    <tbody>
+      <tr><td>OpenSCAD</td><td class="num">eigene Sprache</td>
+        <td class="w">Geometrie beschreiben</td><td class="num">STL</td></tr>
+      <tr><td>Blender</td><td class="num">Python</td>
+        <td class="w">Bilder rendern</td><td class="num">PNG</td></tr>
+      <tr><td>Python</td><td class="num">Python</td>
+        <td class="w">pr&uuml;fen, zeichnen, dokumentieren</td><td class="num">SVG, HTML</td></tr>
+    </tbody>
+  </table></div>
+
+  <figure class="dia"><svg viewBox="0 0 760 386" width="100%" role="img" aria-label="Von der Quelle zum fertigen Paket" style="max-width:760px"><rect x="280.0" y="10" width="200" height="66" rx="2" fill="var(--paper2)" stroke="var(--linie)" stroke-width="1.5"/><text x="380.0" y="37" text-anchor="middle" font-size="14" font-weight="650" fill="var(--ink)" font-family="var(--sans)">Modell</text><text x="380.0" y="57" text-anchor="middle" font-size="11.5" fill="var(--grau)" font-family="var(--mono)">katzenfutter-regal.scad</text><rect x="280.0" y="110" width="200" height="66" rx="2" fill="var(--paper2)" stroke="var(--linie)" stroke-width="1.5"/><text x="380.0" y="137" text-anchor="middle" font-size="14" font-weight="650" fill="var(--ink)" font-family="var(--sans)">Geometrie</text><text x="380.0" y="157" text-anchor="middle" font-size="11.5" fill="var(--grau)" font-family="var(--mono)">stl/*.stl</text><rect x="40.0" y="210" width="200" height="66" rx="2" fill="var(--paper2)" stroke="var(--linie)" stroke-width="1.5"/><text x="140.0" y="237" text-anchor="middle" font-size="14" font-weight="650" fill="var(--ink)" font-family="var(--sans)">Bilder</text><text x="140.0" y="257" text-anchor="middle" font-size="11.5" fill="var(--grau)" font-family="var(--mono)">Blender</text><rect x="280.0" y="210" width="200" height="66" rx="2" fill="var(--paper2)" stroke="var(--linie)" stroke-width="1.5"/><text x="380.0" y="237" text-anchor="middle" font-size="14" font-weight="650" fill="var(--ink)" font-family="var(--sans)">Pr&#252;fung</text><text x="380.0" y="257" text-anchor="middle" font-size="11.5" fill="var(--grau)" font-family="var(--mono)">pruefen.py</text><rect x="520.0" y="210" width="200" height="66" rx="2" fill="var(--paper2)" stroke="var(--linie)" stroke-width="1.5"/><text x="620.0" y="237" text-anchor="middle" font-size="14" font-weight="650" fill="var(--ink)" font-family="var(--sans)">Zeichnungen</text><text x="620.0" y="257" text-anchor="middle" font-size="11.5" fill="var(--grau)" font-family="var(--mono)">zeichnungen.py</text><rect x="280.0" y="310" width="200" height="66" rx="2" fill="var(--paper2)" stroke="var(--linie)" stroke-width="1.5"/><text x="380.0" y="337" text-anchor="middle" font-size="14" font-weight="650" fill="var(--ink)" font-family="var(--sans)">Dokumentation</text><text x="380.0" y="357" text-anchor="middle" font-size="11.5" fill="var(--grau)" font-family="var(--mono)">paket/*.html</text><path d="M380.0 76 L380.0 101" stroke="var(--akzent)" stroke-width="1.6" fill="none"/><path d="M375.5 101 L384.5 101 L380.0 109 z" fill="var(--akzent)"/><path d="M380.0 176 L380.0 201" stroke="var(--akzent)" stroke-width="1.6" fill="none"/><path d="M375.5 201 L384.5 201 L380.0 209 z" fill="var(--akzent)"/><path d="M380.0 276 L380.0 301" stroke="var(--akzent)" stroke-width="1.6" fill="none"/><path d="M375.5 301 L384.5 301 L380.0 309 z" fill="var(--akzent)"/></svg><figcaption>Von der Quelle zum fertigen Paket</figcaption></figure>
+</section>
+
+<section>
+  <h2 id="k-openscad-geometrie-als-programm" data-nr="02">OpenSCAD: Geometrie als Programm</h2>
+  <div class="text">
+    <p>Der entscheidende Unterschied zu Fusion oder SolidWorks: Man klickt nicht,
+    man schreibt. Ein Bauteil ist ein Programm, das bei jedem Aufruf neu gerechnet
+    wird.</p>
+
+    <figure class="cd"><div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span><span class="spr">openscad</span></div><pre><code><span class="c-key">cube</span>([<span class="c-zahl">95.2</span>, <span class="c-zahl">163</span>, <span class="c-zahl">144.8</span>]);           <span class="c-kom">// ein Quader</span>
+<span class="c-key">translate</span>([<span class="c-zahl">1.6</span>, <span class="c-zahl">3</span>, <span class="c-zahl">4.8</span>])           <span class="c-kom">// verschieben</span>
+    <span class="c-key">cube</span>([<span class="c-zahl">92</span>, <span class="c-zahl">157</span>, <span class="c-zahl">140</span>]);          <span class="c-kom">// und noch einer</span></code></pre></figure>
+
+    <p>Gebaut wird mit drei Operationen &mdash; das nennt sich Constructive Solid
+    Geometry:</p>
+  </div>
+
+  <div class="tab"><table>
+    <thead><tr><th>Operation</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td class="num">union()</td><td class="w">K&ouml;rper verschmelzen</td></tr>
+      <tr><td class="num">difference()</td>
+        <td class="w">vom ersten alle folgenden abziehen</td></tr>
+      <tr><td class="num">intersection()</td>
+        <td class="w">nur die Schnittmenge behalten</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="text">
+    <h3>Ein Vollk&ouml;rper, aus dem alles herausgestochen wird</h3>
+    <p>Jedes Segment entsteht als ein einziger Grundk&ouml;rper, aus dem Innenraum,
+    Fenster, Bodennut und Griffmulde herausgeschnitten werden. Das ist eine bewusste
+    Entscheidung: Eine fr&uuml;here Fassung setzte den Kanal aus einzelnen W&auml;nden
+    zusammen, und an den Sto&szlig;fl&auml;chen entstanden 28 Netzfehler.</p>
+
+    <h3>Alles parametrisch</h3>
+    <p>Ganz oben in der Datei stehen die Ma&szlig;e als Variablen, alles Weitere leitet
+    sich ab:</p>
+    <figure class="cd"><div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span><span class="spr">openscad</span></div><pre><code>beutel_breit = <span class="c-zahl">88</span>;
+wand         = <span class="c-zahl">1.6</span>;
+spiel        = <span class="c-zahl">4</span>;
+innen_x  = beutel_breit + spiel;     <span class="c-kom">// 92</span>
+aussen_x = innen_x + <span class="c-zahl">2</span> * wand;       <span class="c-kom">// 95,2</span></code></pre></figure>
+    <p>&Auml;ndert sich die gemessene Beutelbreite, w&auml;chst das ganze Modell mit &mdash;
+    Wandst&auml;rken, Fensterpositionen, Spaltenzahl. Genau das ist passiert: Die erste
+    Auslegung ging von 72 mm aus, gemessen wurden 88. Ein Wert ge&auml;ndert, alles
+    andere folgte automatisch.</p>
+
+    <h3>Eine Datei, sieben Teile</h3>
+    <p>&Uuml;ber Parameter von au&szlig;en wird gesteuert, welches Teil erzeugt wird:</p>
+    <figure class="cd"><div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span><span class="spr">bash</span></div><pre><code><span class="c-key">openscad</span> -o stl/segment-mitte.stl --<span class="c-key">export</span>-format=binstl \\
+         -D <span class="c-str">'TEIL="segment"'</span> -D <span class="c-str">'segment_typ="mitte"'</span> \\
+         katzenfutter-regal.scad</code></pre></figure>
+    <p>Das <code>-D</code> &uuml;berschreibt eine Variable. Deshalb liefert eine Datei
+    alle Segmenttypen, den Schieber, das Schild und die Passprobe.</p>
+  </div>
+</section>
+
+<section>
+  <h2 id="k-stl-was-dabei-verloren-geht" data-nr="03">STL: was dabei verloren geht</h2>
+  <div class="text">
+    <p>Ein STL ist nur noch eine Liste von Dreiecken &mdash; drei Punkte und eine
+    Normale, sonst nichts. Kein Wissen mehr &uuml;ber Bohrungen, Parameter oder
+    Zusammenh&auml;nge. Ein Zylinder wird zum 32-eckigen Prisma.</p>
+    <p>Das ist der Grund, warum im Blender-Skript alle Positionen noch einmal stehen:
+    Die STL-Datei wei&szlig; nicht, dass sie ein Mittelsegment ist, das bei 163 mm
+    anf&auml;ngt.</p>
+  </div>
+</section>
+
+<section>
+  <h2 id="k-blender-bilder-ueber-python" data-nr="04">Blender: Bilder &uuml;ber Python</h2>
+  <div class="text">
+    <p>Blender wird &uuml;ber seine Python-Schnittstelle gesteuert. Auch hier kein
+    Klicken, sondern ein Skript, das die STLs importiert, Materialien zuweist, Licht
+    und Kamera setzt und rendert.</p>
+
+    <figure class="cd"><div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span><span class="spr">openscad</span></div><pre><code>bpy.ops.wm.<span class="c-fn">stl_import</span>(filepath=<span class="c-str">"stl/segment-front.stl"</span>)
+material.inputs[<span class="c-str">"Base Color"</span>].default_value = (<span class="c-zahl">0.022</span>, <span class="c-zahl">0.022</span>, <span class="c-zahl">0.026</span>, <span class="c-zahl">1</span>)
+scene.cycles.samples = <span class="c-zahl">320</span>
+bpy.ops.render.<span class="c-fn">render</span>(write_still=True)</code></pre></figure>
+
+    <p>Gerendert wird mit <strong>Cycles</strong>, einem Pathtracer: Er verfolgt
+    Lichtstrahlen physikalisch. Deshalb wirken die Bilder wie Fotos &mdash; die weichen
+    Schatten und die Reflexe auf dem orangen Schieber sind nicht gemalt, sondern
+    gerechnet. 320 Strahlen pro Bildpunkt, rund 25 Sekunden je Bild auf der Grafikkarte.</p>
+
+    <h3>Der Bildausschnitt wird gerechnet, nicht gesch&auml;tzt</h3>
+    <p>Anfangs stand die Kamera auf einem festen Abstand, und Teile des Objekts lagen
+    au&szlig;erhalb. Jetzt l&auml;uft es umgekehrt:</p>
+    <ul>
+      <li>Jeden Eckpunkt aller Objekte ins Kamerakoordinatensystem umrechnen</li>
+      <li>Daraus das Seitenverh&auml;ltnis der Silhouette bestimmen und die
+        Bildaufl&ouml;sung passend setzen</li>
+      <li>Den Abstand l&ouml;sen, bei dem der &auml;u&szlig;erste Punkt gerade noch im
+        Sichtkegel liegt</li>
+      <li>Die Bildmitte auf die Silhouette schieben, nicht auf das Objektzentrum
+        &mdash; sonst klebt das Motiv an einer Seite</li>
+    </ul>
+    <p>Damit ist rechnerisch garantiert, dass nichts abgeschnitten wird und wenig
+    Rand bleibt.</p>
+  </div>
+</section>
+
+<section>
+  <h2 id="k-python-die-pruefinstanz" data-nr="05">Python: die Pr&uuml;finstanz</h2>
+  <div class="text">
+    <p>Das ist der Teil, der &uuml;ber die Qualit&auml;t entscheidet. Ein gerendertes Bild
+    zeigt nicht, ob ein Netz L&ouml;cher hat oder ob zwei Teile sich durchdringen.
+    Deshalb rechnet ein Pr&uuml;fskript jede erzeugte Datei durch:</p>
+  </div>
+
+  <div class="tab"><table>
+    <thead><tr><th>Pr&uuml;fung</th><th>Verfahren</th><th>Sollwert</th></tr></thead>
+    <tbody>
+      <tr><td>Wasserdicht</td>
+        <td class="w">Jede Kante muss in genau zwei Dreiecken vorkommen</td>
+        <td class="num">0 offene</td></tr>
+      <tr><td>Volumen</td>
+        <td class="w">Divergenzsatz &uuml;ber alle Dreiecke</td>
+        <td class="num">Gramm</td></tr>
+      <tr><td>&Uuml;berh&auml;nge</td>
+        <td class="w">Fl&auml;chennormalen gegen 45 Grad, Bettauflage gefiltert</td>
+        <td class="num">unter 3 %</td></tr>
+      <tr><td>Kollision</td>
+        <td class="w">intersection() zweier Nachbarteile</td>
+        <td class="num">0 cm&sup3;</td></tr>
+      <tr><td>Bauraum</td>
+        <td class="w">Bounding Box gegen das Druckbett</td>
+        <td class="num">unter 180 mm</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="text">
+    <h3>Was die Pr&uuml;fungen gefunden haben</h3>
+    <p>Diese Tests haben echte Fehler aufgedeckt, die im Bild unsichtbar waren:</p>
+    <ul>
+      <li><strong>Fl&auml;chen ohne Volumen.</strong> Zwei Schnittk&ouml;rper endeten exakt
+        auf derselben Ebene und hinterlie&szlig;en eine Fl&auml;che der Dicke null. Der Slicer
+        h&auml;tte 14 % des Teils als &Uuml;berhang gesehen. Ein &Uuml;berschnitt von 0,02 mm
+        l&ouml;ste es.</li>
+      <li><strong>Eine Kollision von 0,16 cm&sup3;.</strong> Eine Anlaufschr&auml;ge am
+        Verbinder stie&szlig; in die Nachbarwand. Der Kollisionstest fand es sofort.</li>
+      <li><strong>Fehlende Fenster.</strong> Bei kurzen Segmenten pr&uuml;fte die
+        Fensterlogik nur einen Bereich &mdash; die Teile w&auml;ren 20 % schwerer geworden.</li>
+    </ul>
+
+    <h3>Und einmal war die Physik der Pr&uuml;fer</h3>
+    <p>Die urspr&uuml;ngliche Anschlagkante war 18 mm hoch. Der Schiebedruck greift auf
+    halber Beutelh&ouml;he an, also bei 68 mm &mdash; Hebelarm 50 mm. Dagegen h&auml;lt nur
+    das Eigengewicht auf der schmalen Standfl&auml;che. Der vorderste Beutel w&auml;re schon
+    bei 0,13 N gekippt, w&auml;hrend die Feder mit rund 6 N dr&uuml;ckt. Die Frontwand musste
+    auf 92 mm wachsen, &uuml;ber den Angriffspunkt hinaus.</p>
+  </div>
+</section>
+
+<section>
+  <h2 id="k-die-bruchstellen-zwischen-den-programmen" data-nr="06">Die Bruchstellen zwischen den Programmen</h2>
+  <div class="text">
+    <p>OpenSCAD und Blender teilen sich nur die STL-Datei. Alle Positionen m&uuml;ssen
+    doppelt gepflegt werden:</p>
+    <figure class="cd"><div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span><span class="spr">openscad</span></div><pre><code># render2.py &mdash; muss zu katzenfutter-regal.scad passen
+AX, AZ = <span class="c-zahl">95.2</span>, <span class="c-zahl">144.8</span>       # Spaltenbreite, Ebenenhoehe
+LF, LM, LE = <span class="c-zahl">163.0</span>, <span class="c-zahl">160.0</span>, <span class="c-zahl">161.6</span>
+BODEN = <span class="c-zahl">4.8</span></code></pre></figure>
+    <p>&Auml;ndert sich ein Ma&szlig; im Modell und das Skript zieht nicht nach, stehen die
+    Teile falsch. Genau das ist passiert: Nach einer Modell&auml;nderung stand die
+    Bodenh&ouml;he im Skript noch auf 6,4 statt 4,8 mm &mdash; die Beutel schwebten
+    1,6 mm zu hoch.</p>
+
+    <h3>Der teuerste Fehler war eine Einheit</h3>
+    <p>Blender rechnet in Metern, OpenSCAD in Millimetern. Ein 95-mm-Segment wird
+    beim Import zu einem 95 <em>Meter</em> gro&szlig;en Objekt. Die Kamera stand rund
+    900 Einheiten entfernt &mdash; Blenders Standard-Clipping endet bei 100. Alles
+    dahinter wurde weggeschnitten: die hintere Reihe, Teile der Sockel, ganze
+    R&uuml;ckw&auml;nde. &Uuml;brig blieben Fragmente, die wie Bildfehler aussahen. Ein
+    <code>clip_end = 20000</code> behob es.</p>
+  </div>
+</section>
+
+<section>
+  <h2 id="k-die-technischen-zeichnungen" data-nr="07">Die technischen Zeichnungen</h2>
+  <div class="text">
+    <p>Die bema&szlig;ten Bl&auml;tter entstehen nicht aus dem STL, sondern direkt aus den
+    Modellma&szlig;en &mdash; ein Python-Skript schreibt SVG. Das hat zwei Gr&uuml;nde: Die
+    Ma&szlig;e sind exakt statt aus Dreiecken zur&uuml;ckgerechnet, und Ma&szlig;linien,
+    Positionsnummern und Legende lassen sich frei setzen.</p>
+    <p>Jede Ma&szlig;linie bekommt mit <code>von=</code> die Kante mitgeteilt, an der
+    sie ansetzt. Daraus zieht das Skript die d&uuml;nne Hilfslinie bis zum Bauteil, so
+    dass immer sichtbar bleibt, welche zwei Kanten ein Ma&szlig; verbindet:</p>
+    <figure class="cd"><div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span><span class="spr">python</span></div><pre><code><span class="c-key">def</span> <span class="c-fn">mh</span>(self, x1, x2, y, zahl, was=<span class="c-str">""</span>, von=<span class="c-key">None</span>, oben=<span class="c-key">False</span>):
+    <span class="c-kom"># von = Objektkante -&gt; Hilfslinie laeuft von dort bis zur Masslinie</span>
+    <span class="c-key">if</span> von is <span class="c-key">not</span> <span class="c-key">None</span>:
+        <span class="c-key">for</span> x <span class="c-key">in</span> (x1, x2):
+            self.<span class="c-fn">line</span>(x, von, x, y - <span class="c-zahl">6</span>, HILF, <span class="c-zahl">0.7</span>)
+    self.<span class="c-fn">line</span>(x1, y, x2, y, MASSL)                   <span class="c-kom"># die Masslinie</span>
+    <span class="c-key">if</span> (x2 - x1) &lt; <span class="c-fn">breite</span>(zahl) + <span class="c-zahl">10</span>:                <span class="c-kom"># zu eng fuer die Zahl?</span>
+        ...                                          <span class="c-kom"># dann steht sie daneben</span>
+    self.<span class="c-fn">txt</span>((x1+x2)/<span class="c-zahl">2</span>, y+<span class="c-zahl">3.6</span>,  zahl, mono=<span class="c-key">True</span>)     <span class="c-kom"># die Zahl</span>
+    self.<span class="c-fn">txt</span>((x1+x2)/<span class="c-zahl">2</span>, y+<span class="c-zahl">17</span>,   was,  klein, grau)   <span class="c-kom"># wofuer sie steht</span></code></pre></figure>
+    <p>Damit sich nichts &uuml;berdeckt, merkt sich das Skript zu jeder Beschriftung
+    ein Rechteck und pr&uuml;ft am Ende alle Paare gegeneinander. Meldet es eine
+    &Uuml;berschneidung, wandert die betroffene Angabe, bis der Lauf still bleibt.
+    Dieselbe Buchhaltung liefert die Blattgr&ouml;&szlig;e: Das SVG wird genau um den
+    belegten Bereich geschnitten, deshalb steht auf keinem Blatt eine leere
+    Fl&auml;che.</p>
+    <p>SVG ist Vektorgrafik: Die Bl&auml;tter lassen sich beliebig vergr&ouml;&szlig;ern und
+    ausdrucken, ohne unscharf zu werden.</p>
+  </div>
+</section>
+
+<section>
+  <h2 id="k-was-dieser-weg-nicht-kann" data-nr="08">Was dieser Weg nicht kann</h2>
+  <div class="text">
+    <p>Alles bisher Beschriebene rechnet. Es kann nicht anfassen, nicht drucken,
+    nicht ausprobieren. Zwei Dinge bleiben offen und lassen sich nur am echten Teil
+    kl&auml;ren:</p>
+    <ul>
+      <li><strong>Die Beutelma&szlig;e.</strong> Sie sind gemessen, nicht aus einem
+        Datenblatt &mdash; Purina ver&ouml;ffentlicht keine Verpackungsma&szlig;e. Deshalb
+        steht die Passprobe am Anfang der Bauanleitung.</li>
+      <li><strong>Die Reibung.</strong> Ob sich f&uuml;nfundzwanzig aneinanderlehnende
+        Beutel sauber schieben lassen, h&auml;ngt an der Folienoberfl&auml;che. Daf&uuml;r gibt
+        es keine Formel, nur den Versuch mit einem kurzen Kanal.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>Modell, Skripte und Pr&uuml;fungen liegen im Paket &middot; alle Ma&szlig;e in
+Millimetern</footer>
+<div class="blaettern"><a href="bauanleitung.html" class="zurueck">&larr; Bauanleitung</a><a href="projekt.html" class="weiter">Projektaufbau &rarr;</a></div></div>
+<dialog class="lupe">
+<button class="zu" aria-label="Schliessen">&times;</button>
+<div class="rahmen"><img alt=""><p class="bu"></p></div></dialog>
+<script>
+(function(){
+  var d=document.querySelector('dialog.lupe'),
+      b=d.querySelector('img'), u=d.querySelector('.bu'),
+      k=Array.prototype.slice.call(document.querySelectorAll('[data-gross]')),
+      i=0;
+  function zeig(n){
+    if(!k.length) return;
+    i=(n+k.length)%k.length;
+    b.src=k[i].dataset.gross; b.alt=k[i].dataset.was||'';
+    u.textContent=k[i].dataset.was||'';
+  }
+  k.forEach(function(el,n){
+    el.addEventListener('click',function(){zeig(n); d.showModal();});
+  });
+  d.querySelector('.zu').addEventListener('click',function(){d.close()});
+  d.addEventListener('click',function(e){
+    if(e.target===d||e.target.classList.contains('rahmen')) d.close();
+  });
+  d.addEventListener('close',function(){b.removeAttribute('src')});
+  document.addEventListener('keydown',function(e){
+    if(!d.open) return;
+    if(e.key==='ArrowRight') zeig(i+1);
+    if(e.key==='ArrowLeft')  zeig(i-1);
+  });
+})();
+</script>

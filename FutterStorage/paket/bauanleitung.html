@@ -1,0 +1,623 @@
+<title>Bauanleitung &mdash; FutterStorage</title>
+<style>
+:root{--ink:#17171b;--ink2:#3d3d43;--paper:#f7f5f2;--paper2:#fff;--akzent:#bd4d0a;
+--grau:#6e6a65;--linie:#e3ded7;--code:#eee9e2;--bild:#d7d8dc;
+--schatten:0 1px 2px rgba(23,23,27,.05),0 10px 28px rgba(23,23,27,.05);
+--sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+--mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--ink:#eceae6;--ink2:#bcb8b1;--paper:#131316;
+--paper2:#1c1c21;--akzent:#ff8a47;--grau:#918c85;--linie:#2d2d33;--code:#232329;
+--bild:#25252a;--schatten:0 1px 2px rgba(0,0,0,.45),0 10px 28px rgba(0,0,0,.32)}}
+:root[data-theme=dark]{--ink:#eceae6;--ink2:#bcb8b1;--paper:#131316;--paper2:#1c1c21;
+--akzent:#ff8a47;--grau:#918c85;--linie:#2d2d33;--code:#232329;--bild:#25252a;
+--schatten:0 1px 2px rgba(0,0,0,.45),0 10px 28px rgba(0,0,0,.32)}
+:root[data-theme=light]{--ink:#17171b;--ink2:#3d3d43;--paper:#f7f5f2;--paper2:#fff;
+--akzent:#bd4d0a;--grau:#6e6a65;--linie:#e3ded7;--code:#eee9e2;--bild:#d7d8dc;
+--schatten:0 1px 2px rgba(23,23,27,.05),0 10px 28px rgba(23,23,27,.05)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+font-size:16.5px;line-height:1.68;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1160px;margin:0 auto;padding:0 26px 110px}
+.text{max-width:70ch}
+nav{border-bottom:1px solid var(--linie);margin-bottom:0}
+nav .in{max-width:1160px;margin:0 auto;padding:14px 26px;display:flex;gap:26px;
+align-items:baseline;flex-wrap:wrap}
+nav a{color:var(--grau);text-decoration:none;font-size:.92rem}
+nav a:hover{color:var(--akzent)}
+nav a.hier{color:var(--ink);font-weight:600}
+nav .marke{font-family:var(--mono);font-size:.8rem;letter-spacing:.12em;
+text-transform:uppercase;color:var(--akzent);margin-right:auto}
+header{padding:66px 0 32px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.15em;
+text-transform:uppercase;color:var(--akzent);margin:0 0 14px}
+h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.06;margin:0 0 18px;
+letter-spacing:-.026em;font-weight:780;text-wrap:balance;max-width:17ch}
+.lead{font-size:1.12rem;color:var(--ink2);margin:0;max-width:62ch}
+.kz-reihe{display:grid;grid-template-columns:repeat(auto-fit,minmax(124px,1fr));
+gap:1px;background:var(--linie);border:1px solid var(--linie);margin:40px 0 0}
+.kz{background:var(--paper);padding:16px 18px}
+.kz b{display:block;font-family:var(--mono);font-size:1.5rem;font-weight:600;
+letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.kz span{font-size:12.5px;color:var(--grau)}
+section{padding-top:70px}
+h2{font-size:1.58rem;letter-spacing:-.02em;margin:0 0 6px;font-weight:720;
+display:flex;align-items:baseline;gap:14px}
+h2::before{content:attr(data-nr);font-family:var(--mono);font-size:.8rem;
+color:var(--akzent);font-weight:500}
+h3{font-size:1.07rem;margin:34px 0 8px;font-weight:670}
+h4{font-size:.99rem;margin:20px 0 6px;font-weight:660}
+.unter{color:var(--grau);margin:0 0 22px;font-size:.96rem;max-width:66ch}
+p{margin:0 0 15px}
+ul,ol{margin:0 0 15px;padding-left:20px}
+li{margin-bottom:7px}
+a{color:var(--akzent);text-underline-offset:2px}
+.karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(288px,1fr));gap:22px}
+.karten{align-items:stretch}
+.karte{background:var(--paper2);border:1px solid var(--linie);
+box-shadow:var(--schatten);display:flex;flex-direction:column}
+.karte figure{aspect-ratio:4/3;overflow:hidden;display:flex}
+.karte img{object-fit:contain;height:100%}
+.karte figure{margin:0;background:var(--bild)}
+.karte img{display:block;width:100%;height:auto}
+.karte .txt{padding:16px 18px 19px;display:flex;flex-direction:column;gap:9px;flex:1}
+.karte h4{margin:0;font-size:1.02rem;font-weight:690}
+.dat{font-family:var(--mono);font-size:12.5px;color:var(--grau);
+font-variant-numeric:tabular-nums}
+.karte p{margin:0;font-size:.93rem;color:var(--ink2)}
+.anz{align-self:flex-start;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;
+text-transform:uppercase;background:var(--akzent);color:#fff;padding:3px 9px}
+:root[data-theme=dark] .anz{color:#17171b}
+@media(prefers-color-scheme:dark){.anz{color:#17171b}}
+figure.gross{margin:26px 0 6px;background:var(--bild);border:1px solid var(--linie)}
+figure.gross img{display:block;width:100%;height:auto}
+figure.plan{margin:26px 0 6px;background:#f7f5f2;border:1px solid var(--linie);padding:0}
+figure.plan img{display:block;width:100%;height:auto}
+figcaption{font-size:.89rem;color:var(--grau);padding:10px 2px 0;max-width:78ch}
+.kauf{border:2px solid var(--akzent);background:var(--paper2);padding:24px 26px;
+margin:22px 0 8px}
+.kauf h3{margin-top:0}
+.kauf dl{display:grid;grid-template-columns:max-content 1fr;gap:8px 22px;margin:0}
+.kauf dt{font-family:var(--mono);font-size:12.5px;color:var(--grau)}
+.kauf dd{margin:0}
+.tab{overflow-x:auto;margin:20px 0;border:1px solid var(--linie)}
+table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--paper2)}
+th,td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--linie);
+white-space:nowrap}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
+color:var(--grau);font-weight:500;background:var(--code)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+td.w{white-space:normal;min-width:210px}
+tbody tr:last-child td{border-bottom:none}
+tfoot td{font-weight:650;background:var(--code);border-bottom:none}
+ol.schritte{list-style:none;counter-reset:s;padding:0;margin:24px 0 0;max-width:74ch}
+ol.schritte>li{counter-increment:s;position:relative;padding:0 0 26px 52px;
+border-left:1px solid var(--linie);margin-left:15px}
+ol.schritte>li:last-child{border-left-color:transparent;padding-bottom:0}
+ol.schritte>li::before{content:counter(s);position:absolute;left:-15px;top:-3px;
+width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);
+font-family:var(--mono);font-size:13px;font-weight:600;display:grid;place-items:center}
+ol.schritte h4{margin:3px 0 6px;font-size:1.03rem;font-weight:680}
+ol.schritte p{font-size:.96rem;color:var(--ink2)}
+.hinweis{border-left:3px solid var(--akzent);padding:2px 0 2px 17px;margin:18px 0;
+color:var(--ink2);font-size:.96rem;max-width:70ch}
+code{font-family:var(--mono);font-size:.89em;background:var(--code);padding:1px 5px}
+pre{background:var(--code);padding:16px 18px;overflow-x:auto;font-family:var(--mono);
+font-size:.84rem;line-height:1.55;margin:14px 0;border-left:3px solid var(--linie)}
+pre code{background:none;padding:0}
+.kachel{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;
+margin:30px 0 0}
+.kachel{align-items:stretch}
+.kachel a{display:flex;flex-direction:column;background:var(--paper2);
+border:1px solid var(--linie);padding:22px 24px;text-decoration:none;
+color:var(--ink);box-shadow:var(--schatten)}
+.kachel a p{margin-bottom:0}
+.kachel a:hover{border-color:var(--akzent)}
+.kachel .nr{font-family:var(--mono);font-size:.76rem;letter-spacing:.1em;
+color:var(--akzent);text-transform:uppercase}
+.kachel h3{margin:8px 0 6px;font-size:1.12rem}
+.kachel p{margin:0;font-size:.93rem;color:var(--grau)}
+footer{margin-top:80px;padding-top:20px;border-top:1px solid var(--linie);
+font-size:.87rem;color:var(--grau)}
+/* Codeblock: eigener dunkler Grund, damit die Hervorhebung in beiden
+   Themes identisch und kontraststark bleibt. */
+figure.cd{margin:22px 0 6px;border-radius:8px;overflow:hidden;
+background:#1b1d23;border:1px solid #2b2e37;box-shadow:var(--schatten)}
+figure.cd .kopf{display:flex;align-items:center;gap:9px;padding:9px 14px;
+background:#22252d;border-bottom:1px solid #2b2e37}
+figure.cd .punkt{width:9px;height:9px;border-radius:50%;background:#3a3e49;flex:none}
+figure.cd .spr{margin-left:4px;font-family:var(--mono);font-size:11px;
+letter-spacing:.1em;text-transform:uppercase;color:#8b91a1}
+figure.cd pre{margin:0;padding:16px 18px;background:none;border:none;
+font-size:.85rem;line-height:1.62;color:#d6dae4;overflow-x:auto}
+figure.cd code{background:none;padding:0;color:inherit}
+.c-kom{color:#6b7385;font-style:italic}
+.c-str{color:#9ecb8a}
+.c-zahl{color:#e0a458}
+.c-key{color:#c98cf1;font-weight:600}
+.c-fn{color:#78b8f0}
+figure.dia{margin:26px 0 6px;padding:22px 18px;background:var(--paper2);
+border:1px solid var(--linie);overflow-x:auto}
+figure.dia svg{display:block;margin:0 auto}
+figure.dia figcaption{padding-top:14px;text-align:center}
+nav.toc{margin:38px 0 0;padding:22px 26px;background:var(--paper2);
+border:1px solid var(--linie);box-shadow:var(--schatten)}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2px 30px}
+nav.toc li{margin:0}
+nav.toc a{display:flex;gap:12px;align-items:baseline;padding:6px 0;
+text-decoration:none;color:var(--ink);font-size:.95rem;border-bottom:1px solid transparent}
+nav.toc a:hover{color:var(--akzent)}
+nav.toc .tnr{font-family:var(--mono);font-size:.78rem;color:var(--akzent);
+min-width:1.6em;font-variant-numeric:tabular-nums}
+h2{scroll-margin-top:22px}
+.klein{font-size:.86em;color:var(--grau)}
+ul.quellen{list-style:none;padding:0;margin:14px 0 18px}
+ul.quellen li{margin-bottom:9px;display:flex;gap:12px;align-items:baseline;
+flex-wrap:wrap}
+ul.quellen a{font-weight:600;text-decoration:none;border-bottom:1px solid var(--linie)}
+ul.quellen a:hover{border-color:var(--akzent)}
+td.w strong{font-weight:660}
+.baum{margin:18px 0;border:1px solid var(--linie);overflow-x:auto}
+.baum table{border-collapse:collapse;width:100%;background:var(--paper2);
+font-size:.88rem}
+.baum th{font-family:var(--mono);font-size:11px;letter-spacing:.07em;
+text-transform:uppercase;color:var(--grau);font-weight:500;background:var(--code);
+text-align:left;padding:9px 14px;white-space:nowrap}
+.baum td{padding:5px 14px;border-bottom:1px solid var(--linie);vertical-align:top}
+.baum tbody tr:last-child td{border-bottom:none}
+.baum tr:hover td{background:var(--code)}
+.baum .pf{font-family:var(--mono);white-space:pre;color:var(--ink);
+font-size:.86rem;width:1%}
+.baum .gr{font-family:var(--mono);font-size:.8rem;color:var(--grau);
+text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;width:1%}
+.baum .be{color:var(--ink2);font-size:.88rem;line-height:1.5;min-width:16ch}
+.baum table{table-layout:auto}
+.baum .ord{color:var(--akzent);font-weight:600}
+.baum .rest{color:var(--grau);font-style:italic}
+.blaettern{display:flex;justify-content:space-between;gap:18px;margin-top:76px;
+padding-top:22px;border-top:1px solid var(--linie)}
+.blaettern a{text-decoration:none;color:var(--ink);font-weight:620;font-size:.97rem}
+.blaettern a:hover{color:var(--akzent)}
+.blaettern .weiter{margin-left:auto;text-align:right}
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:26px;
+margin-top:34px}
+.gal figure{margin:0;background:var(--paper2);border:1px solid var(--linie);
+box-shadow:var(--schatten);display:flex;flex-direction:column}
+.gal .bild{background:var(--bild);cursor:zoom-in;display:block;border:none;padding:0;
+width:100%;aspect-ratio:4/3;overflow:hidden}
+.gal img{display:block;width:100%;height:100%;object-fit:contain}
+.gal figcaption{padding:14px 17px 17px;flex:1;display:flex;flex-direction:column}
+.gal .roh{margin-top:auto;align-self:flex-start}
+.gal h4{margin:0 0 4px;font-size:1.02rem;font-weight:680;color:var(--ink)}
+.gal p{margin:0 0 9px;font-size:.92rem;color:var(--ink2)}
+.gal .roh{font-family:var(--mono);font-size:12px;color:var(--grau);text-decoration:none;
+border-bottom:1px solid var(--linie)}
+.gal .roh:hover{color:var(--akzent);border-color:var(--akzent)}
+.plaene{display:grid;gap:34px;margin-top:34px}
+.plaene figure{margin:0}
+.plaene .blatt{background:#f7f5f2;border:1px solid var(--linie);box-shadow:var(--schatten);
+cursor:zoom-in;display:block;padding:0;width:100%;border-radius:0}
+.plaene img{display:block;width:100%;height:auto}
+.plaene figcaption{display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;
+padding:12px 2px 0;color:var(--grau);font-size:.9rem}
+.plaene b{color:var(--ink);font-size:1rem}
+/* Lightbox: der Dialog fuellt den Bildschirm, das Bild wird darin zentriert.
+   Ein am Inhalt bemessener Dialog haette je nach Bildformat versetzt gesessen. */
+dialog.lupe{border:none;padding:0;background:transparent;width:100vw;height:100vh;
+max-width:100vw;max-height:100vh;overflow:hidden}
+dialog.lupe::backdrop{background:rgba(10,10,12,.9)}
+dialog.lupe .rahmen{width:100vw;height:100vh;display:flex;flex-direction:column;
+align-items:center;justify-content:center;gap:14px;padding:56px 32px 40px}
+dialog.lupe img{display:block;max-width:calc(100vw - 64px);max-height:calc(100vh - 130px);
+width:auto;height:auto;object-fit:contain}
+dialog.lupe .bu{color:#e8e5e0;font-size:.92rem;text-align:center;max-width:70ch}
+dialog.lupe .zu{position:fixed;top:14px;right:20px;background:none;border:none;
+color:#f2efea;font-size:32px;line-height:1;cursor:pointer;font-family:var(--mono);
+padding:4px 10px}
+dialog.lupe .zu:hover{color:var(--akzent)}
+.gal.eng{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
+.gal.eng .bild{aspect-ratio:16/7}
+.gal.eng figcaption{padding:10px 13px 13px}
+.gal.eng h4{font-size:.92rem;font-family:var(--mono);letter-spacing:.04em}
+section.block{padding-top:56px}
+@media(max-width:640px){.wrap{padding:0 17px 70px}ol.schritte>li{padding-left:42px}
+.gal{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<nav><div class="in"><a href="index.html" class="marke">FutterStorage</a><a href="index.html">&Uuml;bersicht</a><a href="bauanleitung.html" class="hier">Bauanleitung</a><a href="technik.html">Technische Umsetzung</a><a href="projekt.html">Projektaufbau</a><a href="zeichnungen.html">Zeichnungen</a><a href="galerie.html">Bilder</a></div></nav>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Dokument 1</p>
+  <h1>Bauanleitung</h1>
+  <p class="lead">Von der Passprobe bis zum bef&uuml;llten Regal. Alle Teile, alle Ma&szlig;e,
+  alle Handgriffe.</p>
+</header>
+<nav class="toc" aria-label="Inhalt"><ol><li><a href="#k-so-funktioniert-es"><span class="tnr">01</span>So funktioniert es</a></li><li><a href="#k-bevor-du-druckst"><span class="tnr">02</span>Bevor du druckst</a></li><li><a href="#k-die-teile"><span class="tnr">03</span>Die Teile</a></li><li><a href="#k-einkaufsliste"><span class="tnr">04</span>Einkaufsliste</a></li><li><a href="#k-druckeinstellungen"><span class="tnr">05</span>Druckeinstellungen</a></li><li><a href="#k-zusammenbau"><span class="tnr">06</span>Zusammenbau</a></li><li><a href="#k-wie-der-verbund-zusammenhaelt"><span class="tnr">07</span>Wie der Verbund zusammenh&auml;lt</a></li><li><a href="#k-anordnung-im-schrank"><span class="tnr">08</span>Anordnung im Schrank</a></li><li><a href="#k-wenn-etwas-klemmt"><span class="tnr">09</span>Wenn etwas klemmt</a></li></ol></nav>
+
+<section>
+  <h2 id="k-so-funktioniert-es" data-nr="01">So funktioniert es</h2>
+  <figure class="gross"><img src="web/08-funktionsprinzip.jpg" alt="Kanal von der Seite"></figure>
+  <figcaption>Ein Kanal von der Seite. Die Beutel stehen hochkant hintereinander, der
+  orange Schieber steht direkt hinter dem letzten und dr&uuml;ckt den Stapel nach vorne.</figcaption>
+
+  <div class="text">
+    <h3>Entnehmen</h3>
+    <p>Der vorderste Beutel lehnt an der Frontwand und ragt 44 mm dar&uuml;ber hinaus. Du
+    greifst ihn dort und durch die Griffmulde und ziehst ihn nach vorne heraus. Nichts
+    muss nach oben angehoben werden.</p>
+
+    <h4>Kommt man &uuml;berall mit den Fingern hin?</h4>
+    <p>Ja &mdash; aber nur von vorne, und das ist Absicht. Zwei &Ouml;ffnungen sorgen
+    daf&uuml;r:</p>
+    <ul>
+      <li>&Uuml;ber der Frontwand bleiben <strong>48 mm</strong> Luft bis zur n&auml;chsten
+        Ebene. In diesen Spalt greifst du von vorne hinein und fasst den Beutel an
+        seiner d&uuml;nnen Oberkante.</li>
+      <li>Die <strong>Griffmulde</strong> schneidet 50 mm tief und 58 mm breit in die
+        Frontwand. Dort bekommst du den Beutel auf halber H&ouml;he zu fassen und kippst
+        ihn nach vorne heraus.</li>
+    </ul>
+    <p>Seitlich neben den Beutel kommt man nicht &mdash; dort sind nur zwei
+    Millimeter Luft, und der Nachbarkanal steht unmittelbar daneben. Eine seitliche
+    Aussparung w&uuml;rde deshalb nichts bringen: Sie w&uuml;rde direkt in die Wand des
+    Nachbarn zeigen. Genau deswegen ist die Mulde vorne so gro&szlig; ausgefallen.</p>
+
+    <h3>Nachf&uuml;llen</h3>
+    <p>Schieber an der Grifflasche nach hinten ziehen, Beutel hochkant von oben
+    einstellen, Schieber loslassen. Die Feder dr&uuml;ckt den Stapel wieder nach vorne.</p>
+
+    <h3>Sorte wechseln</h3>
+    <p>Schild aus der Tasche an der Frontwand ziehen, neues einschieben.</p>
+  </div>
+</section>
+
+<section>
+  <h2 id="k-bevor-du-druckst" data-nr="02">Bevor du druckst</h2>
+  <div class="text">
+    <h3>Die Passprobe</h3>
+    <p>Das ganze System steht und f&auml;llt mit der Beutelbreite. Gemessen sind 88 mm,
+    daraus ergibt sich die Spaltenbreite von 95,2 mm und damit f&uuml;nf Spalten in
+    540 mm Schrankbreite.</p>
+    <p>Drucke zuerst <code>probe.stl</code> &mdash; 34 g, gut eine halbe Stunde. Das
+    Innenma&szlig; ist eingepr&auml;gt. Stell einen echten Beutel hinein: Passt er mit ein, zwei
+    Millimetern Luft, stimmen alle weiteren Ma&szlig;e.</p>
+
+    <h3>Dann ein einzelner Kanal</h3>
+    <p>Die zweite offene Frage ist die Reibung: Ob sich sechzehn aneinanderlehnende
+    Beutel sauber schieben lassen, h&auml;ngt an der Folienoberfl&auml;che. Bau deshalb erst
+    einen kurzen Kanal aus Front- und Endsegment &mdash; 325 mm, 16 Beutel. Funktioniert
+    der, kannst du die Serie starten.</p>
+  </div>
+
+  <figure class="plan"><img src="zeichnungen/05-beutel-passung.svg" alt="Zeichnung Beutel und Passung"></figure>
+  <figcaption>Die gemessenen Beutelma&szlig;e und wie der Beutel im Kanal sitzt.</figcaption>
+</section>
+
+<section>
+  <h2 id="k-die-teile" data-nr="03">Die Teile</h2>
+  <p class="unter">Sechs Teiletypen. Die Mengen gelten je Kanal &mdash; und ein Kanal
+  ist eine Sorte.</p>
+
+  <div class="karten">
+    <article class="karte">
+      <figure><img src="web/01-segment-front.jpg" alt="Frontsegment"></figure>
+      <div class="txt"><span class="anz">1&times; je Kanal</span>
+      <h4>Frontsegment</h4>
+      <div class="dat">95 &times; 175 &times; 145 mm &middot; 100 g</div>
+      <p>Kommt nach vorne. Tr&auml;gt die 92 mm hohe Frontwand mit Griffmulde, die
+      Schildtasche und den Haken f&uuml;r das Federband.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="web/02-segment-mitte.jpg" alt="Mittelsegment"></figure>
+      <div class="txt"><span class="anz">beliebig oft</span>
+      <h4>Mittelsegment</h4>
+      <div class="dat">95 &times; 169 &times; 145 mm &middot; 70 g</div>
+      <p>Beidseitig offen. Jedes St&uuml;ck verl&auml;ngert den Kanal um 160 mm, also um
+      acht Beutel.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="web/03-segment-end.jpg" alt="Endsegment"></figure>
+      <div class="txt"><span class="anz">1&times; je Kanal</span>
+      <h4>Endsegment</h4>
+      <div class="dat">95 &times; 162 &times; 145 mm &middot; 82 g</div>
+      <p>Schlie&szlig;t hinten ab. Durch den Sichtschlitz siehst du, ob noch Vorrat
+      im Kanal ist.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="web/04-schieber.jpg" alt="Schieber"></figure>
+      <div class="txt"><span class="anz">1&times; je Kanal</span>
+      <h4>Schieber</h4>
+      <div class="dat">95 &times; 42 &times; 149 mm &middot; 50 g</div>
+      <p>Im Fu&szlig; sitzt die Kammer f&uuml;r die Federrolle. Unten Gleitkufen, oben die
+      Grifflasche zum Zur&uuml;ckziehen.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="web/05-schild.jpg" alt="Schild"></figure>
+      <div class="txt"><span class="anz">1&times; je Kanal</span>
+      <h4>Schild</h4>
+      <div class="dat">74 &times; 18 &times; 2 mm &middot; 2 g</div>
+      <p>Orange Platte, Schrift 0,6 mm vertieft. Mit zwei Farben zus&auml;tzlich
+      <code>schild-text.stl</code> in Schwarz drucken und einkleben.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="web/06-kanal-komplett.jpg" alt="Fertiger Kanal"></figure>
+      <div class="txt"><span class="anz">Ergebnis</span>
+      <h4>Ein fertiger Kanal</h4>
+      <div class="dat">95 &times; 485 &times; 145 mm &middot; 304 g</div>
+      <p>Front + Mitte + End + Schieber + Schild. Eine Sorte mit Platz f&uuml;r
+      25 Beutel.</p></div>
+    </article>
+  </div>
+
+  <h3>Zeichnungen</h3>
+  <figure class="plan"><img src="zeichnungen/01-frontsegment.svg" alt="Zeichnung Frontsegment"></figure>
+  <figure class="plan"><img src="zeichnungen/02-mittel-endsegment.svg" alt="Zeichnung Mittel- und Endsegment"></figure>
+  <figure class="plan"><img src="zeichnungen/03-schieber-schild.svg" alt="Zeichnung Schieber und Schild"></figure>
+
+  <h3>Wie viele Segmente</h3>
+  <div class="tab"><table>
+    <thead><tr><th>Kanal</th><th>Aufbau</th><th>L&auml;nge</th><th>Beutel</th>
+      <th>Filament</th></tr></thead>
+    <tbody>
+      <tr><td>kurz</td><td class="w">Front + End</td><td class="num">325 mm</td>
+        <td class="num">16</td><td class="num">234 g</td></tr>
+      <tr><td>mittel</td><td class="w">Front + 1&times; Mitte + End</td>
+        <td class="num">485 mm</td><td class="num">25</td><td class="num">304 g</td></tr>
+      <tr><td>lang</td><td class="w">Front + 2&times; Mitte + End</td>
+        <td class="num">645 mm</td><td class="num">33</td><td class="num">374 g</td></tr>
+    </tbody>
+  </table></div>
+  <p class="unter">In deinen Schrank passt der mittlere Kanal genau.</p>
+
+  <h3>St&uuml;ckliste</h3>
+  <div class="tab"><table>
+    <thead><tr><th>Stufe</th><th>Sorten</th><th>Beutel</th><th>Teile</th>
+      <th>Filament</th><th>Druckzeit ca.</th></tr></thead>
+    <tbody>
+      <tr><td>Testkanal, kurz</td><td class="num">1</td><td class="num">16</td>
+        <td class="num">5</td><td class="num">234 g</td><td class="num">14 h</td></tr>
+      <tr><td>Eine Ebene</td><td class="num">5</td><td class="num">125</td>
+        <td class="num">30</td><td class="num">1,52 kg</td><td class="num">89 h</td></tr>
+      <tr><td>Zwei Ebenen</td><td class="num">10</td><td class="num">250</td>
+        <td class="num">60</td><td class="num">3,04 kg</td><td class="num">179 h</td></tr>
+    </tbody>
+    <tfoot><tr><td>Drei Ebenen</td><td class="num">15</td><td class="num">375</td>
+      <td class="num">90</td><td class="num">4,56 kg</td><td class="num">268 h</td></tr></tfoot>
+  </table></div>
+  <p class="unter">Druckzeit grob mit 17 g/h. Bei zehn Sorten reichen zwei Ebenen.</p>
+</section>
+
+<section>
+  <h2 id="k-einkaufsliste" data-nr="04">Einkaufsliste</h2>
+  <p class="unter">Zwei Kleinteile je Kanal. Keine Schrauben, keine Muttern, kein Kleber.</p>
+
+  <div class="tab"><table>
+    <thead><tr><th>Teil</th><th>Anforderung</th><th>Menge</th><th>Preis</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="w"><strong>Konstantkraftfeder</strong><br>
+          <span class="klein">aufgerolltes Federstahlband</span></td>
+        <td class="w">Zugkraft <strong>8&ndash;12 N</strong> &middot;
+          Auszug <strong>&ge; 500 mm</strong> &middot;
+          Band <strong>16 mm</strong> breit &middot;
+          Rolle <strong>&le; 26 mm</strong></td>
+        <td class="num">1 je Kanal</td>
+        <td class="num">3&ndash;8 &euro;</td>
+      </tr>
+      <tr>
+        <td class="w"><strong>Achse</strong><br>
+          <span class="klein">h&auml;lt die Federrolle</span></td>
+        <td class="w">Rundstab <strong>3 mm</strong>, 90 mm lang &mdash; Stahldraht,
+          Messing oder ein St&uuml;ck 3-mm-Filament</td>
+        <td class="num">1 je Kanal</td>
+        <td class="num">&lt; 1 &euro;</td>
+      </tr>
+    </tbody>
+    <tfoot><tr><td>F&uuml;r 15 Kan&auml;le</td><td>&nbsp;</td><td class="num">15 + 15</td>
+      <td class="num">45&ndash;135 &euro;</td></tr></tfoot>
+  </table></div>
+
+  <div class="text">
+    <h3>Wo es die Feder gibt</h3>
+    <p>Der Fachbegriff ist entscheidend: <strong>Konstantkraftfeder</strong>, auch
+    Rollfeder, englisch <em>constant force spring</em>. Dasselbe Bauteil steckt in
+    den Warenschiebern im Supermarktregal.</p>
+    <ul class="quellen">
+      <li><a href="https://www.google.com/search?q=Konstantkraftfeder+16mm+Band+8N"
+        rel="noopener">Konstantkraftfeder 16 mm Band, 8 N</a>
+        <span class="klein">allgemeine Suche</span></li>
+      <li><a href="https://www.ebay.de/sch/i.html?_nkw=konstantkraftfeder+rollfeder"
+        rel="noopener">eBay: Konstantkraftfeder / Rollfeder</a>
+        <span class="klein">g&uuml;nstig, oft als Restposten</span></li>
+      <li><a href="https://www.amazon.de/s?k=konstantkraftfeder" rel="noopener">Amazon:
+        Konstantkraftfeder</a> <span class="klein">schnell, kleine Auswahl</span></li>
+      <li><a href="https://www.gutekunst-federn.de/federn/konstantkraftfedern.html"
+        rel="noopener">Gutekunst Federn</a>
+        <span class="klein">Hersteller, Katalogware und Sonderanfertigung</span></li>
+      <li><a href="https://www.sodemann-federn.de/konstantkraftfedern.html"
+        rel="noopener">Sodemann Federn</a>
+        <span class="klein">Hersteller, Datenbl&auml;tter mit Kraftangabe</span></li>
+    </ul>
+    <div class="hinweis">Beim Kauf z&auml;hlt nur dreierlei: Die <strong>Bandbreite</strong>
+    muss unter 17 mm liegen, der <strong>Rollendurchmesser</strong> unter 26 mm, und
+    der <strong>Auszug</strong> mindestens 500 mm betragen. Die Kraft darf h&ouml;her als
+    12 N sein &mdash; dann l&auml;sst sich der Schieber nur schwerer zur&uuml;ckziehen.</div>
+    <p>Der Kraftbedarf liegt bei etwa 0,25 N je Beutel: rund 4 N bei 16 Beuteln,
+    6 N bei 25. Wenn du zwischen zwei St&auml;rken w&auml;hlen kannst, nimm die st&auml;rkere.
+    Von Hand nachschieben funktioniert nicht &mdash; der Schieber steht im vollen
+    Kanal fast einen halben Meter tief drin.</p>
+  </div>
+</section>
+
+<section>
+  <h2 id="k-druckeinstellungen" data-nr="05">Druckeinstellungen</h2>
+  <div class="tab"><table>
+    <thead><tr><th>Einstellung</th><th>Wert</th><th>Warum</th></tr></thead>
+    <tbody>
+      <tr><td>D&uuml;se</td><td class="num">0,4 mm</td><td class="w">Standard</td></tr>
+      <tr><td>Schichth&ouml;he</td><td class="num">0,2 mm</td>
+        <td class="w">Kompromiss aus Zeit und Qualit&auml;t</td></tr>
+      <tr><td>Wandlinien</td><td class="num">4</td>
+        <td class="w">Wandst&auml;rke 1,6 mm geht exakt in vier Linien auf</td></tr>
+      <tr><td>Infill</td><td class="num">15 %</td>
+        <td class="w">die W&auml;nde tragen, viel F&uuml;llung gibt es nicht</td></tr>
+      <tr><td>St&uuml;tzen</td><td class="num">nein</td>
+        <td class="w">&Uuml;berh&auml;nge unter 3 %, nur kurze Br&uuml;cken</td></tr>
+      <tr><td>Ausrichtung</td><td class="num">wie modelliert</td>
+        <td class="w">Boden aufs Bett, nichts drehen</td></tr>
+      <tr><td>Material</td><td class="num">PLA</td>
+        <td class="w">reicht, im Schrank wird nichts warm</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="text">
+    <h3>Passung</h3>
+    <p>Ein Parameter im Modell steuert alle Steckverbindungen:</p>
+    <figure class="cd"><div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span><span class="spr">openscad</span></div><pre><code>passung = <span class="c-zahl">0.2</span>;   <span class="c-kom">// Spiel je Flanke in mm</span></code></pre></figure>
+    <p>Betrifft die Bodenzunge zwischen den Segmenten und die Schildtasche. 0,15 sitzt
+    stramm, 0,20 ist Standard, 0,25 l&auml;uft leicht. Einmal mit einem Toleranztest
+    ermitteln und eintragen.</p>
+    <div class="hinweis">Das Frontsegment ist mit 175 mm das l&auml;ngste Teil. Auf einem
+    180er Bett bleiben 5 mm Reserve.</div>
+  </div>
+</section>
+
+<section>
+  <h2 id="k-zusammenbau" data-nr="06">Zusammenbau</h2>
+  <figure class="gross"><img src="web/07-explosion.jpg" alt="Explosionsdarstellung"></figure>
+  <figcaption>Die drei Segmente auseinandergezogen. Am hinteren Ende jedes St&uuml;cks
+  sitzt die Bodenzunge, die sich unter das n&auml;chste schiebt.</figcaption>
+
+  <ol class="schritte">
+    <li><h4>Segmente aneinanderreihen</h4>
+    <p>Frontsegment nach vorne, dahinter die Mittelst&uuml;cke, hinten das Endsegment. Die
+    Bodenzunge schiebt sich unter den Boden des n&auml;chsten Teils und &uuml;berbr&uuml;ckt die
+    Fuge &mdash; so bleibt kein Beutel an einer Stufe h&auml;ngen. Nichts verschrauben:
+    Der Schieberdruck presst die Segmente gegeneinander.</p></li>
+
+    <li><h4>Feder in den Schieber einsetzen</h4>
+    <p>Im Fu&szlig; des Schiebers sitzt eine Kammer mit zwei Wangen. Federrolle hineinlegen,
+    den 3-mm-Stab durch beide Bohrungen schieben. Der Stab darf seitlich nicht
+    &uuml;berstehen, sonst schleift er an der Kanalwand.</p></li>
+
+    <li><h4>Band nach vorne f&uuml;hren</h4>
+    <p>Das Bandende tritt unten aus dem Schieber aus und l&auml;uft in der 18 mm breiten
+    Nut mittig durch den Boden aller Segmente nach vorne.</p></li>
+
+    <li><h4>Band vorne einh&auml;ngen</h4>
+    <p>Im Frontsegment sitzt ein Quersteg in der Bodennut. Bandende dort einh&auml;ngen
+    &mdash; die meisten Federn haben ein Loch im Band. Sonst eines bohren oder mit
+    einem Kabelbinder befestigen.</p></li>
+
+    <li><h4>Funktion pr&uuml;fen</h4>
+    <p>Schieber nach hinten ziehen und loslassen. Er sollte gleichm&auml;&szlig;ig nach vorne
+    laufen und an der Frontwand anschlagen.</p></li>
+
+    <li><h4>Schild einschieben</h4>
+    <p>Von oben in die Tasche an der Frontwand.</p></li>
+
+    <li><h4>Bef&uuml;llen</h4>
+    <p>Schieber zur&uuml;ckziehen, Beutel hochkant von oben einstellen &mdash; alle in
+    derselben Richtung &mdash; und loslassen.</p></li>
+
+    <li><h4>Spalten nebeneinandersetzen</h4>
+    <p>In beiden Bodenr&auml;ndern jedes Segments sitzt dieselbe Tasche. Lege je
+    Segmentfuge einen <strong>Verbinder</strong> ein und schiebe die n&auml;chste
+    Spalte dagegen, bis die Rastnoppe h&ouml;rbar einschnappt. Zum L&ouml;sen gen&uuml;gt
+    kr&auml;ftiger Zug &mdash; werkzeuglos.</p>
+    <p>Weil die Nase nicht angeformt ist, bleibt jede Au&szlig;enkante b&uuml;ndig:
+    Die &auml;u&szlig;erste Spalte l&auml;sst ihre Tasche einfach leer, dort steht nichts
+    &uuml;ber.</p></li>
+
+    <li><h4>Ebenen stapeln</h4>
+    <p>Auf den Oberkanten der Seitenw&auml;nde stehen vier Zapfen &uuml;ber, im Boden
+    der n&auml;chsten Ebene sitzen die passenden Taschen. Die Ebene von oben aufsetzen,
+    bis sie satt auf den W&auml;nden aufliegt &mdash; nicht auf den Zapfen. Kein Sockel,
+    kein Kleber, kein Werkzeug.</p>
+    <p>F&uuml;r die <strong>oberste Lage</strong> liegt in <code>stl/oben/</code> derselbe
+    Satz ohne Zapfen. Damit schlie&szlig;t der Stapel oben glatt ab. Wer das nicht
+    braucht, nimmt einfach die normalen Segmente &mdash; die 2,6 mm stehen dort
+    frei nach oben und st&ouml;ren nicht.</p></li>
+  </ol>
+</section>
+
+<section>
+  <h2 id="k-wie-der-verbund-zusammenhaelt" data-nr="07">Wie der Verbund zusammenh&auml;lt</h2>
+  <p class="unter">Zwei Steckverbindungen, beide ohne Zusatzteile.</p>
+  <figure class="plan"><img src="zeichnungen/06-verbindungen.svg" alt="Zeichnung Verbindungen"></figure>
+  <div class="text">
+    <p>Beim Herausziehen eines Beutels wirkt eine Kraft nach vorne. Ohne Verbindung
+    w&uuml;rde sich der Stapel mit der Zeit verschieben. Deshalb greifen die Teile
+    ineinander:</p>
+    <ul>
+      <li><strong>Nach oben</strong> laufen die Seitenw&auml;nde als Zapfen weiter und
+        stecken in Taschen im Boden der Ebene dar&uuml;ber. Der Zapfen ist genauso breit
+        wie die Wand &mdash; er schw&auml;cht sie also nicht und druckt ohne St&uuml;tzen.</li>
+      <li><strong>Zur Seite</strong> greift eine Nase am Bodenrand in die Tasche der
+        Nachbarspalte. Beide liegen unterhalb des Innenraums und nehmen dem Beutel
+        keinen Platz weg.</li>
+    </ul>
+    <div class="hinweis">Ringsum sind 0,2 mm Spiel eingerechnet. Sitzt es zu stramm,
+    in der Modelldatei <code>passung</code> auf 0,25 erh&ouml;hen und die Segmente neu
+    bauen &mdash; sitzt es zu locker, auf 0,15 verringern.</div>
+  </div>
+</section>
+
+<section>
+  <h2 id="k-anordnung-im-schrank" data-nr="08">Anordnung im Schrank</h2>
+  <figure class="plan"><img src="zeichnungen/04-gesamtanordnung.svg" alt="Zeichnung Gesamtanordnung"></figure>
+  <figure class="gross"><img src="web/09-eine-ebene.jpg" alt="Eine Ebene"></figure>
+  <figcaption>Eine Ebene: f&uuml;nf Kan&auml;le nebeneinander, 476 von 540 mm Breite.</figcaption>
+</section>
+
+<section>
+  <h2 id="k-wenn-etwas-klemmt" data-nr="09">Wenn etwas klemmt</h2>
+  <div class="text">
+    <h4>Der Stapel rutscht nicht nach</h4>
+    <p>Meist ist die Feder zu schwach &mdash; rechne mit 0,25 N je Beutel. Zweite
+    M&ouml;glichkeit: Ein Beutel steht quer. Durch die Seitenfenster siehst du, wo es hakt.</p>
+    <h4>Ein Beutel bleibt an der Fuge h&auml;ngen</h4>
+    <p>Die Bodenzunge sitzt nicht sauber unter dem n&auml;chsten Segment. Segmente fest
+    zusammenschieben, notfalls <code>passung</code> auf 0,25 erh&ouml;hen.</p>
+    <h4>Der Schieber verkantet</h4>
+    <p>Die Achse steht seitlich &uuml;ber und schleift. B&uuml;ndig k&uuml;rzen.</p>
+    <h4>Der vorderste Beutel f&auml;llt heraus</h4>
+    <p>Sollte nicht passieren, die Frontwand ist mit 92 mm hoch genug. Falls doch:
+    Feder ist zu stark.</p>
+  </div>
+</section>
+
+<footer>Alle Ma&szlig;e in Millimetern &middot; Modell parametrisch in
+<code>katzenfutter-regal.scad</code></footer>
+<div class="blaettern"><a href="index.html" class="zurueck">&larr; &Uuml;bersicht</a><a href="technik.html" class="weiter">Technische Umsetzung &rarr;</a></div></div>
+<dialog class="lupe">
+<button class="zu" aria-label="Schliessen">&times;</button>
+<div class="rahmen"><img alt=""><p class="bu"></p></div></dialog>
+<script>
+(function(){
+  var d=document.querySelector('dialog.lupe'),
+      b=d.querySelector('img'), u=d.querySelector('.bu'),
+      k=Array.prototype.slice.call(document.querySelectorAll('[data-gross]')),
+      i=0;
+  function zeig(n){
+    if(!k.length) return;
+    i=(n+k.length)%k.length;
+    b.src=k[i].dataset.gross; b.alt=k[i].dataset.was||'';
+    u.textContent=k[i].dataset.was||'';
+  }
+  k.forEach(function(el,n){
+    el.addEventListener('click',function(){zeig(n); d.showModal();});
+  });
+  d.querySelector('.zu').addEventListener('click',function(){d.close()});
+  d.addEventListener('click',function(e){
+    if(e.target===d||e.target.classList.contains('rahmen')) d.close();
+  });
+  d.addEventListener('close',function(){b.removeAttribute('src')});
+  document.addEventListener('keydown',function(e){
+    if(!d.open) return;
+    if(e.key==='ArrowRight') zeig(i+1);
+    if(e.key==='ArrowLeft')  zeig(i-1);
+  });
+})();
+</script>

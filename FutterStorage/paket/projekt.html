@@ -1,0 +1,335 @@
+<title>Projektaufbau &mdash; FutterStorage</title>
+<style>
+:root{--ink:#17171b;--ink2:#3d3d43;--paper:#f7f5f2;--paper2:#fff;--akzent:#bd4d0a;
+--grau:#6e6a65;--linie:#e3ded7;--code:#eee9e2;--bild:#d7d8dc;
+--schatten:0 1px 2px rgba(23,23,27,.05),0 10px 28px rgba(23,23,27,.05);
+--sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+--mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace}
+@media(prefers-color-scheme:dark){:root{--ink:#eceae6;--ink2:#bcb8b1;--paper:#131316;
+--paper2:#1c1c21;--akzent:#ff8a47;--grau:#918c85;--linie:#2d2d33;--code:#232329;
+--bild:#25252a;--schatten:0 1px 2px rgba(0,0,0,.45),0 10px 28px rgba(0,0,0,.32)}}
+:root[data-theme=dark]{--ink:#eceae6;--ink2:#bcb8b1;--paper:#131316;--paper2:#1c1c21;
+--akzent:#ff8a47;--grau:#918c85;--linie:#2d2d33;--code:#232329;--bild:#25252a;
+--schatten:0 1px 2px rgba(0,0,0,.45),0 10px 28px rgba(0,0,0,.32)}
+:root[data-theme=light]{--ink:#17171b;--ink2:#3d3d43;--paper:#f7f5f2;--paper2:#fff;
+--akzent:#bd4d0a;--grau:#6e6a65;--linie:#e3ded7;--code:#eee9e2;--bild:#d7d8dc;
+--schatten:0 1px 2px rgba(23,23,27,.05),0 10px 28px rgba(23,23,27,.05)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+font-size:16.5px;line-height:1.68;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1160px;margin:0 auto;padding:0 26px 110px}
+.text{max-width:70ch}
+nav{border-bottom:1px solid var(--linie);margin-bottom:0}
+nav .in{max-width:1160px;margin:0 auto;padding:14px 26px;display:flex;gap:26px;
+align-items:baseline;flex-wrap:wrap}
+nav a{color:var(--grau);text-decoration:none;font-size:.92rem}
+nav a:hover{color:var(--akzent)}
+nav a.hier{color:var(--ink);font-weight:600}
+nav .marke{font-family:var(--mono);font-size:.8rem;letter-spacing:.12em;
+text-transform:uppercase;color:var(--akzent);margin-right:auto}
+header{padding:66px 0 32px;border-bottom:2px solid var(--ink)}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.15em;
+text-transform:uppercase;color:var(--akzent);margin:0 0 14px}
+h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.06;margin:0 0 18px;
+letter-spacing:-.026em;font-weight:780;text-wrap:balance;max-width:17ch}
+.lead{font-size:1.12rem;color:var(--ink2);margin:0;max-width:62ch}
+.kz-reihe{display:grid;grid-template-columns:repeat(auto-fit,minmax(124px,1fr));
+gap:1px;background:var(--linie);border:1px solid var(--linie);margin:40px 0 0}
+.kz{background:var(--paper);padding:16px 18px}
+.kz b{display:block;font-family:var(--mono);font-size:1.5rem;font-weight:600;
+letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.kz span{font-size:12.5px;color:var(--grau)}
+section{padding-top:70px}
+h2{font-size:1.58rem;letter-spacing:-.02em;margin:0 0 6px;font-weight:720;
+display:flex;align-items:baseline;gap:14px}
+h2::before{content:attr(data-nr);font-family:var(--mono);font-size:.8rem;
+color:var(--akzent);font-weight:500}
+h3{font-size:1.07rem;margin:34px 0 8px;font-weight:670}
+h4{font-size:.99rem;margin:20px 0 6px;font-weight:660}
+.unter{color:var(--grau);margin:0 0 22px;font-size:.96rem;max-width:66ch}
+p{margin:0 0 15px}
+ul,ol{margin:0 0 15px;padding-left:20px}
+li{margin-bottom:7px}
+a{color:var(--akzent);text-underline-offset:2px}
+.karten{display:grid;grid-template-columns:repeat(auto-fit,minmax(288px,1fr));gap:22px}
+.karten{align-items:stretch}
+.karte{background:var(--paper2);border:1px solid var(--linie);
+box-shadow:var(--schatten);display:flex;flex-direction:column}
+.karte figure{aspect-ratio:4/3;overflow:hidden;display:flex}
+.karte img{object-fit:contain;height:100%}
+.karte figure{margin:0;background:var(--bild)}
+.karte img{display:block;width:100%;height:auto}
+.karte .txt{padding:16px 18px 19px;display:flex;flex-direction:column;gap:9px;flex:1}
+.karte h4{margin:0;font-size:1.02rem;font-weight:690}
+.dat{font-family:var(--mono);font-size:12.5px;color:var(--grau);
+font-variant-numeric:tabular-nums}
+.karte p{margin:0;font-size:.93rem;color:var(--ink2)}
+.anz{align-self:flex-start;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;
+text-transform:uppercase;background:var(--akzent);color:#fff;padding:3px 9px}
+:root[data-theme=dark] .anz{color:#17171b}
+@media(prefers-color-scheme:dark){.anz{color:#17171b}}
+figure.gross{margin:26px 0 6px;background:var(--bild);border:1px solid var(--linie)}
+figure.gross img{display:block;width:100%;height:auto}
+figure.plan{margin:26px 0 6px;background:#f7f5f2;border:1px solid var(--linie);padding:0}
+figure.plan img{display:block;width:100%;height:auto}
+figcaption{font-size:.89rem;color:var(--grau);padding:10px 2px 0;max-width:78ch}
+.kauf{border:2px solid var(--akzent);background:var(--paper2);padding:24px 26px;
+margin:22px 0 8px}
+.kauf h3{margin-top:0}
+.kauf dl{display:grid;grid-template-columns:max-content 1fr;gap:8px 22px;margin:0}
+.kauf dt{font-family:var(--mono);font-size:12.5px;color:var(--grau)}
+.kauf dd{margin:0}
+.tab{overflow-x:auto;margin:20px 0;border:1px solid var(--linie)}
+table{border-collapse:collapse;width:100%;font-size:.93rem;background:var(--paper2)}
+th,td{text-align:left;padding:11px 15px;border-bottom:1px solid var(--linie);
+white-space:nowrap}
+th{font-family:var(--mono);font-size:11.5px;letter-spacing:.07em;text-transform:uppercase;
+color:var(--grau);font-weight:500;background:var(--code)}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+td.w{white-space:normal;min-width:210px}
+tbody tr:last-child td{border-bottom:none}
+tfoot td{font-weight:650;background:var(--code);border-bottom:none}
+ol.schritte{list-style:none;counter-reset:s;padding:0;margin:24px 0 0;max-width:74ch}
+ol.schritte>li{counter-increment:s;position:relative;padding:0 0 26px 52px;
+border-left:1px solid var(--linie);margin-left:15px}
+ol.schritte>li:last-child{border-left-color:transparent;padding-bottom:0}
+ol.schritte>li::before{content:counter(s);position:absolute;left:-15px;top:-3px;
+width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);
+font-family:var(--mono);font-size:13px;font-weight:600;display:grid;place-items:center}
+ol.schritte h4{margin:3px 0 6px;font-size:1.03rem;font-weight:680}
+ol.schritte p{font-size:.96rem;color:var(--ink2)}
+.hinweis{border-left:3px solid var(--akzent);padding:2px 0 2px 17px;margin:18px 0;
+color:var(--ink2);font-size:.96rem;max-width:70ch}
+code{font-family:var(--mono);font-size:.89em;background:var(--code);padding:1px 5px}
+pre{background:var(--code);padding:16px 18px;overflow-x:auto;font-family:var(--mono);
+font-size:.84rem;line-height:1.55;margin:14px 0;border-left:3px solid var(--linie)}
+pre code{background:none;padding:0}
+.kachel{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;
+margin:30px 0 0}
+.kachel{align-items:stretch}
+.kachel a{display:flex;flex-direction:column;background:var(--paper2);
+border:1px solid var(--linie);padding:22px 24px;text-decoration:none;
+color:var(--ink);box-shadow:var(--schatten)}
+.kachel a p{margin-bottom:0}
+.kachel a:hover{border-color:var(--akzent)}
+.kachel .nr{font-family:var(--mono);font-size:.76rem;letter-spacing:.1em;
+color:var(--akzent);text-transform:uppercase}
+.kachel h3{margin:8px 0 6px;font-size:1.12rem}
+.kachel p{margin:0;font-size:.93rem;color:var(--grau)}
+footer{margin-top:80px;padding-top:20px;border-top:1px solid var(--linie);
+font-size:.87rem;color:var(--grau)}
+/* Codeblock: eigener dunkler Grund, damit die Hervorhebung in beiden
+   Themes identisch und kontraststark bleibt. */
+figure.cd{margin:22px 0 6px;border-radius:8px;overflow:hidden;
+background:#1b1d23;border:1px solid #2b2e37;box-shadow:var(--schatten)}
+figure.cd .kopf{display:flex;align-items:center;gap:9px;padding:9px 14px;
+background:#22252d;border-bottom:1px solid #2b2e37}
+figure.cd .punkt{width:9px;height:9px;border-radius:50%;background:#3a3e49;flex:none}
+figure.cd .spr{margin-left:4px;font-family:var(--mono);font-size:11px;
+letter-spacing:.1em;text-transform:uppercase;color:#8b91a1}
+figure.cd pre{margin:0;padding:16px 18px;background:none;border:none;
+font-size:.85rem;line-height:1.62;color:#d6dae4;overflow-x:auto}
+figure.cd code{background:none;padding:0;color:inherit}
+.c-kom{color:#6b7385;font-style:italic}
+.c-str{color:#9ecb8a}
+.c-zahl{color:#e0a458}
+.c-key{color:#c98cf1;font-weight:600}
+.c-fn{color:#78b8f0}
+figure.dia{margin:26px 0 6px;padding:22px 18px;background:var(--paper2);
+border:1px solid var(--linie);overflow-x:auto}
+figure.dia svg{display:block;margin:0 auto}
+figure.dia figcaption{padding-top:14px;text-align:center}
+nav.toc{margin:38px 0 0;padding:22px 26px;background:var(--paper2);
+border:1px solid var(--linie);box-shadow:var(--schatten)}
+nav.toc ol{list-style:none;margin:0;padding:0;display:grid;
+grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:2px 30px}
+nav.toc li{margin:0}
+nav.toc a{display:flex;gap:12px;align-items:baseline;padding:6px 0;
+text-decoration:none;color:var(--ink);font-size:.95rem;border-bottom:1px solid transparent}
+nav.toc a:hover{color:var(--akzent)}
+nav.toc .tnr{font-family:var(--mono);font-size:.78rem;color:var(--akzent);
+min-width:1.6em;font-variant-numeric:tabular-nums}
+h2{scroll-margin-top:22px}
+.klein{font-size:.86em;color:var(--grau)}
+ul.quellen{list-style:none;padding:0;margin:14px 0 18px}
+ul.quellen li{margin-bottom:9px;display:flex;gap:12px;align-items:baseline;
+flex-wrap:wrap}
+ul.quellen a{font-weight:600;text-decoration:none;border-bottom:1px solid var(--linie)}
+ul.quellen a:hover{border-color:var(--akzent)}
+td.w strong{font-weight:660}
+.baum{margin:18px 0;border:1px solid var(--linie);overflow-x:auto}
+.baum table{border-collapse:collapse;width:100%;background:var(--paper2);
+font-size:.88rem}
+.baum th{font-family:var(--mono);font-size:11px;letter-spacing:.07em;
+text-transform:uppercase;color:var(--grau);font-weight:500;background:var(--code);
+text-align:left;padding:9px 14px;white-space:nowrap}
+.baum td{padding:5px 14px;border-bottom:1px solid var(--linie);vertical-align:top}
+.baum tbody tr:last-child td{border-bottom:none}
+.baum tr:hover td{background:var(--code)}
+.baum .pf{font-family:var(--mono);white-space:pre;color:var(--ink);
+font-size:.86rem;width:1%}
+.baum .gr{font-family:var(--mono);font-size:.8rem;color:var(--grau);
+text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;width:1%}
+.baum .be{color:var(--ink2);font-size:.88rem;line-height:1.5;min-width:16ch}
+.baum table{table-layout:auto}
+.baum .ord{color:var(--akzent);font-weight:600}
+.baum .rest{color:var(--grau);font-style:italic}
+.blaettern{display:flex;justify-content:space-between;gap:18px;margin-top:76px;
+padding-top:22px;border-top:1px solid var(--linie)}
+.blaettern a{text-decoration:none;color:var(--ink);font-weight:620;font-size:.97rem}
+.blaettern a:hover{color:var(--akzent)}
+.blaettern .weiter{margin-left:auto;text-align:right}
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:26px;
+margin-top:34px}
+.gal figure{margin:0;background:var(--paper2);border:1px solid var(--linie);
+box-shadow:var(--schatten);display:flex;flex-direction:column}
+.gal .bild{background:var(--bild);cursor:zoom-in;display:block;border:none;padding:0;
+width:100%;aspect-ratio:4/3;overflow:hidden}
+.gal img{display:block;width:100%;height:100%;object-fit:contain}
+.gal figcaption{padding:14px 17px 17px;flex:1;display:flex;flex-direction:column}
+.gal .roh{margin-top:auto;align-self:flex-start}
+.gal h4{margin:0 0 4px;font-size:1.02rem;font-weight:680;color:var(--ink)}
+.gal p{margin:0 0 9px;font-size:.92rem;color:var(--ink2)}
+.gal .roh{font-family:var(--mono);font-size:12px;color:var(--grau);text-decoration:none;
+border-bottom:1px solid var(--linie)}
+.gal .roh:hover{color:var(--akzent);border-color:var(--akzent)}
+.plaene{display:grid;gap:34px;margin-top:34px}
+.plaene figure{margin:0}
+.plaene .blatt{background:#f7f5f2;border:1px solid var(--linie);box-shadow:var(--schatten);
+cursor:zoom-in;display:block;padding:0;width:100%;border-radius:0}
+.plaene img{display:block;width:100%;height:auto}
+.plaene figcaption{display:flex;gap:16px;align-items:baseline;flex-wrap:wrap;
+padding:12px 2px 0;color:var(--grau);font-size:.9rem}
+.plaene b{color:var(--ink);font-size:1rem}
+/* Lightbox: der Dialog fuellt den Bildschirm, das Bild wird darin zentriert.
+   Ein am Inhalt bemessener Dialog haette je nach Bildformat versetzt gesessen. */
+dialog.lupe{border:none;padding:0;background:transparent;width:100vw;height:100vh;
+max-width:100vw;max-height:100vh;overflow:hidden}
+dialog.lupe::backdrop{background:rgba(10,10,12,.9)}
+dialog.lupe .rahmen{width:100vw;height:100vh;display:flex;flex-direction:column;
+align-items:center;justify-content:center;gap:14px;padding:56px 32px 40px}
+dialog.lupe img{display:block;max-width:calc(100vw - 64px);max-height:calc(100vh - 130px);
+width:auto;height:auto;object-fit:contain}
+dialog.lupe .bu{color:#e8e5e0;font-size:.92rem;text-align:center;max-width:70ch}
+dialog.lupe .zu{position:fixed;top:14px;right:20px;background:none;border:none;
+color:#f2efea;font-size:32px;line-height:1;cursor:pointer;font-family:var(--mono);
+padding:4px 10px}
+dialog.lupe .zu:hover{color:var(--akzent)}
+.gal.eng{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
+.gal.eng .bild{aspect-ratio:16/7}
+.gal.eng figcaption{padding:10px 13px 13px}
+.gal.eng h4{font-size:.92rem;font-family:var(--mono);letter-spacing:.04em}
+section.block{padding-top:56px}
+@media(max-width:640px){.wrap{padding:0 17px 70px}ol.schritte>li{padding-left:42px}
+.gal{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<nav><div class="in"><a href="index.html" class="marke">FutterStorage</a><a href="index.html">&Uuml;bersicht</a><a href="bauanleitung.html">Bauanleitung</a><a href="technik.html">Technische Umsetzung</a><a href="projekt.html" class="hier">Projektaufbau</a><a href="zeichnungen.html">Zeichnungen</a><a href="galerie.html">Bilder</a></div></nav>
+
+<div class="wrap">
+<header>
+  <p class="eyebrow">Projektaufbau</p>
+  <h1>Wie das Projekt aufgebaut ist</h1>
+  <p class="lead">Eine Quelldatei, f&uuml;nf Skripte, der Rest ist erzeugt. Wer eine
+  Zahl im Modell &auml;ndert, l&auml;sst die Skripte laufen und bekommt neue STLs,
+  neue Zeichnungen, neue Bilder und diese Seiten &mdash; alles wieder zueinander
+  passend.</p>
+</header>
+<nav class="toc" aria-label="Inhalt"><ol><li><a href="#k-der-verzeichnisbaum"><span class="tnr">01</span>Der Verzeichnisbaum</a></li><li><a href="#k-erzeugt-und-von-hand-geschrieben"><span class="tnr">02</span>Erzeugt und von Hand geschrieben</a></li><li><a href="#k-alles-neu-bauen"><span class="tnr">03</span>Alles neu bauen</a></li></ol></nav>
+
+<section>
+  <h2 id="k-der-verzeichnisbaum" data-nr="01">Der Verzeichnisbaum</h2>
+  <p class="unter">Direkt aus dem Projektordner gelesen &mdash; was hier steht,
+  liegt auch wirklich dort.</p>
+  <div class="baum"><table><thead><tr><th>Datei</th><th>Gr&#246;&#223;e</th><th>Wozu</th></tr></thead><tbody><tr><td class="pf">&#9500;&#9472;&#160;<span class="ord">bilder/</span></td><td class="gr"></td><td class="be">Renderings in voller Aufl&ouml;sung</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;<span class="ord">schilder/</span></td><td class="gr"></td><td class="be">Alle Sortenschilder als Bild</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;01-huhn.png</td><td class="gr">8 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;02-rind.png</td><td class="gr">8 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;03-lachs.png</td><td class="gr">9 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9492;&#9472;&#160;<span class="rest">&#8230; und 9 weitere</span></td><td class="gr"></td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;<span class="ord">web/</span></td><td class="gr"></td><td class="be">Dieselben Bilder klein, f&uuml;r die Seiten</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;b_ebene.jpg</td><td class="gr">68 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;b_end.jpg</td><td class="gr">41 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;b_explosion.jpg</td><td class="gr">94 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9492;&#9472;&#160;<span class="rest">&#8230; und 7 weitere</span></td><td class="gr"></td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;b_ebene.png</td><td class="gr">2.7 MB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;b_end.png</td><td class="gr">2.4 MB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;b_explosion.png</td><td class="gr">2.6 MB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9492;&#9472;&#160;<span class="rest">&#8230; und 7 weitere</span></td><td class="gr"></td><td class="be"></td></tr><tr><td class="pf">&#9500;&#9472;&#160;<span class="ord">modell/</span></td><td class="gr"></td><td class="be">Die einzige Quelle der Geometrie</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9492;&#9472;&#160;katzenfutter-regal.scad</td><td class="gr">36 kB</td><td class="be">Das ganze Regal als Programm &mdash; alle Ma&szlig;e als Variablen</td></tr><tr><td class="pf">&#9500;&#9472;&#160;<span class="ord">stl/</span></td><td class="gr"></td><td class="be">Druckfertige Dateien, direkt in den Slicer</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;<span class="ord">oben/</span></td><td class="gr"></td><td class="be">3 Dateien</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;segment-end.stl</td><td class="gr">303 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;segment-front.stl</td><td class="gr">327 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9492;&#9472;&#160;segment-mitte.stl</td><td class="gr">276 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;<span class="ord">schilder/</span></td><td class="gr"></td><td class="be">Ein fertiges Schild je Sorte</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;01-huhn-text.stl</td><td class="gr">168 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;01-huhn.stl</td><td class="gr">204 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;02-rind-text.stl</td><td class="gr">283 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9474;&#160;&#160;&#160;&#9492;&#9472;&#160;<span class="rest">&#8230; und 21 weitere</span></td><td class="gr"></td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;probe.stl</td><td class="gr">6 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;schieber.stl</td><td class="gr">111 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;schild-text.stl</td><td class="gr">168 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9492;&#9472;&#160;<span class="rest">&#8230; und 5 weitere</span></td><td class="gr"></td><td class="be"></td></tr><tr><td class="pf">&#9500;&#9472;&#160;<span class="ord">werkzeuge/</span></td><td class="gr"></td><td class="be">Skripte, die aus dem Modell alles Weitere erzeugen</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;abgleich.py</td><td class="gr">7 kB</td><td class="be">Vergleicht Modell, STL, Zeichnungen und Bilder</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;pruefen.py</td><td class="gr">7 kB</td><td class="be">Wasserdicht, Volumen, &Uuml;berh&auml;nge, Bauraum, Passung</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;rendern.py</td><td class="gr">14 kB</td><td class="be">Blender-Szene mit automatischer Kamerarahmung</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9492;&#9472;&#160;<span class="rest">&#8230; und 4 weitere</span></td><td class="gr"></td><td class="be"></td></tr><tr><td class="pf">&#9500;&#9472;&#160;<span class="ord">zeichnungen/</span></td><td class="gr"></td><td class="be">Sieben bema&szlig;te Bl&auml;tter, beliebig skalierbar</td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;01-frontsegment.svg</td><td class="gr">17 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;02-mittel-endsegment.svg</td><td class="gr">16 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9500;&#9472;&#160;03-schieber-schild.svg</td><td class="gr">16 kB</td><td class="be"></td></tr><tr><td class="pf">&#9474;&#160;&#160;&#160;&#9492;&#9472;&#160;<span class="rest">&#8230; und 4 weitere</span></td><td class="gr"></td><td class="be"></td></tr><tr><td class="pf">&#9500;&#9472;&#160;README.md</td><td class="gr">4 kB</td><td class="be">Kurzfassung f&uuml;rs Verzeichnis</td></tr><tr><td class="pf">&#9492;&#9472;&#160;futterstorage.zip</td><td class="gr">26.6 MB</td><td class="be">Alles zusammen, zum Verschicken</td></tr></tbody></table></div>
+</section>
+
+<section>
+  <h2 id="k-erzeugt-und-von-hand-geschrieben" data-nr="02">Erzeugt und von Hand geschrieben</h2>
+  <div class="text">
+    <p>Nur zwei Dinge sind handgeschrieben: das Modell und die Skripte. Alles
+    andere entsteht daraus. Das ist der Grund, warum eine Ma&szlig;&auml;nderung nicht
+    an zehn Stellen nachgezogen werden muss.</p>
+  </div>
+  <div class="tab"><table>
+    <thead><tr><th>Ordner</th><th>Herkunft</th><th>Was passiert, wenn das Modell
+      sich &auml;ndert</th></tr></thead>
+    <tbody>
+      <tr><td class="num">modell/</td><td>von Hand</td>
+        <td class="w">hier wird ge&auml;ndert</td></tr>
+      <tr><td class="num">werkzeuge/</td><td>von Hand</td>
+        <td class="w">bleibt gleich</td></tr>
+      <tr><td class="num">stl/</td><td>erzeugt</td>
+        <td class="w">neu bauen mit stl-bauen.py</td></tr>
+      <tr><td class="num">zeichnungen/</td><td>erzeugt</td>
+        <td class="w">Ma&szlig;e werden aus dem Modell gelesen, nur neu laufen lassen</td></tr>
+      <tr><td class="num">bilder/</td><td>erzeugt</td>
+        <td class="w">Blender liest die neuen STLs</td></tr>
+      <tr><td class="num">paket/</td><td>erzeugt</td>
+        <td class="w">seiten.py baut alles neu zusammen</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2 id="k-alles-neu-bauen" data-nr="03">Alles neu bauen</h2>
+  <div class="text">
+    <p>Die Reihenfolge ist wichtig: erst die Geometrie, dann die Pr&uuml;fung, dann
+    was daraus abgeleitet wird.</p>
+    <figure class="cd"><div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span><span class="spr">bash</span></div><pre><code><span class="c-kom"># 1. Bauteile aus dem Modell erzeugen</span>
+<span class="c-key">python3</span> werkzeuge/stl-bauen.py
+
+<span class="c-kom"># 2. pruefen, bevor irgendwas darauf aufbaut</span>
+<span class="c-key">python3</span> werkzeuge/pruefen.py
+
+<span class="c-kom"># 3. Schilder fuer alle Sorten</span>
+<span class="c-key">python3</span> werkzeuge/schilder.py beide
+
+<span class="c-kom"># 4. bemasste Blaetter</span>
+<span class="c-key">python3</span> werkzeuge/zeichnungen.py
+
+<span class="c-kom"># 5. Bilder, je Szene ein Aufruf</span>
+<span class="c-key">for</span> s <span class="c-key">in</span> front mitte end schieber schild kanal explosion gefuellt ebene gesamt; <span class="c-key">do</span>
+    <span class="c-key">blender</span> -b -P werkzeuge/rendern.py -- $s bilder/b_$s.png
+<span class="c-key">done</span>
+
+<span class="c-kom"># 6. Seiten und ZIP</span>
+<span class="c-key">python3</span> werkzeuge/seiten.py</code></pre></figure>
+    <div class="hinweis">Schritt 2 bricht mit einem Fehlercode ab, wenn ein Bauteil
+    undicht ist, nicht aufs Druckbett passt oder eine Steckverbindung klemmt.
+    Damit f&auml;llt ein Fehler auf, bevor Stunden Druckzeit darauf gehen.</div>
+  </div>
+</section>
+
+<footer>Der Baum wird bei jedem Bau dieser Seite neu eingelesen</footer>
+<div class="blaettern"><a href="technik.html" class="zurueck">&larr; Technische Umsetzung</a><a href="zeichnungen.html" class="weiter">Zeichnungen &rarr;</a></div></div>
+<dialog class="lupe">
+<button class="zu" aria-label="Schliessen">&times;</button>
+<div class="rahmen"><img alt=""><p class="bu"></p></div></dialog>
+<script>
+(function(){
+  var d=document.querySelector('dialog.lupe'),
+      b=d.querySelector('img'), u=d.querySelector('.bu'),
+      k=Array.prototype.slice.call(document.querySelectorAll('[data-gross]')),
+      i=0;
+  function zeig(n){
+    if(!k.length) return;
+    i=(n+k.length)%k.length;
+    b.src=k[i].dataset.gross; b.alt=k[i].dataset.was||'';
+    u.textContent=k[i].dataset.was||'';
+  }
+  k.forEach(function(el,n){
+    el.addEventListener('click',function(){zeig(n); d.showModal();});
+  });
+  d.querySelector('.zu').addEventListener('click',function(){d.close()});
+  d.addEventListener('click',function(e){
+    if(e.target===d||e.target.classList.contains('rahmen')) d.close();
+  });
+  d.addEventListener('close',function(){b.removeAttribute('src')});
+  document.addEventListener('keydown',function(e){
+    if(!d.open) return;
+    if(e.key==='ArrowRight') zeig(i+1);
+    if(e.key==='ArrowLeft')  zeig(i-1);
+  });
+})();
+</script>
