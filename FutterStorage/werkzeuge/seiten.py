@@ -764,9 +764,378 @@ INDEX = f"""
 </div>
 """
 
+# =====================================================================
+BAU = f"""
+<div class="wrap">
+<header>
+  <p class="eyebrow">Dokument 1</p>
+  <h1>Bauanleitung</h1>
+  <p class="lead">Von der Passprobe bis zum befuellten Regal. Alle Teile, alle Masse,
+  alle Handgriffe.</p>
+</header>
+
+<section>
+  <h2 data-nr="01">So funktioniert es</h2>
+  <figure class="gross"><img src="{R['b_gefuellt']}" alt="Kanal von der Seite"></figure>
+  <figcaption>Ein Kanal von der Seite. Die Beutel stehen hochkant hintereinander, der
+  orange Schieber steht direkt hinter dem letzten und drueckt den Stapel nach vorne.</figcaption>
+
+  <div class="text">
+    <h3>Entnehmen</h3>
+    <p>Der vorderste Beutel lehnt an der Frontwand und ragt 44 mm darueber hinaus. Du
+    greifst ihn dort und durch die Griffmulde und ziehst ihn nach vorne heraus. Nichts
+    muss nach oben angehoben werden.</p>
+
+    <h4>Kommt man ueberall mit den Fingern hin?</h4>
+    <p>Ja &mdash; aber nur von vorne, und das ist Absicht. Zwei Oeffnungen sorgen
+    dafuer:</p>
+    <ul>
+      <li>Ueber der Frontwand bleiben <strong>48 mm</strong> Luft bis zur naechsten
+        Ebene. In diesen Spalt greifst du von vorne hinein und fasst den Beutel an
+        seiner duennen Oberkante.</li>
+      <li>Die <strong>Griffmulde</strong> schneidet 50 mm tief und 58 mm breit in die
+        Frontwand. Dort bekommst du den Beutel auf halber Hoehe zu fassen und kippst
+        ihn nach vorne heraus.</li>
+    </ul>
+    <p>Seitlich neben den Beutel kommt man nicht &mdash; dort sind nur zwei
+    Millimeter Luft, und der Nachbarkanal steht unmittelbar daneben. Eine seitliche
+    Aussparung wuerde deshalb nichts bringen: Sie wuerde direkt in die Wand des
+    Nachbarn zeigen. Genau deswegen ist die Mulde vorne so gross ausgefallen.</p>
+
+    <h3>Nachfuellen</h3>
+    <p>Schieber an der Grifflasche nach hinten ziehen, Beutel hochkant von oben
+    einstellen, Schieber loslassen. Die Feder drueckt den Stapel wieder nach vorne.</p>
+
+    <h3>Sorte wechseln</h3>
+    <p>Schild aus der Tasche an der Frontwand ziehen, neues einschieben.</p>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="02">Bevor du druckst</h2>
+  <div class="text">
+    <h3>Die Passprobe</h3>
+    <p>Das ganze System steht und faellt mit der Beutelbreite. Gemessen sind 88 mm,
+    daraus ergibt sich die Spaltenbreite von 95,2 mm und damit fuenf Spalten in
+    540 mm Schrankbreite.</p>
+    <p>Drucke zuerst <code>probe.stl</code> &mdash; 34 g, gut eine halbe Stunde. Das
+    Innenmass ist eingepraegt. Stell einen echten Beutel hinein: Passt er mit ein, zwei
+    Millimetern Luft, stimmen alle weiteren Masse.</p>
+
+    <h3>Dann ein einzelner Kanal</h3>
+    <p>Die zweite offene Frage ist die Reibung: Ob sich sechzehn aneinanderlehnende
+    Beutel sauber schieben lassen, haengt an der Folienoberflaeche. Bau deshalb erst
+    einen kurzen Kanal aus Front- und Endsegment &mdash; 325 mm, 16 Beutel. Funktioniert
+    der, kannst du die Serie starten.</p>
+  </div>
+
+  <figure class="plan"><img src="{Z['05-beutel-passung']}" alt="Zeichnung Beutel und Passung"></figure>
+  <figcaption>Die gemessenen Beutelmasse und wie der Beutel im Kanal sitzt.</figcaption>
+</section>
+
+<section>
+  <h2 data-nr="03">Die Teile</h2>
+  <p class="unter">Sechs Teiletypen. Die Mengen gelten je Kanal &mdash; und ein Kanal
+  ist eine Sorte.</p>
+
+  <div class="karten">
+    <article class="karte">
+      <figure><img src="{R['b_front']}" alt="Frontsegment"></figure>
+      <div class="txt"><span class="anz">1&times; je Kanal</span>
+      <h4>Frontsegment</h4>
+      <div class="dat">95 &times; 175 &times; 145 mm &middot; 100 g</div>
+      <p>Kommt nach vorne. Traegt die 92 mm hohe Frontwand mit Griffmulde, die
+      Schildtasche und den Haken fuer das Federband.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="{R['b_mitte']}" alt="Mittelsegment"></figure>
+      <div class="txt"><span class="anz">beliebig oft</span>
+      <h4>Mittelsegment</h4>
+      <div class="dat">95 &times; 169 &times; 145 mm &middot; 70 g</div>
+      <p>Beidseitig offen. Jedes Stueck verlaengert den Kanal um 160 mm, also um
+      acht Beutel.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="{R['b_end']}" alt="Endsegment"></figure>
+      <div class="txt"><span class="anz">1&times; je Kanal</span>
+      <h4>Endsegment</h4>
+      <div class="dat">95 &times; 162 &times; 145 mm &middot; 82 g</div>
+      <p>Schliesst hinten ab. Durch den Sichtschlitz siehst du, ob noch Vorrat
+      im Kanal ist.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="{R['b_schieber']}" alt="Schieber"></figure>
+      <div class="txt"><span class="anz">1&times; je Kanal</span>
+      <h4>Schieber</h4>
+      <div class="dat">95 &times; 42 &times; 149 mm &middot; 50 g</div>
+      <p>Im Fuss sitzt die Kammer fuer die Federrolle. Unten Gleitkufen, oben die
+      Grifflasche zum Zurueckziehen.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="{R['b_schild']}" alt="Schild"></figure>
+      <div class="txt"><span class="anz">1&times; je Kanal</span>
+      <h4>Schild</h4>
+      <div class="dat">74 &times; 18 &times; 2 mm &middot; 2 g</div>
+      <p>Orange Platte, Schrift 0,6 mm vertieft. Mit zwei Farben zusaetzlich
+      <code>schild-text.stl</code> in Schwarz drucken und einkleben.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="{R['b_kanal']}" alt="Fertiger Kanal"></figure>
+      <div class="txt"><span class="anz">Ergebnis</span>
+      <h4>Ein fertiger Kanal</h4>
+      <div class="dat">95 &times; 485 &times; 145 mm &middot; 304 g</div>
+      <p>Front + Mitte + End + Schieber + Schild. Eine Sorte mit Platz fuer
+      25 Beutel.</p></div>
+    </article>
+  </div>
+
+  <h3>Zeichnungen</h3>
+  <figure class="plan"><img src="{Z['01-frontsegment']}" alt="Zeichnung Frontsegment"></figure>
+  <figure class="plan"><img src="{Z['02-mittel-endsegment']}" alt="Zeichnung Mittel- und Endsegment"></figure>
+  <figure class="plan"><img src="{Z['03-schieber-schild']}" alt="Zeichnung Schieber und Schild"></figure>
+
+  <h3>Wie viele Segmente</h3>
+  <div class="tab"><table>
+    <thead><tr><th>Kanal</th><th>Aufbau</th><th>Laenge</th><th>Beutel</th>
+      <th>Filament</th></tr></thead>
+    <tbody>
+      <tr><td>kurz</td><td class="w">Front + End</td><td class="num">325 mm</td>
+        <td class="num">16</td><td class="num">234 g</td></tr>
+      <tr><td>mittel</td><td class="w">Front + 1&times; Mitte + End</td>
+        <td class="num">485 mm</td><td class="num">25</td><td class="num">304 g</td></tr>
+      <tr><td>lang</td><td class="w">Front + 2&times; Mitte + End</td>
+        <td class="num">645 mm</td><td class="num">33</td><td class="num">374 g</td></tr>
+    </tbody>
+  </table></div>
+  <p class="unter">In deinen Schrank passt der mittlere Kanal genau.</p>
+
+  <h3>Stueckliste</h3>
+  <div class="tab"><table>
+    <thead><tr><th>Stufe</th><th>Sorten</th><th>Beutel</th><th>Teile</th>
+      <th>Filament</th><th>Druckzeit ca.</th></tr></thead>
+    <tbody>
+      <tr><td>Testkanal, kurz</td><td class="num">1</td><td class="num">16</td>
+        <td class="num">5</td><td class="num">234 g</td><td class="num">14 h</td></tr>
+      <tr><td>Eine Ebene</td><td class="num">5</td><td class="num">125</td>
+        <td class="num">30</td><td class="num">1,52 kg</td><td class="num">89 h</td></tr>
+      <tr><td>Zwei Ebenen</td><td class="num">10</td><td class="num">250</td>
+        <td class="num">60</td><td class="num">3,04 kg</td><td class="num">179 h</td></tr>
+    </tbody>
+    <tfoot><tr><td>Drei Ebenen</td><td class="num">15</td><td class="num">375</td>
+      <td class="num">90</td><td class="num">4,56 kg</td><td class="num">268 h</td></tr></tfoot>
+  </table></div>
+  <p class="unter">Druckzeit grob mit 17 g/h. Bei zehn Sorten reichen zwei Ebenen.</p>
+</section>
+
+<section>
+  <h2 data-nr="04">Einkaufsliste</h2>
+  <p class="unter">Zwei Kleinteile je Kanal. Keine Schrauben, keine Muttern, kein Kleber.</p>
+
+  <div class="tab"><table>
+    <thead><tr><th>Teil</th><th>Anforderung</th><th>Menge</th><th>Preis</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="w"><strong>Konstantkraftfeder</strong><br>
+          <span class="klein">aufgerolltes Federstahlband</span></td>
+        <td class="w">Zugkraft <strong>8&ndash;12 N</strong> &middot;
+          Auszug <strong>&ge; 500 mm</strong> &middot;
+          Band <strong>16 mm</strong> breit &middot;
+          Rolle <strong>&le; 26 mm</strong></td>
+        <td class="num">1 je Kanal</td>
+        <td class="num">3&ndash;8 &euro;</td>
+      </tr>
+      <tr>
+        <td class="w"><strong>Achse</strong><br>
+          <span class="klein">haelt die Federrolle</span></td>
+        <td class="w">Rundstab <strong>3 mm</strong>, 90 mm lang &mdash; Stahldraht,
+          Messing oder ein Stueck 3-mm-Filament</td>
+        <td class="num">1 je Kanal</td>
+        <td class="num">&lt; 1 &euro;</td>
+      </tr>
+    </tbody>
+    <tfoot><tr><td>Fuer 15 Kanaele</td><td>&nbsp;</td><td class="num">15 + 15</td>
+      <td class="num">45&ndash;135 &euro;</td></tr></tfoot>
+  </table></div>
+
+  <div class="text">
+    <h3>Wo es die Feder gibt</h3>
+    <p>Der Fachbegriff ist entscheidend: <strong>Konstantkraftfeder</strong>, auch
+    Rollfeder, englisch <em>constant force spring</em>. Dasselbe Bauteil steckt in
+    den Warenschiebern im Supermarktregal.</p>
+    <ul class="quellen">
+      <li><a href="https://www.google.com/search?q=Konstantkraftfeder+16mm+Band+8N"
+        rel="noopener">Konstantkraftfeder 16 mm Band, 8 N</a>
+        <span class="klein">allgemeine Suche</span></li>
+      <li><a href="https://www.ebay.de/sch/i.html?_nkw=konstantkraftfeder+rollfeder"
+        rel="noopener">eBay: Konstantkraftfeder / Rollfeder</a>
+        <span class="klein">guenstig, oft als Restposten</span></li>
+      <li><a href="https://www.amazon.de/s?k=konstantkraftfeder" rel="noopener">Amazon:
+        Konstantkraftfeder</a> <span class="klein">schnell, kleine Auswahl</span></li>
+      <li><a href="https://www.gutekunst-federn.de/federn/konstantkraftfedern.html"
+        rel="noopener">Gutekunst Federn</a>
+        <span class="klein">Hersteller, Katalogware und Sonderanfertigung</span></li>
+      <li><a href="https://www.sodemann-federn.de/konstantkraftfedern.html"
+        rel="noopener">Sodemann Federn</a>
+        <span class="klein">Hersteller, Datenblaetter mit Kraftangabe</span></li>
+    </ul>
+    <div class="hinweis">Beim Kauf zaehlt nur dreierlei: Die <strong>Bandbreite</strong>
+    muss unter 17 mm liegen, der <strong>Rollendurchmesser</strong> unter 26 mm, und
+    der <strong>Auszug</strong> mindestens 500 mm betragen. Die Kraft darf hoeher als
+    12 N sein &mdash; dann laesst sich der Schieber nur schwerer zurueckziehen.</div>
+    <p>Der Kraftbedarf liegt bei etwa 0,25 N je Beutel: rund 4 N bei 16 Beuteln,
+    6 N bei 25. Wenn du zwischen zwei Staerken waehlen kannst, nimm die staerkere.
+    Von Hand nachschieben funktioniert nicht &mdash; der Schieber steht im vollen
+    Kanal fast einen halben Meter tief drin.</p>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="05">Druckeinstellungen</h2>
+  <div class="tab"><table>
+    <thead><tr><th>Einstellung</th><th>Wert</th><th>Warum</th></tr></thead>
+    <tbody>
+      <tr><td>Duese</td><td class="num">0,4 mm</td><td class="w">Standard</td></tr>
+      <tr><td>Schichthoehe</td><td class="num">0,2 mm</td>
+        <td class="w">Kompromiss aus Zeit und Qualitaet</td></tr>
+      <tr><td>Wandlinien</td><td class="num">4</td>
+        <td class="w">Wandstaerke 1,6 mm geht exakt in vier Linien auf</td></tr>
+      <tr><td>Infill</td><td class="num">15 %</td>
+        <td class="w">die Waende tragen, viel Fuellung gibt es nicht</td></tr>
+      <tr><td>Stuetzen</td><td class="num">nein</td>
+        <td class="w">Ueberhaenge unter 3 %, nur kurze Bruecken</td></tr>
+      <tr><td>Ausrichtung</td><td class="num">wie modelliert</td>
+        <td class="w">Boden aufs Bett, nichts drehen</td></tr>
+      <tr><td>Material</td><td class="num">PLA</td>
+        <td class="w">reicht, im Schrank wird nichts warm</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="text">
+    <h3>Passung</h3>
+    <p>Ein Parameter im Modell steuert alle Steckverbindungen:</p>
+    {code('passung = 0.2;   // Spiel je Flanke in mm', 'openscad')}
+    <p>Betrifft die Bodenzunge zwischen den Segmenten und die Schildtasche. 0,15 sitzt
+    stramm, 0,20 ist Standard, 0,25 laeuft leicht. Einmal mit einem Toleranztest
+    ermitteln und eintragen.</p>
+    <div class="hinweis">Das Frontsegment ist mit 175 mm das laengste Teil. Auf einem
+    180er Bett bleiben 5 mm Reserve.</div>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="06">Zusammenbau</h2>
+  <figure class="gross"><img src="{R['b_explosion']}" alt="Explosionsdarstellung"></figure>
+  <figcaption>Die drei Segmente auseinandergezogen. Am hinteren Ende jedes Stuecks
+  sitzt die Bodenzunge, die sich unter das naechste schiebt.</figcaption>
+
+  <ol class="schritte">
+    <li><h4>Segmente aneinanderreihen</h4>
+    <p>Frontsegment nach vorne, dahinter die Mittelstuecke, hinten das Endsegment. Die
+    Bodenzunge schiebt sich unter den Boden des naechsten Teils und ueberbrueckt die
+    Fuge &mdash; so bleibt kein Beutel an einer Stufe haengen. Nichts verschrauben:
+    Der Schieberdruck presst die Segmente gegeneinander.</p></li>
+
+    <li><h4>Feder in den Schieber einsetzen</h4>
+    <p>Im Fuss des Schiebers sitzt eine Kammer mit zwei Wangen. Federrolle hineinlegen,
+    den 3-mm-Stab durch beide Bohrungen schieben. Der Stab darf seitlich nicht
+    ueberstehen, sonst schleift er an der Kanalwand.</p></li>
+
+    <li><h4>Band nach vorne fuehren</h4>
+    <p>Das Bandende tritt unten aus dem Schieber aus und laeuft in der 18 mm breiten
+    Nut mittig durch den Boden aller Segmente nach vorne.</p></li>
+
+    <li><h4>Band vorne einhaengen</h4>
+    <p>Im Frontsegment sitzt ein Quersteg in der Bodennut. Bandende dort einhaengen
+    &mdash; die meisten Federn haben ein Loch im Band. Sonst eines bohren oder mit
+    einem Kabelbinder befestigen.</p></li>
+
+    <li><h4>Funktion pruefen</h4>
+    <p>Schieber nach hinten ziehen und loslassen. Er sollte gleichmaessig nach vorne
+    laufen und an der Frontwand anschlagen.</p></li>
+
+    <li><h4>Schild einschieben</h4>
+    <p>Von oben in die Tasche an der Frontwand.</p></li>
+
+    <li><h4>Befuellen</h4>
+    <p>Schieber zurueckziehen, Beutel hochkant von oben einstellen &mdash; alle in
+    derselben Richtung &mdash; und loslassen.</p></li>
+
+    <li><h4>Spalten nebeneinandersetzen</h4>
+    <p>In beiden Bodenraendern jedes Segments sitzt dieselbe Tasche. Lege je
+    Segmentfuge einen <strong>Verbinder</strong> ein und schiebe die naechste
+    Spalte dagegen, bis die Rastnoppe hoerbar einschnappt. Zum Loesen genuegt
+    kraeftiger Zug &mdash; werkzeuglos.</p>
+    <p>Weil die Nase nicht angeformt ist, bleibt jede Aussenkante buendig:
+    Die aeusserste Spalte laesst ihre Tasche einfach leer, dort steht nichts
+    ueber.</p></li>
+
+    <li><h4>Ebenen stapeln</h4>
+    <p>Auf den Oberkanten der Seitenwaende stehen vier Zapfen &uuml;ber, im Boden
+    der naechsten Ebene sitzen die passenden Taschen. Die Ebene von oben aufsetzen,
+    bis sie satt auf den Waenden aufliegt &mdash; nicht auf den Zapfen. Kein Sockel,
+    kein Kleber, kein Werkzeug.</p>
+    <p>Fuer die <strong>oberste Lage</strong> liegt in <code>stl/oben/</code> derselbe
+    Satz ohne Zapfen. Damit schliesst der Stapel oben glatt ab. Wer das nicht
+    braucht, nimmt einfach die normalen Segmente &mdash; die 2,6 mm stehen dort
+    frei nach oben und stoeren nicht.</p></li>
+  </ol>
+</section>
+
+<section>
+  <h2 data-nr="07">Wie der Verbund zusammenhaelt</h2>
+  <p class="unter">Zwei Steckverbindungen, beide ohne Zusatzteile.</p>
+  <figure class="plan"><img src="{Z['06-verbindungen']}" alt="Zeichnung Verbindungen"></figure>
+  <div class="text">
+    <p>Beim Herausziehen eines Beutels wirkt eine Kraft nach vorne. Ohne Verbindung
+    wuerde sich der Stapel mit der Zeit verschieben. Deshalb greifen die Teile
+    ineinander:</p>
+    <ul>
+      <li><strong>Nach oben</strong> laufen die Seitenwaende als Zapfen weiter und
+        stecken in Taschen im Boden der Ebene darueber. Der Zapfen ist genauso breit
+        wie die Wand &mdash; er schwaecht sie also nicht und druckt ohne Stuetzen.</li>
+      <li><strong>Zur Seite</strong> greift eine Nase am Bodenrand in die Tasche der
+        Nachbarspalte. Beide liegen unterhalb des Innenraums und nehmen dem Beutel
+        keinen Platz weg.</li>
+    </ul>
+    <div class="hinweis">Ringsum sind 0,2 mm Spiel eingerechnet. Sitzt es zu stramm,
+    in der Modelldatei <code>passung</code> auf 0,25 erhoehen und die Segmente neu
+    bauen &mdash; sitzt es zu locker, auf 0,15 verringern.</div>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="08">Anordnung im Schrank</h2>
+  <figure class="plan"><img src="{Z['04-gesamtanordnung']}" alt="Zeichnung Gesamtanordnung"></figure>
+  <figure class="gross"><img src="{R['b_ebene']}" alt="Eine Ebene"></figure>
+  <figcaption>Eine Ebene: fuenf Kanaele nebeneinander, 476 von 540 mm Breite.</figcaption>
+</section>
+
+<section>
+  <h2 data-nr="09">Wenn etwas klemmt</h2>
+  <div class="text">
+    <h4>Der Stapel rutscht nicht nach</h4>
+    <p>Meist ist die Feder zu schwach &mdash; rechne mit 0,25 N je Beutel. Zweite
+    Moeglichkeit: Ein Beutel steht quer. Durch die Seitenfenster siehst du, wo es hakt.</p>
+    <h4>Ein Beutel bleibt an der Fuge haengen</h4>
+    <p>Die Bodenzunge sitzt nicht sauber unter dem naechsten Segment. Segmente fest
+    zusammenschieben, notfalls <code>passung</code> auf 0,25 erhoehen.</p>
+    <h4>Der Schieber verkantet</h4>
+    <p>Die Achse steht seitlich ueber und schleift. Buendig kuerzen.</p>
+    <h4>Der vorderste Beutel faellt heraus</h4>
+    <p>Sollte nicht passieren, die Frontwand ist mit 92 mm hoch genug. Falls doch:
+    Feder ist zu stark.</p>
+  </div>
+</section>
+
+<footer>Alle Masse in Millimetern &middot; Modell parametrisch in
+<code>katzenfutter-regal.scad</code></footer>
+</div>
+"""
+
 os.makedirs(PAKET, exist_ok=True)
 for datei, titel, inhalt in [
-        ("index.html", "FutterStorage &mdash; Uebersicht", INDEX)]:
+        ("index.html", "FutterStorage &mdash; Uebersicht", INDEX),
+        ("bauanleitung.html", "Bauanleitung &mdash; FutterStorage", BAU)]:
     with open(os.path.join(PAKET, datei), "w", encoding="utf-8") as f:
         f.write(seite(titel, datei, inhalt))
     print(f"{datei:22s}{os.path.getsize(os.path.join(PAKET, datei))/1024:7.0f} kB")
