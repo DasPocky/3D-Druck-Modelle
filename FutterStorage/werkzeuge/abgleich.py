@@ -56,8 +56,11 @@ def main():
                           f"- neu erzeugen: {os.path.relpath(pfad, PROJ)}")
 
     stl_zeiten = []
-    for f in ("segment-front.stl", "segment-mitte.stl", "segment-end.stl",
-              "schieber.stl", "schild.stl", "schild-text.stl", "probe.stl"):
+    # Stellvertretend die Mittellage je Tiefe - sie enthaelt alle Merkmale.
+    # Die uebrigen 24 Varianten entstehen im selben Lauf.
+    for f in ("segmente/front-mitte-mitte.stl", "segmente/mitte-mitte-mitte.stl",
+              "segmente/end-mitte-mitte.stl", "schieber.stl", "schild.stl",
+              "schild-text.stl", "trommel.stl", "probe.stl"):
         p = os.path.join(PROJ, "stl", f)
         juenger(p, "STL", t_modell, "das Modell")
         if os.path.exists(p):
@@ -76,13 +79,21 @@ def main():
     soll = {
         # Die seitliche Verbindung steht nicht mehr vor - die Aussenkante
         # ist buendig, deshalb genau aussen_x.
-        "segment-front.stl": (v["aussen_x"],
-                              v["segment_laenge"] + 3.0 + 9 + v["schild_dicke"] + 0.4,
-                              v["aussen_z"] + v["zapfen_h"]),
-        "segment-mitte.stl": (v["aussen_x"],
-                              v["segment_laenge"] + 9,
-                              v["aussen_z"] + v["zapfen_h"]),
+        "segmente/front-mitte-mitte.stl":
+            (v["aussen_x"],
+             v["segment_laenge"] + 3.0 + 9 + v["schild_dicke"] + 0.4,
+             v["aussen_z"] + v["zapfen_h"]),
+        "segmente/mitte-mitte-mitte.stl":
+            (v["aussen_x"], v["segment_laenge"] + 9,
+             v["aussen_z"] + v["zapfen_h"]),
+        # Oberste Lage: ohne Zapfen genau die Ebenenhoehe
+        "segmente/mitte-oben-mitte.stl":
+            (v["aussen_x"], v["segment_laenge"] + 9, v["aussen_z"]),
         "schild.stl": (v["schild_breite"], v["schild_hoehe"], v["schild_dicke"]),
+        # Trommel liegend: X und Y sind der Bordscheiben-Durchmesser,
+        # Z die Wickelbreite mit beiden Scheiben
+        "trommel.stl": (v["trommel_d"] + 3.0, v["trommel_d"] + 3.0,
+                        v["trommel_b"] + 2 * 1.2),
     }
     for datei, (sx, sy, sz) in soll.items():
         p = os.path.join(PROJ, "stl", datei)
@@ -106,6 +117,14 @@ def main():
                                   f'{v["beutel_dicke"]:.0f}'],
         "06-verbindungen.svg": [f'{v["zapfen_h"]:.1f}'.replace(".", ","),
                                 f'{v["nase_t"]:.1f}'.replace(".", ",")],
+        # Der Greifraum ist das Mass, an dem die Entnahme haengt - er muss
+        # auf dem Zugriffsblatt stehen.
+        "07-zugriff.svg": [f'{v["luft_oben"]:.0f}',
+                           f'{v["anschlag_hoehe"]:.0f}'],
+        # Federkammer und Trommel gehoeren aufs Schieberblatt
+        "03-schieber-schild.svg": [
+            f'{v["trommel_d"]:.1f}'.replace(".", ","),
+            f'{v["schild_breite"]:.0f}'],
     }
     for datei, zahlen in erwartet.items():
         p = os.path.join(PROJ, "zeichnungen", datei)
@@ -141,10 +160,11 @@ def main():
 
     # ---- Ergebnis ---------------------------------------------------
     print(f"Modell:   Schild {v['schild_breite']:.0f} x {v['schild_hoehe']:.0f} mm, "
-          f"Mulde {v['mulde_breite']:.0f} mm breit, "
-          f"{v['anschlag_hoehe'] - v['mulde_bis']:.0f} mm tief")
+          f"Greifraum {v['luft_oben']:.0f} mm ueber dem Beutel")
     print(f"          Segment {v['aussen_x']:.1f} x {v['aussen_z']:.1f} mm, "
           f"Zapfen {v['zapfen_h']:.1f} mm, Nase {v['nase_t']:.1f} mm")
+    print(f"          Feder {v['feder_band_b']:.0f} mm Band auf Trommel "
+          f"{v['trommel_d']:.1f} mm")
     print()
     for h in hinweise:
         print("  Hinweis:", h)

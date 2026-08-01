@@ -21,12 +21,22 @@ def _scad(name, standard):
     return standard
 
 
-AX, AZ = 95.2, 144.8
+# Alle Masse aus der Quelle rechnen, nicht fest eintragen. AZ stand hier
+# mit 144,8 mm - dem Wert von vor der Greifraum-Aenderung. Die Ebenen sassen
+# dadurch 38 mm zu tief und durchdrangen einander.
+BB   = _scad("beutel_breit", 88.0)
+BH   = _scad("beutel_hoch", 136.0)
+BD   = _scad("beutel_dicke", 19.0)
+WAND = _scad("wand", 1.6)
+SPIEL = _scad("spiel", 4.0)
+LUFT = _scad("luft_oben", 42.0)
+BODEN = _scad("boden", 2.4) + _scad("bandnut_tiefe", 1.6) + 0.8
+AX = BB + SPIEL + 2 * WAND                 # Spaltenbreite
+AZ = BODEN + BH + LUFT                     # Ebenenhoehe
+SEGL = _scad("segment_laenge", 160.0)
+LF, LM = SEGL + 3.0, SEGL                  # Front- und Mittelsegment
+LE = SEGL + WAND                           # Endsegment
 SCHILD_B = _scad("schild_breite", 78.0)
-LF, LM, LE = 163.0, 160.0, 161.6
-BODEN = 4.8
-BB, BH, BD = 88.0, 136.0, 19.0
-WAND, SPIEL = 1.6, 4.0
 
 def clear():
     bpy.ops.object.select_all(action='SELECT')
@@ -73,7 +83,10 @@ ORANGE  = mat("PLA orange",  (0.72, 0.24, 0.03),   rough=0.42)
 # Der Beutel muss sich auf einen Blick vom Bauteil unterscheiden. Vorher
 # war er fast so grau wie das PLA, dadurch sah es aus, als fuelle er die
 # ganze Kanalhoehe aus. Jetzt ein helles Folienbeige mit wenig Glanz.
-FOLIE   = mat("Beutel",      (0.78, 0.72, 0.60),   rough=0.30, metal=0.15)
+# Warmes Folienbeige: hell genug, um sich vom dunklen PLA abzuheben, aber
+# nicht so hell, dass die Beutel im Licht wie Papierblaetter ausbrennen.
+# Kein Metallic - der Glanz liess sie zusaetzlich weiss erscheinen.
+FOLIE   = mat("Beutel",      (0.60, 0.52, 0.40),   rough=0.44)
 HAUT    = mat("Hand",        (0.86, 0.66, 0.52),   rough=0.62)
 HOLZ    = mat("Boden",       (0.26, 0.19, 0.13),   rough=0.65)
 
@@ -255,10 +268,13 @@ def beutel_entnahme(x=0, z=0):
     if _BEUTEL_MESH is None:
         _BEUTEL_MESH = beutel_mesh()
     o = bpy.data.objects.new("beutel_entnahme", _BEUTEL_MESH)
-    kipp = 26.0
+    # So weit herausgezogen, dass die Oberkante frei vor der Wand steht -
+    # nicht weiter, sonst zeigt das Bild einen Beutel in der Luft statt
+    # den Vorgang.
+    kipp = 18.0
     o.rotation_euler = (math.radians(-kipp), 0, 0)
-    o.location = (x + WAND + SPIEL / 2 + BB / 2, -22,
-                  z + BODEN + BH / 2 * math.cos(math.radians(kipp)) + 20)
+    o.location = (x + WAND + SPIEL / 2 + BB / 2, 2.0,
+                  z + BODEN + BH / 2 * math.cos(math.radians(kipp)) + 26)
     o.data.materials.clear()
     o.data.materials.append(FOLIE)
     bpy.context.collection.objects.link(o)
@@ -294,21 +310,23 @@ elif SZENE == "gesamt":
             beutel(fuell[e][i], x=i * AX, z=e * AZ)
             schieber_bei(fuell[e][i], x=i * AX, z=e * AZ)
 elif SZENE == "entnahme":
-    # Wie der Beutel herauskommt: gefasst wird oben an der Kante, der
-    # Greifraum darueber ist der Platz fuer die Finger.
-    kanal(ebene="mitte")
-    kanal(z=AZ, ebene="oben")            # Ebene darueber bildet die Decke
+    # Nur der vordere Ausschnitt: ein Frontsegment und darueber das
+    # naechste. Der ganze Kanal wuerde die Kamera so weit zuruecknehmen,
+    # dass vom Vorgang nichts mehr zu erkennen ist.
+    put(seg("front", "mitte", "mitte"), (0, 0, 0), SCHWARZ)
+    put(seg("front", "oben", "mitte"), (0, 0, AZ), SCHWARZ)
     schild_an()
-    beutel(9); schieber_bei(9)
+    beutel(7)
     beutel_entnahme()
-    finger(WAND + SPIEL / 2 + BB / 2, -14, BODEN + BH + 16)
+    # Finger an der Oberkante des herausgezogenen Beutels
+    finger(WAND + SPIEL / 2 + BB / 2, -26, BODEN + BH * 0.96 + 26)
 elif SZENE == "greifraum":
-    # Derselbe Ausschnitt ohne Hand, dafuer mit Blick auf den Spalt
+    # Derselbe Ausschnitt ohne Hand, dafuer mit freiem Blick auf den Spalt
     # zwischen Beutelkante und der Ebene darueber.
-    kanal(ebene="mitte")
-    kanal(z=AZ, ebene="oben")
+    put(seg("front", "mitte", "mitte"), (0, 0, 0), SCHWARZ)
+    put(seg("front", "oben", "mitte"), (0, 0, AZ), SCHWARZ)
     schild_an()
-    beutel(12); schieber_bei(12)
+    beutel(8)
 elif SZENE == "schild":
     put(s_schd, (0, 0, 0), ORANGE, bevel=0.1)
     put(s_txt, (0, 0, 0.02), SCHWARZ, bevel=0)
