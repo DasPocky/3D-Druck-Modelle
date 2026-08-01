@@ -1574,3 +1574,82 @@ if FUNDE:
 else:
     print("\nSchreibung geprueft: alle Umlaute gesetzt")
 
+# ---------------------------------------------------------------- Paket
+import shutil, zipfile
+
+for ordner in ("stl", "stl/schilder", "zeichnungen", "bilder",
+               "bilder/schilder", "modell", "web", "werkzeuge",
+               "schilder"):
+    ziel = os.path.join(PAKET, ordner)
+    os.makedirs(ziel, exist_ok=True)
+
+for f in os.listdir(os.path.join(PROJ, "stl")):
+    if f.endswith(".stl"):
+        shutil.copy2(os.path.join(PROJ, "stl", f), os.path.join(PAKET, "stl", f))
+for f in os.listdir(os.path.join(PROJ, "zeichnungen")):
+    if f.endswith(".svg"):
+        shutil.copy2(os.path.join(PROJ, "zeichnungen", f),
+                     os.path.join(PAKET, "zeichnungen", f))
+
+for alt, neu in NAMEN.items():
+    q = os.path.join(PROJ, "bilder", alt + ".png")
+    if os.path.exists(q):
+        shutil.copy2(q, os.path.join(PAKET, "bilder", neu + ".png"))
+    w = os.path.join(PROJ, "bilder", "web", alt + ".jpg")
+    if os.path.exists(w):
+        shutil.copy2(w, os.path.join(PAKET, "web", neu + ".jpg"))
+
+shutil.copy2(os.path.join(PROJ, "modell", "katzenfutter-regal.scad"),
+             os.path.join(PAKET, "modell", "katzenfutter-regal.scad"))
+for f in sorted(os.listdir(os.path.join(PROJ, "werkzeuge"))):
+    if f.endswith(".py"):
+        shutil.copy2(os.path.join(PROJ, "werkzeuge", f),
+                     os.path.join(PAKET, "werkzeuge", f))
+# Die Schilderbilder liegen zusaetzlich flach unter schilder/, weil die
+# Galerie sie von dort laedt.
+_sq = os.path.join(PROJ, "bilder", "schilder")
+if os.path.isdir(_sq):
+    for f in sorted(os.listdir(_sq)):
+        if f.endswith(".png"):
+            shutil.copy2(os.path.join(_sq, f), os.path.join(PAKET, "schilder", f))
+for u in ("stl/schilder", "bilder/schilder"):
+    q = os.path.join(PROJ, u)
+    if os.path.isdir(q):
+        for f in sorted(os.listdir(q)):
+            if not f.startswith("."):
+                shutil.copy2(os.path.join(q, f), os.path.join(PAKET, u, f))
+
+liesmich = """FUTTERSTORAGE
+=============
+
+Oeffne index.html im Browser - von dort aus ist alles verlinkt.
+
+  index.html          Uebersicht und Einstieg
+  bauanleitung.html   Was gedruckt und gekauft wird, wie es zusammengeht
+  technik.html        Wie das Modell entstanden ist, Code und Werkzeuge
+  zeichnungen.html    Die fuenf bemassten Blaetter zum Durchblaettern
+  galerie.html        Alle zehn Renderings, klickbar in voller Groesse
+
+  stl/                Sieben druckfertige Dateien fuer den Slicer
+  zeichnungen/        Sieben bemasste Blaetter (SVG, beliebig skalierbar)
+  bilder/             Zehn Renderings in voller Aufloesung (PNG)
+  web/                Dieselben Bilder klein - werden von den Seiten geladen
+  modell/             Die OpenSCAD-Quelldatei, alle Masse parametrisch
+
+Die Seiten laufen ohne Internet: einfach index.html doppelklicken.
+Alle Masse in Millimetern.
+"""
+with open(os.path.join(PAKET, "LIESMICH.txt"), "w") as f:
+    f.write(liesmich)
+
+zipname = os.path.join(PROJ, "futterstorage.zip")
+if os.path.exists(zipname):
+    os.remove(zipname)
+with zipfile.ZipFile(zipname, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
+    for wurzel, _, dateien in os.walk(PAKET):
+        for d in sorted(dateien):
+            voll = os.path.join(wurzel, d)
+            rel = os.path.relpath(voll, PAKET)
+            z.write(voll, os.path.join("FutterStorage", rel))
+
+print(f"\nfutterstorage.zip  {os.path.getsize(zipname)/1048576:.1f} MB")
