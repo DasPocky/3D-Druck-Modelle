@@ -3,14 +3,19 @@
 //
 //  Prinzip: waagerechte Kanäle über die volle Schranktiefe. Die Beutel
 //  stehen hochkant hintereinander, ein Schieber drückt sie nach vorne.
-//  Entnommen wird NACH VORNE: der Beutel ragt 30 mm über die Frontwand
-//  hinaus, wird dort und durch die Griffmulde gefasst und nach vorne
-//  herausgezogen. Die Frontwand ist 70 mm hoch - hoch genug, dass der
-//  Schiebedruck den vordersten Beutel nicht darüber hinauskippt.
 //
-//  Weil beim Herausziehen nichts nach oben muss, brauchen die Ebenen
-//  keinen Greifraum und lassen sich direkt stapeln: kein Sockel,
-//  kein Hohlraum darunter.
+//  Entnommen wird NACH VORNE: der Beutel ragt 44 mm über die Frontwand
+//  hinaus. Gefasst wird er an seiner OBERKANTE - dort greifen Daumen und
+//  Zeigefinger zu und ziehen ihn nach vorne heraus. Der Platz dafür ist
+//  der Greifraum über dem Beutel (luft_oben), nicht die Frontwand: vorne
+//  ist der Kanal oberhalb der Wand ohnehin offen.
+//
+//  Deshalb hat die Frontwand auch keine Griffmulde. Sie säße dort, wo die
+//  Hand gar nicht hinfasst, und nähme nur dem Schild Platz weg.
+//
+//  Die Frontwand ist 92 mm hoch - hoch genug, dass der Schiebedruck den
+//  vordersten Beutel nicht darüber hinauskippt (Angriffspunkt bei halber
+//  Beutelhöhe, also 68 mm).
 //
 //  Koordinaten: X = Breite, Y = Tiefe (nach hinten), Z = Höhe.
 //               Y = 0 ist vorne, dort wird entnommen.
@@ -52,13 +57,11 @@ segment_laenge = 160;
 // Wie viele Segmente bilden einen Kanal (nur für Layout und Kapazität)
 segment_anzahl = 3;
 // Höhe der Frontwand. Muss über dem Angriffspunkt des Schiebedrucks
-// liegen (halbe Beutelhöhe), sonst kippt der vorderste Beutel darüber
-// hinaus. 70 mm gibt Sicherheit und lässt den Beutel 30 mm herausragen.
+// liegen (halbe Beutelhöhe = 68 mm), sonst kippt der vorderste Beutel
+// darüber hinaus. 92 mm gibt Sicherheit und lässt den Beutel 44 mm
+// herausragen. Eine Griffmulde hat die Wand nicht - gegriffen wird oben
+// an der Beutelkante, siehe luft_oben.
 anschlag_hoehe = 92;
-// Griffmulde in der Frontwand: dort greift man den Beutel
-mulde_breite = 58;
-// bis auf welche Höhe die Mulde herunterreicht
-mulde_bis = 66;
 
 /* [Schrank] */
 // Nutzbare Breite: 545 mm abzüglich Scharnier, sicherheitshalber 540
@@ -313,26 +316,12 @@ module segment() {
         translate([wand, y0, boden_dick])
             cube([innen_x, y1 - y0 + (ist_end ? 0 : zunge_l + 1), innen_z + 1]);
 
-        // --- Front: oberhalb der Wand offen, plus Griffmulde in der Mitte ---
-        if (ist_front) {
+        // --- Front: oberhalb der Anschlagwand ist der Kanal offen ---
+        // Hier greift die Hand an die Beutelkante. Keine Mulde in der Wand:
+        // gefasst wird oben, nicht durch die Wand hindurch.
+        if (ist_front)
             translate([wand, -1, boden_dick + anschlag_hoehe])
                 cube([innen_x, anschlag_dicke() + 1, innen_z + 1]);
-            // Mulde mit 45-Grad-Auslauf unten, damit sie stützenfrei druckt
-            cx = aussen_x / 2;
-            zt = boden_dick + mulde_bis;
-            fa = 11;
-            translate([0, anschlag_dicke() + 1, 0])
-                rotate([90, 0, 0])
-                    linear_extrude(height = anschlag_dicke() + 2)
-                        polygon([
-                            [cx - mulde_breite/2, boden_dick + anschlag_hoehe + 1],
-                            [cx + mulde_breite/2, boden_dick + anschlag_hoehe + 1],
-                            [cx + mulde_breite/2, zt + fa],
-                            [cx + mulde_breite/2 - fa, zt],
-                            [cx - mulde_breite/2 + fa, zt],
-                            [cx - mulde_breite/2, zt + fa]
-                        ]);
-        }
 
         // --- Aufnahme für die Zunge des vorderen Nachbarn ---
         if (!ist_front)
@@ -789,20 +778,9 @@ module kanal_vorschau() {
         // Innenraum
         translate([wand, anschlag_dicke(), boden_dick])
             cube([innen_x, L - anschlag_dicke() - wand, innen_z + 1]);
-        // Front oberhalb der Wand offen, plus Griffmulde
+        // Front oberhalb der Wand offen - dort wird gegriffen
         translate([wand, -1, boden_dick + anschlag_hoehe])
             cube([innen_x, anschlag_dicke() + 1, innen_z + 1]);
-        translate([0, anschlag_dicke() + 1, 0])
-            rotate([90, 0, 0])
-                linear_extrude(height = anschlag_dicke() + 2)
-                    polygon([
-                        [aussen_x/2 - mulde_breite/2, boden_dick + anschlag_hoehe + 1],
-                        [aussen_x/2 + mulde_breite/2, boden_dick + anschlag_hoehe + 1],
-                        [aussen_x/2 + mulde_breite/2, boden_dick + mulde_bis + 11],
-                        [aussen_x/2 + mulde_breite/2 - 11, boden_dick + mulde_bis],
-                        [aussen_x/2 - mulde_breite/2 + 11, boden_dick + mulde_bis],
-                        [aussen_x/2 - mulde_breite/2, boden_dick + mulde_bis + 11]
-                    ]);
         // Bandnut
         if (bandnut)
             translate([(aussen_x - bandnut_breite) / 2, -1,
