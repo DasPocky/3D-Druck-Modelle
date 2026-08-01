@@ -18,7 +18,7 @@
 // =====================================================================
 
 /* [Was soll gerendert werden] */
-TEIL = "segment";  // [segment, schieber, verbinder, test]
+TEIL = "segment";  // [segment, schieber, schild, schild_text, verbinder, test]
 
 // front = vorderstes Segment mit Anschlagkante und Schildhalter
 // mitte = beidseitig offenes Zwischenstück, beliebig oft
@@ -114,6 +114,15 @@ nase_h = 3.2;          // Höhe ab Unterkante
 rastung = true;
 rast_d = 2.6;          // Durchmesser der Noppe
 rast_h = 0.45;         // wie weit sie vorsteht
+
+/* [Beschriftung] */
+schild_text = "HUHN";
+schild_breite = 78;
+schild_hoehe = 62;
+// Laengster vorkommender Sortenname in Zeichen. Danach richtet sich die
+// Schriftgroesse aller Schilder, damit sie einheitlich aussehen.
+schild_namen_max = 9;
+schild_dicke = 1.5;
 
 /* [FDM-Toleranzen] */
 // Spiel je Flanke bei Steckverbindungen. Mit einem Toleranztest von
@@ -365,6 +374,9 @@ module segment() {
                 fenster_xz(innen_x - 24, innen_z - 34, 6, wand + 2);
     }
 
+    // --- Schildhalter an der Frontwand ---
+    if (ist_front) schildhalter();
+
     // --- Haken für das Gummiband, quer durch die Bodennut ---
     if (ist_front && bandnut)
         translate([(aussen_x - bandnut_breite) / 2 - 1.5,
@@ -374,6 +386,26 @@ module segment() {
                 translate([1.5, -1, -1])
                     cube([bandnut_breite, 6, bandnut_tiefe + 1]);
             }
+}
+
+// Tasche vor der Anschlagkante, Schild wird von oben eingeschoben
+module schildhalter() {
+    sp = schild_dicke + 0.4;
+    rb = 1.2;
+    b  = schild_breite + 3.2;
+    x0 = (aussen_x - b) / 2;
+    // nur so hoch wie das Schild plus etwas Einfuehrung, sonst bleibt
+    // ueber der Tafel ein leerer Rahmen stehen
+    h  = min(anschlag_hoehe - 2, schild_hoehe + 3);
+    difference() {
+        // taucht 0,6 mm in die Anschlagkante ein
+        translate([x0, -(sp + rb), 3]) cube([b, sp + rb + 0.6, h]);
+        // Spalt für das Schild, nach oben offen
+        translate([x0 + 1.6, -sp, 4]) cube([b - 3.2, sp, h]);
+        // Sichtfenster
+        translate([x0 + 3.5, -(sp + rb) - 1, 5])
+            fenster_xz(b - 7, h - 6, 2.5, rb + 2);
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -432,11 +464,56 @@ module schieber() {
 }
 
 // ---------------------------------------------------------------------
+//  Beschriftungsschild
+//
+//  Die Grundplatte wird orange gedruckt, die Schrift liegt 0,6 mm vertieft.
+//  Wer zwei Farben hat, druckt zusätzlich TEIL="schild_text" in Schwarz und
+//  klebt ihn ein - oder wechselt beim Drucken auf der letzten Schicht die
+//  Farbe. Ohne zweite Farbe genügt ein Filzstift in der Vertiefung.
+// ---------------------------------------------------------------------
+schild_gravur = 0.6;
+
+module schild_platte() {
+    linear_extrude(height = schild_dicke)
+        hull()
+            for (px = [1.4, schild_breite - 1.4],
+                 py = [1.4, schild_hoehe - 1.4])
+                translate([px, py]) circle(r = 1.4);
+}
+
+// Der Name mittig auf der Tafel. Lange Sortennamen wie KANINCHEN werden
+// schmaler gesetzt, damit sie nicht über den Rand laufen.
+module schild_schrift(h = schild_gravur) {
+    rand    = 4;
+    breite  = schild_breite - 2 * rand;
+    text_h  = schild_hoehe - 2 * rand;
+    // Die Schriftgröße richtet sich nach dem längsten vorkommenden Namen,
+    // nicht nach dem gerade gesetzten. Sonst stünde auf jedem Schild eine
+    // andere Größe und die Tafeln wirkten uneinheitlich.
+    // Versalien in Helvetica Bold sind rund 0,78 em breit.
+    groesse = min(text_h * 0.92, breite / (schild_namen_max * 0.78));
+    translate([0, 0, schild_dicke - schild_gravur]) linear_extrude(height = h) {
+        translate([schild_breite / 2, rand + text_h / 2])
+            text(schild_text, size = groesse, halign = "center",
+                 valign = "center", font = "Helvetica:style=Bold");
+    }
+}
+
+module schild() {
+    difference() {
+        schild_platte();
+        translate([0, 0, 0.001]) schild_schrift(schild_gravur + 1);
+    }
+}
+
+// ---------------------------------------------------------------------
 //  Ausgabe
 // ---------------------------------------------------------------------
 if (TEIL == "segment")       segment();
 else if (TEIL == "schieber") schieber();
+else if (TEIL == "schild")   schild();
 else if (TEIL == "verbinder") verbinder();
+else if (TEIL == "schild_text") schild_schrift();
 else if (TEIL == "test")
     // Ebene darüber darf sich nicht mit dieser durchdringen
     intersection() {
