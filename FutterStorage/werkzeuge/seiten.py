@@ -1132,10 +1132,258 @@ BAU = f"""
 </div>
 """
 
+TECHNIK = f"""
+<div class="wrap">
+<header>
+  <p class="eyebrow">Dokument 2</p>
+  <h1>Technische Umsetzung</h1>
+  <p class="lead">Wie das Modell entstanden ist: welche Programme, welche Sprachen,
+  wie sie zusammenspielen und woran die Qualitaet haengt.</p>
+</header>
+
+<section>
+  <h2 data-nr="01">Die Werkzeugkette</h2>
+  <div class="text">
+    <p>Drei Programme, jedes fuer eine Aufgabe. Keines wird per Maus bedient &mdash;
+    alle drei werden geschrieben und ueber die Kommandozeile aufgerufen. Das ist der
+    Grund, warum sich das Modell in Minuten umbauen laesst.</p>
+  </div>
+
+  <div class="tab"><table>
+    <thead><tr><th>Programm</th><th>Sprache</th><th>Aufgabe</th><th>Ergebnis</th></tr></thead>
+    <tbody>
+      <tr><td>OpenSCAD</td><td class="num">eigene Sprache</td>
+        <td class="w">Geometrie beschreiben</td><td class="num">STL</td></tr>
+      <tr><td>Blender</td><td class="num">Python</td>
+        <td class="w">Bilder rendern</td><td class="num">PNG</td></tr>
+      <tr><td>Python</td><td class="num">Python</td>
+        <td class="w">pruefen, zeichnen, dokumentieren</td><td class="num">SVG, HTML</td></tr>
+    </tbody>
+  </table></div>
+
+  {diagramm("Von der Quelle zum fertigen Paket", [
+      ("Modell", "katzenfutter-regal.scad", 1, 0),
+      ("Geometrie", "stl/*.stl", 1, 1),
+      ("Bilder", "Blender", 0, 2),
+      ("Pr&#252;fung", "pruefen.py", 1, 2),
+      ("Zeichnungen", "zeichnungen.py", 2, 2),
+      ("Dokumentation", "paket/*.html", 1, 3),
+  ])}
+</section>
+
+<section>
+  <h2 data-nr="02">OpenSCAD: Geometrie als Programm</h2>
+  <div class="text">
+    <p>Der entscheidende Unterschied zu Fusion oder SolidWorks: Man klickt nicht,
+    man schreibt. Ein Bauteil ist ein Programm, das bei jedem Aufruf neu gerechnet
+    wird.</p>
+
+    {code('cube([95.2, 163, 144.8]);           // ein Quader\ntranslate([1.6, 3, 4.8])           // verschieben\n    cube([92, 157, 140]);          // und noch einer', 'openscad')}
+
+    <p>Gebaut wird mit drei Operationen &mdash; das nennt sich Constructive Solid
+    Geometry:</p>
+  </div>
+
+  <div class="tab"><table>
+    <thead><tr><th>Operation</th><th>Wirkung</th></tr></thead>
+    <tbody>
+      <tr><td class="num">union()</td><td class="w">Koerper verschmelzen</td></tr>
+      <tr><td class="num">difference()</td>
+        <td class="w">vom ersten alle folgenden abziehen</td></tr>
+      <tr><td class="num">intersection()</td>
+        <td class="w">nur die Schnittmenge behalten</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="text">
+    <h3>Ein Vollkoerper, aus dem alles herausgestochen wird</h3>
+    <p>Jedes Segment entsteht als ein einziger Grundkoerper, aus dem Innenraum,
+    Fenster, Bodennut und Griffmulde herausgeschnitten werden. Das ist eine bewusste
+    Entscheidung: Eine fruehere Fassung setzte den Kanal aus einzelnen Waenden
+    zusammen, und an den Stossflaechen entstanden 28 Netzfehler.</p>
+
+    <h3>Alles parametrisch</h3>
+    <p>Ganz oben in der Datei stehen die Masse als Variablen, alles Weitere leitet
+    sich ab:</p>
+    {code('beutel_breit = 88;\nwand         = 1.6;\nspiel        = 4;\ninnen_x  = beutel_breit + spiel;     // 92\naussen_x = innen_x + 2 * wand;       // 95,2', 'openscad')}
+    <p>Aendert sich die gemessene Beutelbreite, waechst das ganze Modell mit &mdash;
+    Wandstaerken, Fensterpositionen, Spaltenzahl. Genau das ist passiert: Die erste
+    Auslegung ging von 72 mm aus, gemessen wurden 88. Ein Wert geaendert, alles
+    andere folgte automatisch.</p>
+
+    <h3>Eine Datei, sieben Teile</h3>
+    <p>Ueber Parameter von aussen wird gesteuert, welches Teil erzeugt wird:</p>
+    {code('openscad -o stl/segment-mitte.stl --export-format=binstl \\\\\n         -D \'TEIL="segment"\' -D \'segment_typ="mitte"\' \\\\\n         katzenfutter-regal.scad', 'bash')}
+    <p>Das <code>-D</code> ueberschreibt eine Variable. Deshalb liefert eine Datei
+    alle Segmenttypen, den Schieber, das Schild und die Passprobe.</p>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="03">STL: was dabei verloren geht</h2>
+  <div class="text">
+    <p>Ein STL ist nur noch eine Liste von Dreiecken &mdash; drei Punkte und eine
+    Normale, sonst nichts. Kein Wissen mehr ueber Bohrungen, Parameter oder
+    Zusammenhaenge. Ein Zylinder wird zum 32-eckigen Prisma.</p>
+    <p>Das ist der Grund, warum im Blender-Skript alle Positionen noch einmal stehen:
+    Die STL-Datei weiss nicht, dass sie ein Mittelsegment ist, das bei 163 mm
+    anfaengt.</p>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="04">Blender: Bilder ueber Python</h2>
+  <div class="text">
+    <p>Blender wird ueber seine Python-Schnittstelle gesteuert. Auch hier kein
+    Klicken, sondern ein Skript, das die STLs importiert, Materialien zuweist, Licht
+    und Kamera setzt und rendert.</p>
+
+    {code('bpy.ops.wm.stl_import(filepath="stl/segment-front.stl")\nmaterial.inputs["Base Color"].default_value = (0.022, 0.022, 0.026, 1)\nscene.cycles.samples = 320\nbpy.ops.render.render(write_still=True)', 'openscad')}
+
+    <p>Gerendert wird mit <strong>Cycles</strong>, einem Pathtracer: Er verfolgt
+    Lichtstrahlen physikalisch. Deshalb wirken die Bilder wie Fotos &mdash; die weichen
+    Schatten und die Reflexe auf dem orangen Schieber sind nicht gemalt, sondern
+    gerechnet. 320 Strahlen pro Bildpunkt, rund 25 Sekunden je Bild auf der Grafikkarte.</p>
+
+    <h3>Der Bildausschnitt wird gerechnet, nicht geschaetzt</h3>
+    <p>Anfangs stand die Kamera auf einem festen Abstand, und Teile des Objekts lagen
+    ausserhalb. Jetzt laeuft es umgekehrt:</p>
+    <ul>
+      <li>Jeden Eckpunkt aller Objekte ins Kamerakoordinatensystem umrechnen</li>
+      <li>Daraus das Seitenverhaeltnis der Silhouette bestimmen und die
+        Bildaufloesung passend setzen</li>
+      <li>Den Abstand loesen, bei dem der aeusserste Punkt gerade noch im
+        Sichtkegel liegt</li>
+      <li>Die Bildmitte auf die Silhouette schieben, nicht auf das Objektzentrum
+        &mdash; sonst klebt das Motiv an einer Seite</li>
+    </ul>
+    <p>Damit ist rechnerisch garantiert, dass nichts abgeschnitten wird und wenig
+    Rand bleibt.</p>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="05">Python: die Pruefinstanz</h2>
+  <div class="text">
+    <p>Das ist der Teil, der ueber die Qualitaet entscheidet. Ein gerendertes Bild
+    zeigt nicht, ob ein Netz Loecher hat oder ob zwei Teile sich durchdringen.
+    Deshalb rechnet ein Pruefskript jede erzeugte Datei durch:</p>
+  </div>
+
+  <div class="tab"><table>
+    <thead><tr><th>Pruefung</th><th>Verfahren</th><th>Sollwert</th></tr></thead>
+    <tbody>
+      <tr><td>Wasserdicht</td>
+        <td class="w">Jede Kante muss in genau zwei Dreiecken vorkommen</td>
+        <td class="num">0 offene</td></tr>
+      <tr><td>Volumen</td>
+        <td class="w">Divergenzsatz ueber alle Dreiecke</td>
+        <td class="num">Gramm</td></tr>
+      <tr><td>Ueberhaenge</td>
+        <td class="w">Flaechennormalen gegen 45 Grad, Bettauflage gefiltert</td>
+        <td class="num">unter 3 %</td></tr>
+      <tr><td>Kollision</td>
+        <td class="w">intersection() zweier Nachbarteile</td>
+        <td class="num">0 cm&sup3;</td></tr>
+      <tr><td>Bauraum</td>
+        <td class="w">Bounding Box gegen das Druckbett</td>
+        <td class="num">unter 180 mm</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="text">
+    <h3>Was die Pruefungen gefunden haben</h3>
+    <p>Diese Tests haben echte Fehler aufgedeckt, die im Bild unsichtbar waren:</p>
+    <ul>
+      <li><strong>Flaechen ohne Volumen.</strong> Zwei Schnittkoerper endeten exakt
+        auf derselben Ebene und hinterliessen eine Flaeche der Dicke null. Der Slicer
+        haette 14 % des Teils als Ueberhang gesehen. Ein Ueberschnitt von 0,02 mm
+        loeste es.</li>
+      <li><strong>Eine Kollision von 0,16 cm&sup3;.</strong> Eine Anlaufschraege am
+        Verbinder stiess in die Nachbarwand. Der Kollisionstest fand es sofort.</li>
+      <li><strong>Fehlende Fenster.</strong> Bei kurzen Segmenten pruefte die
+        Fensterlogik nur einen Bereich &mdash; die Teile waeren 20 % schwerer geworden.</li>
+    </ul>
+
+    <h3>Und einmal war die Physik der Pruefer</h3>
+    <p>Die urspruengliche Anschlagkante war 18 mm hoch. Der Schiebedruck greift auf
+    halber Beutelhoehe an, also bei 68 mm &mdash; Hebelarm 50 mm. Dagegen haelt nur
+    das Eigengewicht auf der schmalen Standflaeche. Der vorderste Beutel waere schon
+    bei 0,13 N gekippt, waehrend die Feder mit rund 6 N drueckt. Die Frontwand musste
+    auf 92 mm wachsen, ueber den Angriffspunkt hinaus.</p>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="06">Die Bruchstellen zwischen den Programmen</h2>
+  <div class="text">
+    <p>OpenSCAD und Blender teilen sich nur die STL-Datei. Alle Positionen muessen
+    doppelt gepflegt werden:</p>
+    {code('# render2.py — muss zu katzenfutter-regal.scad passen\nAX, AZ = 95.2, 144.8       # Spaltenbreite, Ebenenhoehe\nLF, LM, LE = 163.0, 160.0, 161.6\nBODEN = 4.8', 'openscad')}
+    <p>Aendert sich ein Mass im Modell und das Skript zieht nicht nach, stehen die
+    Teile falsch. Genau das ist passiert: Nach einer Modellaenderung stand die
+    Bodenhoehe im Skript noch auf 6,4 statt 4,8 mm &mdash; die Beutel schwebten
+    1,6 mm zu hoch.</p>
+
+    <h3>Der teuerste Fehler war eine Einheit</h3>
+    <p>Blender rechnet in Metern, OpenSCAD in Millimetern. Ein 95-mm-Segment wird
+    beim Import zu einem 95 <em>Meter</em> grossen Objekt. Die Kamera stand rund
+    900 Einheiten entfernt &mdash; Blenders Standard-Clipping endet bei 100. Alles
+    dahinter wurde weggeschnitten: die hintere Reihe, Teile der Sockel, ganze
+    Rueckwaende. Uebrig blieben Fragmente, die wie Bildfehler aussahen. Ein
+    <code>clip_end = 20000</code> behob es.</p>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="07">Die technischen Zeichnungen</h2>
+  <div class="text">
+    <p>Die bemassten Blaetter entstehen nicht aus dem STL, sondern direkt aus den
+    Modellmassen &mdash; ein Python-Skript schreibt SVG. Das hat zwei Gruende: Die
+    Masse sind exakt statt aus Dreiecken zurueckgerechnet, und Masslinien,
+    Positionsnummern und Legende lassen sich frei setzen.</p>
+    <p>Jede Masslinie bekommt mit <code>von=</code> die Kante mitgeteilt, an der
+    sie ansetzt. Daraus zieht das Skript die duenne Hilfslinie bis zum Bauteil, so
+    dass immer sichtbar bleibt, welche zwei Kanten ein Mass verbindet:</p>
+    {code('def mh(self, x1, x2, y, zahl, was="", von=None, oben=False):\n    # von = Objektkante -> Hilfslinie laeuft von dort bis zur Masslinie\n    if von is not None:\n        for x in (x1, x2):\n            self.line(x, von, x, y - 6, HILF, 0.7)\n    self.line(x1, y, x2, y, MASSL)                   # die Masslinie\n    if (x2 - x1) < breite(zahl) + 10:                # zu eng fuer die Zahl?\n        ...                                          # dann steht sie daneben\n    self.txt((x1+x2)/2, y+3.6,  zahl, mono=True)     # die Zahl\n    self.txt((x1+x2)/2, y+17,   was,  klein, grau)   # wofuer sie steht', 'python')}
+    <p>Damit sich nichts ueberdeckt, merkt sich das Skript zu jeder Beschriftung
+    ein Rechteck und prueft am Ende alle Paare gegeneinander. Meldet es eine
+    Ueberschneidung, wandert die betroffene Angabe, bis der Lauf still bleibt.
+    Dieselbe Buchhaltung liefert die Blattgroesse: Das SVG wird genau um den
+    belegten Bereich geschnitten, deshalb steht auf keinem Blatt eine leere
+    Flaeche.</p>
+    <p>SVG ist Vektorgrafik: Die Blaetter lassen sich beliebig vergroessern und
+    ausdrucken, ohne unscharf zu werden.</p>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="08">Was dieser Weg nicht kann</h2>
+  <div class="text">
+    <p>Alles bisher Beschriebene rechnet. Es kann nicht anfassen, nicht drucken,
+    nicht ausprobieren. Zwei Dinge bleiben offen und lassen sich nur am echten Teil
+    klaeren:</p>
+    <ul>
+      <li><strong>Die Beutelmasse.</strong> Sie sind gemessen, nicht aus einem
+        Datenblatt &mdash; Purina veroeffentlicht keine Verpackungsmasse. Deshalb
+        steht die Passprobe am Anfang der Bauanleitung.</li>
+      <li><strong>Die Reibung.</strong> Ob sich fuenfundzwanzig aneinanderlehnende
+        Beutel sauber schieben lassen, haengt an der Folienoberflaeche. Dafuer gibt
+        es keine Formel, nur den Versuch mit einem kurzen Kanal.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>Modell, Skripte und Pruefungen liegen im Paket &middot; alle Masse in
+Millimetern</footer>
+</div>
+"""
+
 os.makedirs(PAKET, exist_ok=True)
 for datei, titel, inhalt in [
         ("index.html", "FutterStorage &mdash; Uebersicht", INDEX),
-        ("bauanleitung.html", "Bauanleitung &mdash; FutterStorage", BAU)]:
+        ("bauanleitung.html", "Bauanleitung &mdash; FutterStorage", BAU),
+        ("technik.html", "Technische Umsetzung &mdash; FutterStorage", TECHNIK)]:
     with open(os.path.join(PAKET, datei), "w", encoding="utf-8") as f:
         f.write(seite(titel, datei, inhalt))
     print(f"{datei:22s}{os.path.getsize(os.path.join(PAKET, datei))/1024:7.0f} kB")
