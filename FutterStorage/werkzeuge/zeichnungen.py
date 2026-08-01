@@ -31,7 +31,8 @@ def _modellwerte():
         innen_x=innen_x, innen_z=innen_z,
         aussen_x=innen_x + 2 * v["wand"], aussen_z=boden_d + innen_z,
         boden=boden_d, wand=v["wand"], anschlag=v["anschlag_hoehe"],
-        mulde_b=v["mulde_breite"], mulde_bis=v["mulde_bis"],
+        greifraum=v["luft_oben"],
+        trommel_d=v["trommel_d"], trommel_b=v["trommel_b"],
         nut_b=v["bandnut_breite"], nut_t=v["bandnut_tiefe"],
         segL=v["segment_laenge"],
         ay_front=v["segment_laenge"] + 3.0,
@@ -317,19 +318,14 @@ def blatt1():
     # Frontwand: alles unterhalb dieser Linie ist Wand
     wy = oy + az - (M["anschlag"] + M["boden"]) * K
     b.rect(ox, wy, ax, (M["anschlag"] + M["boden"]) * K, FLAECHE, LINIE, 1.2)
-    # Griffmulde
-    mb, fa = M["mulde_b"] * K, 11 * K
-    mx = ox + ax / 2 - mb / 2
-    my = oy + az - (M["mulde_bis"] + M["boden"]) * K
-    b.poly([(mx, wy), (mx, my - fa), (mx + fa, my), (mx + mb - fa, my),
-            (mx + mb, my - fa), (mx + mb, wy)], PAPIER, LINIE, 1.2)
     # Schildtasche
     sb, sh = M["schild_b"] * K, (M["schild_h"] + 4) * K
     sx, sy = ox + ax / 2 - sb / 2, oy + az - (6 + M["schild_h"] + 4) * K
     b.rect(sx - 1.6 * K, sy, sb + 3.2 * K, sh, "none", MASSL, 1.4)
 
     b.pos(1, ox + ax - 14, wy + 8, ox + ax + 66, wy - 16)
-    b.pos(2, mx + mb / 2, my - fa / 2, ox + ax + 66, my - 30)
+    b.pos(2, ox + ax / 2, oy + az - M["greifraum"] * K / 2, ox + ax + 66,
+          oy + az - 30)
     b.pos(3, sx + sb - 10, sy + sh / 2, ox + ax + 66, sy + sh / 2)
 
     b.mh(ox + W, ox + ax - W, oy + az + 40, f'{M["innen_x"]:.0f}', "Innenbreite für den Beutel",
@@ -337,7 +333,10 @@ def blatt1():
     b.mh(ox, ox + ax, oy + az + 74, f'{M["aussen_x"]:.1f}'.replace(".", ","), "Außenbreite = Spaltenmaß", von=oy + az)
     b.mv(oy, oy + az, ox - 34, f'{M["aussen_z"]:.1f}'.replace(".", ","), "Außenhöhe = Ebenenmaß", von=ox)
     b.mv(wy, oy + az, ox - 78, f'{M["anschlag"]:.0f}', "Frontwand", von=ox)
-    b.mh(mx, mx + mb, oy - 34, "52", "Griffmulde", von=my - fa, oben=True)
+    # Der Greifraum ist das Mass, an dem die Entnahme haengt: dort
+    # fassen die Finger die Beutelkante.
+    b.mv(oy + az - M["greifraum"] * K, oy + az, ox - 122,
+         f'{M["greifraum"]:.0f}', "Greifraum über dem Beutel", von=ox)
 
     # ---------- Seitenansicht ----------
     ox2 = ox + ax + 210
@@ -369,21 +368,22 @@ def blatt1():
     nb = M["nut_b"] * K
     b.rect(ox + ax / 2 - nb / 2, oy3, nb, ay, "#f0d9c8", MASSL, 1.3)
     b.pos(7, ox + ax / 2 + nb / 2, oy3 + ay * 0.4, ox + ax + 66, oy3 + ay * 0.4)
-    b.mh(ox + ax / 2 - nb / 2, ox + ax / 2 + nb / 2, oy3 - 34, "18", "Bandnut",
+    b.mh(ox + ax / 2 - nb / 2, ox + ax / 2 + nb / 2, oy3 - 34,
+         f'{M["nut_b"]:.0f}', "Bandnut",
          von=oy3, oben=True)
     b.mv(oy3, oy3 + ay, ox - 34, "163", "Bauteillänge", von=ox)
 
     b.legende(ox2, oy3 + 30, [
         (1, "Frontwand, hält den Beutel", "92 hoch"),
-        (2, "Griffmulde zum Anfassen", "52 breit"),
+        (2, "Greifraum über dem Beutel", "42 hoch"),
         (3, "Tasche für das Schild", "74 x 18"),
         (4, "Fenster in der Seitenwand", "132 x 114"),
         (5, "Bodenzunge zum Nachbarsegment", "9 lang"),
         (6, "Bodenstärke mit Nut", "4,8"),
-        (7, "Bandnut für die Feder", "18 x 1,6"),
+        (7, "Bandnut für die Feder", "17 x 1,6"),
     ], spalten=1)
 
-    b.titel("Frontsegment", "Vorderstes Kanalstück mit Frontwand, Griffmulde, "
+    b.titel("Frontsegment", "Vorderstes Kanalstück mit Frontwand, "
             "Schildtasche und Bandhaken", "TEIL 01")
     return b.save("01-frontsegment.svg")
 
@@ -560,7 +560,9 @@ def blatt3():
 def blatt4():
     K = 1.0
     b = Blatt(1560, 960)
-    SB, ST, SH = 540, 500, 520
+    # Schrankmaße aus dem Modell - der Regalboden wurde für den
+    # Greifraum höher gesetzt, das muss die Zeichnung mitbekommen.
+    SB, ST, SH = 540, 500, 550
     ax, az, ay = M["aussen_x"], M["aussen_z"], 485
 
     ox, oy = 128, 108
@@ -580,7 +582,7 @@ def blatt4():
     b.mh(ox, ox + SB * K, oy + SH * K + 74, "540", "Schrankbreite nutzbar",
          von=oy + SH * K)
     b.mv(oy + SH * K - 3 * az * K, oy + SH * K, ox - 36, "434", "3 Ebenen belegt", von=ox)
-    b.mv(oy, oy + SH * K, ox - 84, "520", "Höhe ohne Regalboden", von=ox)
+    b.mv(oy, oy + SH * K, ox - 84, f"{SH}", "Fachhöhe", von=ox)
     b.mh(ox, ox + ax * K, oy - 34, f'{M["aussen_x"]:.1f}'.replace(".", ","), "eine Spalte", von=oy + SH * K - 3 * az * K, oben=True)
 
     ox2 = ox + SB * K + 200
@@ -617,7 +619,7 @@ def blatt4():
             "Ohne Regalboden: 15 Sorten. Bleibt der Boden drin, passt unten nur eine Ebene mit 5 Sorten"]):
         b.txt(ox, ly + i * 20, t, 10.5, "start", LINIE if i == 0 else GRAU)
 
-    b.titel("Gesamtanordnung", "Aufbau im Schrank für 540 x 500 x 520 mm nutzbaren Raum",
+    b.titel("Gesamtanordnung", "Aufbau im Schrank für 540 x 500 x 550 mm nutzbaren Raum",
             "ÜBERSICHT")
     return b.save("04-gesamtanordnung.svg")
 
@@ -668,8 +670,8 @@ def blatt5():
     ly = oy + max(bh, azz) + 120
     b.txt(ox, ly, "Die Beutelbreite bestimmt die Spaltenzahl: bei 88 mm passen fünf "
           "Kanäle in 540 mm.", 10.5, "start")
-    b.txt(ox, ly + 20, "Die Beutelhöhe bestimmt die Ebenenhöhe: bei 136 mm passen "
-          "drei Ebenen in 520 mm.", 10.5, "start", GRAU)
+    b.txt(ox, ly + 20, "Beutelhöhe plus Greifraum bestimmen die Ebenenhöhe: 136 + 42 mm, "
+          "drei Ebenen in 550 mm.", 10.5, "start", GRAU)
     b.txt(ox, ly + 40, "Vor dem Serienstart mit probe.stl prüfen — das Innenmaß ist "
           "dort eingeprägt.", 10.5, "start", GRAU)
 
@@ -775,7 +777,8 @@ def blatt7():
     AZ, BO, W = M["aussen_z"] * K, M["boden"] * K, M["wand"] * K
     AN = M["anschlag"] * K
     BH, BD = M["beutel_h"] * K, M["beutel_d"] * K
-    MB, MT = M["mulde_b"] * K, (M["anschlag"] - M["mulde_bis"]) * K
+    GR = M["greifraum"] * K          # Luft über der Beutelkante
+    FINGER = 17.5 * K                # Dicke eines Erwachsenenfingers
 
     ox, oy = 150, 150
     b.ansicht(ox, oy - 78, "ZUGRIFF — Schnitt durch zwei Ebenen")
@@ -796,32 +799,36 @@ def blatt7():
     b.rect(ox, o2 - 26, 3 * K, 26, "#3d3d43")
     b.txt(ox + tiefe / 2, o2 - 40, "Ebene dar&#252;ber", 10, "middle", GRAU)
 
-    # --- der Greifraum ---
-    gr_oben, gr_unten = o2 + BO, fw_oben
-    b.rect(ox - 4, gr_oben, 92, gr_unten - gr_oben, "#f6ddc8", MASSL, 1.3, "6 4")
-    b.txt(ox + 44, gr_oben + (gr_unten - gr_oben) / 2 + 4, "Greifraum",
-          10, "middle", MASSL, "700")
+    # --- der Greifraum: zwischen Beutelkante und der Ebene darüber ---
+    # Das ist das Maß, an dem die Entnahme hängt. Nicht der Raum vor der
+    # Frontwand - dort ist ohnehin alles offen.
+    gr_unten = u - BO - BH                        # Oberkante des Beutels
+    gr_oben = o2 + BO                             # Unterkante der Ebene darüber
+    b.rect(ox + 4 * K, gr_oben, 6 * (BD - 1), gr_unten - gr_oben,
+           "#f6ddc8", MASSL, 1.3, "6 4")
+    b.txt(ox + 4 * K + 3 * (BD - 1), gr_oben + (gr_unten - gr_oben) / 2 + 4,
+          "Greifraum", 10, "middle", MASSL, "700")
+    # Ein Finger im Massstab daneben - er muss in diesen Spalt passen
+    fx = ox + 4 * K + 6 * (BD - 1) + 26
+    b.rect(fx, gr_oben + (gr_unten - gr_oben - FINGER) / 2, 54, FINGER,
+           "#e8c9a8", "#b98a5e", 1.1)
+    b.txt(fx + 27, gr_oben + (gr_unten - gr_oben) / 2 + 4,
+          "Finger 17,5", 9, "middle", "#8a5a2a")
 
     b.pos(1, ox + 3 * K, fw_oben + 6, ox + 300, fw_oben - 34)
     b.pos(2, ox + 12, gr_oben + 16, ox + 300, gr_oben - 4)
     b.pos(3, ox + 4 * K + 6, u - BO - BH + 52, ox + 300, u - BO - BH + 62)
 
-    b.mv(gr_oben, gr_unten, ox - 40,
-         f'{M["aussen_z"] - M["boden"] - M["anschlag"]:.0f}',
-         "freie H&#246;he", von=ox)
+    b.mv(gr_oben, gr_unten, ox - 40, f'{M["greifraum"]:.0f}',
+         "Greifraum über der Beutelkante", von=ox)
     b.mv(u - BO - BH, fw_oben, ox - 96,
          f'{M["beutel_h"] - M["anschlag"]:.0f}', "Beutel steht &#252;ber", von=ox)
 
-    # --- Frontwand von vorne, mit der Mulde ---
+    # --- Frontwand von vorne ---
     ox2 = ox + 470
-    b.ansicht(ox2, oy - 78, "FRONTWAND VON VORNE — die Mulde")
+    b.ansicht(ox2, oy - 78, "FRONTWAND VON VORNE")
     AXv = M["aussen_x"] * K
     b.rect(ox2, oy + 40, AXv, AN + BO, FLAECHE, LINIE, 1.2)
-    mx = ox2 + AXv / 2 - MB / 2
-    fa = 11 * K
-    my = oy + 40 + MT
-    b.poly([(mx, oy + 40), (mx, my - fa), (mx + fa, my), (mx + MB - fa, my),
-            (mx + MB, my - fa), (mx + MB, oy + 40)], PAPIER, MASSL, 1.6)
     # Schild darunter
     sb, sh = M["schild_b"] * K, M["schild_h"] * K
     sx = ox2 + AXv / 2 - sb / 2
@@ -829,30 +836,29 @@ def blatt7():
     b.txt(sx + sb / 2, oy + 40 + AN + BO - sh / 2 - 6 * K + 4, "Schild",
           10, "middle", "#8a5a2a")
 
-    b.pos(4, mx + MB / 2, my - fa / 2, ox2 - 62, my + 18)
-    b.mh(mx, mx + MB, oy + 26, f'{M["mulde_b"]:.0f}', "Muldenbreite",
-         von=oy + 40, oben=True)
-    b.mv(oy + 40, my, ox2 + AXv + 40, f'{M["anschlag"] - M["mulde_bis"]:.0f}',
-         "Muldentiefe", von=ox2 + AXv)
+    b.pos(4, sx + 8, oy + 40 + AN + BO - sh - 6 * K + 10,
+          ox2 - 62, oy + 40 + AN + BO - sh - 30)
+    b.mv(oy + 40, oy + 40 + AN + BO, ox2 + AXv + 40, f'{M["anschlag"]:.0f}',
+         "Frontwand — ohne Mulde", von=ox2 + AXv)
 
     ly = u + BO + 76
     for i, t in enumerate([
-            "Die Mulde ist ein Einschnitt von OBEN in die Frontwand — "
-            "dort greift die Hand von vorne hinein.",
-            "Der Beutel wird nicht angehoben, sondern nach vorne "
-            "herausgezogen und dabei &#252;ber die Frontwand gekippt.",
-            "Deshalb bleibt der Zugriff auch dann frei, wenn eine "
-            "weitere Ebene direkt dar&#252;ber steht."]):
+            "Gegriffen wird an der OBERKANTE des Beutels — Daumen und "
+            "Zeigefinger fassen dort zu und ziehen ihn nach vorne heraus.",
+            "Der Platz daf&#252;r ist der Greifraum &#252;ber dem Beutel. "
+            "Mit 42 mm passen zwei Finger neben die Kante.",
+            "Die Frontwand braucht deshalb keine Mulde: vor ihr ist der "
+            "Kanal oberhalb der Wand ohnehin offen."]):
         b.txt(ox - 96, ly + i * 21, t, 10.5, "start", LINIE if i == 0 else GRAU)
 
     b.legende(ox2 - 40, ly + 58, [
         (1, "Frontwand, h&#228;lt den Stapel", f'{M["anschlag"]:.0f} hoch'),
-        (2, "Greifraum bis zur Ebene dar&#252;ber",
-            f'{M["aussen_z"] - M["boden"] - M["anschlag"]:.0f} hoch'),
+        (2, "Greifraum &#252;ber der Beutelkante",
+            f'{M["greifraum"]:.0f} hoch'),
         (3, "Beutel, steht &#252;ber die Wand",
             f'{M["beutel_h"] - M["anschlag"]:.0f} frei'),
-        (4, "Griffmulde, von oben eingeschnitten",
-            f'{M["mulde_b"]:.0f} x {M["anschlag"] - M["mulde_bis"]:.0f}'),
+        (4, "Schild in der Frontwandtasche",
+            f'{M["schild_b"]:.0f} x {M["schild_h"]:.0f}'),
     ], spalten=1)
 
     b.titel("Zugriff", "Wo die Hand hinkommt und warum die Ebenen sich nicht "
