@@ -499,7 +499,11 @@ module schieber() {
             // Aussteifungen außerhalb der Kammer. Sie greifen 0,6 mm in die
             // Stützfläche hinein - eine bloße Berührung ergäbe zwei Flächen
             // auf derselben Ebene und damit ein undichtes Netz.
-            for (xp = [4, b - 12])
+            // Achtung Richtung: rotate([0,-90,0]) legt die Extrusion nach
+            // -X, jede Rippe wächst also von xp aus nach links. Deshalb
+            // xp = 12 und nicht 4 - sonst ragt die linke Rippe über die
+            // Bauteilkante hinaus und der Schieber klemmt im Kanal.
+            for (xp = [12, b - 4])
                 translate([xp, 0, 0])
                     rotate([0, -90, 0])
                         linear_extrude(height = 8)
