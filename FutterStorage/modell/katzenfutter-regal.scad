@@ -18,7 +18,7 @@
 // =====================================================================
 
 /* [Was soll gerendert werden] */
-TEIL = "segment";  // [segment]
+TEIL = "segment";  // [segment, verbinder, test]
 
 // front = vorderstes Segment mit Anschlagkante und Schildhalter
 // mitte = beidseitig offenes Zwischenstück, beliebig oft
@@ -70,6 +70,34 @@ boden = 2.4;
 
 /* [Material sparen] */
 fenster = true;
+
+/* [Verbindungen] */
+// Die Ebenen stehen aufeinander, die Spalten nebeneinander. Beides wird
+// gesteckt, sonst verschiebt sich der Verbund beim Herausziehen eines
+// Beutels. Beide Verbindungen sind reine Materialfortsetzungen und
+// drucken ohne Stützen.
+//
+// Oben: die Seitenwände laufen als Zapfen weiter, unten im Boden sitzen
+// die passenden Taschen. Der Zapfen ist so breit wie die Wand, schwächt
+// sie also nicht.
+stapel_zapfen = true;
+zapfen_h = 2.6;        // wie weit der Zapfen übersteht
+zapfen_l = 22;         // Länge eines Zapfens
+zapfen_rand = 16;      // Abstand vom Segmentende
+// Seitlich: eine Nase am Bodenrand greift in die Tasche des Nachbarn.
+// Sie liegt unterhalb des Innenraums und nimmt dem Beutel keinen Platz.
+seiten_nase = true;
+nase_t = 3.0;          // wie weit sie herausragt
+nase_l = 20;           // Länge
+nase_h = 3.2;          // Höhe ab Unterkante
+// Rastung des seitlichen Verbinders: eine flache Noppe hält die Spalten
+// zusammen. Ohne sie würde die Reibung allein nicht reichen - mit ihr
+// rastet es spürbar ein und lässt sich mit etwas Zug wieder trennen.
+// Die Stapelzapfen brauchen keine Rastung: dort hält das Eigengewicht,
+// und eine Noppe an der Wandflanke stünde seitlich über.
+rastung = true;
+rast_d = 2.6;          // Durchmesser der Noppe
+rast_h = 0.45;         // wie weit sie vorsteht
 
 /* [FDM-Toleranzen] */
 // Spiel je Flanke bei Steckverbindungen. Mit einem Toleranztest von
@@ -142,6 +170,82 @@ module langloch(b, l, r, h) {
 }
 
 // ---------------------------------------------------------------------
+//  Verbindungen zwischen den Segmenten
+// ---------------------------------------------------------------------
+// Wo die Stapelzapfen sitzen - zwei je Seitenwand, an beiden Enden.
+// Die Taschen der darüberliegenden Ebene benutzen dieselbe Liste,
+// deshalb passt jede Ebene auf jede andere.
+function zapfen_y() = [zapfen_rand, aussen_y - zapfen_rand - zapfen_l];
+
+// Ein Zapfen: Fortsetzung der Seitenwand nach oben, oben angefast,
+// damit er sich beim Aufsetzen von selbst fängt.
+module zapfen(x0, y0) {
+    // Die Fase darf hoechstens ein Viertel der Wandstaerke betragen - bei
+    // wand/2 wuerde der obere Querschnitt zu null und der Zapfen verschwaende
+    // spurlos aus dem Koerper.
+    fase = min(0.5, wand / 4);
+    union() {
+        hull() {
+            translate([x0, y0, aussen_z]) cube([wand, zapfen_l, 0.01]);
+            translate([x0 + fase, y0 + fase, aussen_z + zapfen_h])
+                cube([wand - 2 * fase, zapfen_l - 2 * fase, 0.01]);
+        }
+    }
+}
+
+// Die Tasche dazu, von unten in den Boden geschnitten. Sie ist ringsum
+// um die Passung größer und reicht 0,3 mm tiefer als der Zapfen hoch ist,
+// damit die Ebenen auf den Wänden aufliegen und nicht auf den Zapfen.
+module zapfentasche(x0, y0) {
+    union() {
+        translate([x0 - passung, y0 - passung, -1])
+            cube([wand + 2 * passung, zapfen_l + 2 * passung, zapfen_h + 1.3]);
+    }
+}
+
+// Seitliche Verbindung: beide Bodenränder bekommen dieselbe Tasche, das
+// verbindende Plättchen liegt lose dazwischen. Eine angeformte Nase stünde
+// an der äußersten Spalte ins Leere - so bleibt jede Außenkante bündig,
+// und alle Segmente sind gleich.
+module nasentasche(y0, links = true) {
+    x0 = links ? -1 : aussen_x - nase_t - passung;
+    union() {
+        translate([x0, y0 - passung, -1])
+            cube([nase_t + 1 + passung, nase_l + 2 * passung, nase_h + 1 + passung]);
+        // Mulde für die Rastnoppe des Verbinders
+        if (rastung)
+            translate([links ? nase_t / 2 : aussen_x - nase_t / 2,
+                       y0 + nase_l / 2, nase_h + passung])
+                rast_form(rast_d + 2 * passung, rast_h + 0.15);
+    }
+}
+
+// Die Rastform: ein flacher Kegelstumpf. Beim Zusammenschieben drückt die
+// schräge Flanke den Verbinder kurz herunter, in der Mulde federt er zurück.
+// Sie hält den Verbund zusammen, lässt sich aber mit etwas Zug wieder lösen.
+module rast_form(d, h) {
+    cylinder(d1 = d, d2 = d * 0.55, h = h);
+}
+
+// Das Plättchen selbst: greift je zur Hälfte in zwei benachbarte Spalten.
+// An den Enden angefast, damit es sich einfädeln lässt.
+module verbinder() {
+    b = 2 * nase_t;
+    union() {
+        hull() {
+            translate([0.7, 0, 0]) cube([b - 1.4, nase_l, 0.01]);
+            translate([0, 0, 0.7]) cube([b, nase_l, nase_h - 1.4]);
+            translate([0.7, 0, nase_h - 0.01]) cube([b - 1.4, nase_l, 0.01]);
+        }
+        // je Hälfte eine Noppe - eine allein könnte sich herausdrehen
+        if (rastung)
+            for (sx = [nase_t / 2, 1.5 * nase_t])
+                translate([sx, nase_l / 2, nase_h - 0.01])
+                    rast_form(rast_d, rast_h);
+    }
+}
+
+// ---------------------------------------------------------------------
 //  Kanalsegment
 // ---------------------------------------------------------------------
 module segment() {
@@ -157,6 +261,12 @@ module segment() {
             if (!ist_end)
                 translate([wand + 0.3, aussen_y, boden_dick - zunge_h])
                     cube([innen_x - 0.6, zunge_l, zunge_h]);
+
+            // --- Zapfen für die Ebene darüber ---
+            if (stapel_zapfen)
+                for (yz = zapfen_y())
+                    for (xz = [0, aussen_x - wand])
+                        zapfen(xz, yz);
 
 
         }
@@ -202,6 +312,19 @@ module segment() {
                         fenster_yz(f_b, innen_z - 26, 7, wand + 2);
         }
 
+        // --- Taschen für die Zapfen der Ebene darunter ---
+        if (stapel_zapfen)
+            for (yz = zapfen_y())
+                for (xz = [0, aussen_x - wand])
+                    zapfentasche(xz, yz);
+
+        // --- Taschen für die seitlichen Verbinder, beide Seiten gleich ---
+        if (seiten_nase)
+            for (yn = zapfen_y()) {
+                nasentasche(yn + (zapfen_l - nase_l) / 2, true);
+                nasentasche(yn + (zapfen_l - nase_l) / 2, false);
+            }
+
         // --- Sichtschlitz in der Rückwand ---
         if (ist_end)
             translate([(aussen_x - (innen_x - 24)) / 2, aussen_y - wand - 1,
@@ -215,3 +338,30 @@ module segment() {
 //  Ausgabe
 // ---------------------------------------------------------------------
 if (TEIL == "segment")       segment();
+else if (TEIL == "verbinder") verbinder();
+else if (TEIL == "test")
+    // Ebene darüber darf sich nicht mit dieser durchdringen
+    intersection() {
+        segment();
+        translate([0, 0, aussen_z]) segment();
+    }
+else if (TEIL == "test_seite")
+    // Spalte daneben ebenso: die Nase muss in die Tasche passen, ohne
+    // dass sich die Körper überschneiden
+    intersection() {
+        segment();
+        translate([aussen_x, 0, 0]) segment();
+    }
+else if (TEIL == "test_diagonal")
+    // Der Nachbar schräg darüber: hier treffen Stapelzapfen und Seitennase
+    // gleichzeitig aufeinander. Wenn eine der beiden Verbindungen zu weit
+    // ausgreift, fällt es nur in dieser Paarung auf.
+    intersection() {
+        segment();
+        translate([aussen_x, 0, aussen_z]) segment();
+    }
+else if (TEIL == "verbund")
+    // Vier Segmente als 2x2-Feld - so steht das Regal später wirklich.
+    // Sichtprüfung im Vorschaufenster.
+    for (sx = [0, aussen_x], sz = [0, aussen_z])
+        translate([sx, 0, sz]) segment();
