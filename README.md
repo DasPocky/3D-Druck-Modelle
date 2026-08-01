@@ -8,7 +8,9 @@ STLs, Zeichnungen und Anleitung gehören zusammen.
 
 ## Projekte
 
-Noch keine — der Ordner ist gerade erst eingerichtet.
+| Projekt | Worum es geht | Druckbett ab |
+|---|---|---|
+| [FutterStorage](FutterStorage/) | Regalsystem für 85-g-Nassfutterbeutel. Waagerechte Kanäle, eine Konstantkraftfeder schiebt die Beutel nach vorn. 5 × 3 Ebenen = 375 Beutel. | 180 × 180 mm |
 
 ---
 
