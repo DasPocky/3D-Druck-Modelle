@@ -441,6 +441,19 @@ module segment() {
 }
 
 // Tasche vor der Anschlagkante, Schild wird von oben eingeschoben
+// Der Rahmen überdeckt den Schildrand ringsum um dieses Maß. Er ist Teil
+// des Segments und deshalb in dessen Farbe - so verschwindet die Kante der
+// farbigen Tafel und man sieht nicht, wo sie eingeschoben wird.
+schild_ueberdeckung = 4;
+
+// Wo das Schild in der Tasche steht und was davon zu sehen ist. Das
+// Layout auf dem Schild richtet sich nach dem SICHTBAREN Ausschnitt,
+// nicht nach der Plattenkante - sonst sitzt das Symbol optisch zu hoch.
+function schild_z0()     = 4;                            // Unterkante Tafel
+function schild_sicht_u() = schild_ueberdeckung;         // ab hier sichtbar
+function schild_sicht_o() = schild_hoehe - schild_ueberdeckung;
+function schild_sicht_h() = schild_sicht_o() - schild_sicht_u();
+
 module schildhalter() {
     sp = schild_dicke + 0.4;
     rb = 1.2;
@@ -449,14 +462,17 @@ module schildhalter() {
     // nur so hoch wie das Schild plus etwas Einführung, sonst bleibt
     // über der Tafel ein leerer Rahmen stehen
     h  = min(anschlag_hoehe - 2, schild_hoehe + 3);
+    u  = schild_ueberdeckung;
     difference() {
         // taucht 0,6 mm in die Anschlagkante ein
         translate([x0, -(sp + rb), 3]) cube([b, sp + rb + 0.6, h]);
         // Spalt für das Schild, nach oben offen
         translate([x0 + 1.6, -sp, 4]) cube([b - 3.2, sp, h]);
-        // Sichtfenster
-        translate([x0 + 3.5, -(sp + rb) - 1, 5])
-            fenster_xz(b - 7, h - 6, 2.5, rb + 2);
+        // Sichtfenster: ringsum um die Überdeckung kleiner als die Tafel
+        translate([x0 + (b - schild_breite) / 2 + u,
+                   -(sp + rb) - 1, schild_z0() + u])
+            fenster_xz(schild_breite - 2 * u, schild_hoehe - 2 * u,
+                       2.5, rb + 2);
     }
 }
 
@@ -622,13 +638,20 @@ schild_font = "Helvetica:style=Bold";
 
 module schild_schrift(h = schild_gravur) {
     hat_sym = schild_symbol != "leer" && schild_symbol != "";
+
+    // Gerechnet wird im SICHTBAREN Ausschnitt, nicht auf der ganzen Tafel:
+    // der Rahmen des Halters überdeckt ringsum schild_ueberdeckung, und was
+    // darunter verschwindet, darf die Aufteilung nicht mitbestimmen. Sonst
+    // sitzt das Symbol optisch zu hoch und klebt am Rahmen.
+    su      = schild_sicht_u();          // untere Kante des Ausschnitts
+    sh      = schild_sicht_h();          // seine Höhe
     rand    = schild_rand;
-    breite  = schild_breite - 2 * rand;
+    breite  = schild_breite - 2 * schild_ueberdeckung - 2 * rand;
 
     // Höhe der Textzeile und des Symbolfeldes. Zwischen beiden bleibt ein
     // Steg, damit das Symbol nicht auf der Schrift sitzt.
-    text_h  = hat_sym ? schild_text_h : schild_hoehe - 2 * rand;
-    sym_h   = schild_hoehe - text_h - 2 * rand - schild_steg;
+    text_h  = hat_sym ? schild_text_h : sh - 2 * rand;
+    sym_h   = sh - text_h - 2 * rand - schild_steg;
 
     // Die Schriftgröße richtet sich nach dem BREITESTEN vorkommenden Namen,
     // nicht nach dem gerade gesetzten - sonst stünde auf jedem Schild eine
@@ -647,10 +670,10 @@ module schild_schrift(h = schild_gravur) {
             // Silhouette dabei mittig bleibt, hängt daran, dass sie um
             // (0,0) zentriert gezeichnet ist - resize verschiebt nicht.
             translate([schild_breite / 2,
-                       rand + text_h + schild_steg + sym_h / 2])
+                       su + rand + text_h + schild_steg + sym_h / 2])
                 resize([sym_feld(), sym_feld()], auto = true)
                     schild_sym(schild_symbol);
-        translate([schild_breite / 2, rand + text_h / 2])
+        translate([schild_breite / 2, su + rand + text_h / 2])
             text(schild_text, size = groesse, halign = "center",
                  valign = "center", font = schild_font);
     }
@@ -659,9 +682,10 @@ module schild_schrift(h = schild_gravur) {
 // Kantenlänge des quadratischen Symbolfelds - für alle Sorten gleich.
 // Sie folgt der Zone, die nach Rand, Textzeile und Steg übrig bleibt,
 // damit das Symbol den Platz ausfüllt statt darin zu schwimmen.
-function sym_feld() = min(schild_hoehe - 2 * schild_rand - schild_text_h
-                          - schild_steg,
-                          schild_breite - 2 * schild_rand);
+function sym_feld() = min(schild_sicht_h() - 2 * schild_rand
+                          - schild_text_h - schild_steg,
+                          schild_breite - 2 * schild_ueberdeckung
+                          - 2 * schild_rand);
 
 module schild() {
     difference() {
