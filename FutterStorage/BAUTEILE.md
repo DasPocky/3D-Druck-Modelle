@@ -102,10 +102,22 @@ lässt sich abschätzen:
   Wir brauchen 7,3 N. Falls sie zu schwach ist: **zwei Federn parallel**,
   ihre Kräfte addieren sich. Dann 18 € statt 9 €.
 
-**Vorgehen:** Bei 0,60 € kostet ein Zehnerpack 6 €. Bestellen, messen,
-dann entscheiden. Die Federkraft misst man ohne Werkzeug: Feder senkrecht
-an einer Küchenwaage ausziehen, angezeigte Masse in Gramm mal 0,00981
-ergibt Newton. 750 g Anzeige entsprechen 7,3 N.
+**Die Gehäusemaße braucht es nicht.** Der Hersteller gibt sie nicht an,
+und aus den Produktbildern lassen sie sich nicht ableiten — dieselbe Kante
+misst dort je nach Bildzeile 184 bis 268 Pixel, die Perspektive verzerrt zu
+stark. Deshalb ist die Aufnahme im Schieber als **Wanne** gebaut, nicht als
+Passung: ein Boden mit zwei Seitenwänden und zwei Querschlitzen für
+Kabelbinder. Damit hält jedes Gehäuse bis 46 × 30 × 26 mm, ohne dass ein
+Maß stimmen muss.
+
+**Was zu prüfen bleibt**, sobald ein Stück da ist:
+
+- **Zugkraft** — Feder senkrecht an einer Küchenwaage ausziehen, angezeigte
+  Gramm mal 0,00981 ergibt Newton. **750 g ≈ 7,3 N** ist die Zielmarke.
+- **Auszugslänge** — mit dem Zollstock, gebraucht werden 470 mm.
+
+Reicht die Kraft nicht: zwei Gehäuse nebeneinander in dieselbe Wanne,
+ihre Kräfte addieren sich.
 
 Das Modell ist auf einen Bereich von 8 bis 12 N ausgelegt und braucht nur
 vier geänderte Zahlen — es funktioniert mit jeder Feder, die passt.

@@ -153,15 +153,22 @@ feder_achse_d = 3.2;   // Bohrung für die Achse: 3-mm-Rundstab, Spielpassung
 //   "rolle"  - Lose Feder auf gedruckter Trommel und 3-mm-Achse. Braucht
 //              zwei Teile mehr, dafür sind die Federdaten dokumentiert.
 //
-// ACHTUNG: Die Pushermaße unten sind GESCHÄTZT - der Hersteller gibt sie
-// nicht an. Vor dem Druck am gekauften Teil nachmessen und hier eintragen.
-// Der Schieber ist der einzige Teil, der davon abhängt.
+// Die Maße des gekauften Gehäuses gibt der Hersteller nicht an, und aus den
+// Produktbildern lassen sie sich nicht ableiten - dieselbe Kante misst dort
+// je nach Bildzeile 184 bis 268 Pixel, die Perspektive verzerrt zu stark.
+//
+// Deshalb ist die Aufnahme als WANNE gebaut, nicht als Passung: ein Boden
+// mit zwei Seitenwänden und zwei Querschlitzen für Kabelbinder. Damit hält
+// jedes Gehäuse in diesem Größenbereich, ohne dass ein Maß stimmen muss.
+// Wer die Maße kennt, kann die Wanne enger machen - nötig ist es nicht.
 feder_bauart = "pusher";  // [pusher, rolle]
 
-pusher_l = 42;         // Gehäuselänge in Bandrichtung   \
-pusher_b = 24;         // Gehäusebreite                   > nachmessen!
-pusher_h = 22;         // Gehäusehöhe                    /
-pusher_spiel = 0.4;    // Luft in der Tasche, damit es sich einlegen lässt
+pusher_l = 46;         // Wannenlänge - nimmt Gehäuse bis 46 mm auf
+pusher_b = 30;         // Wannenbreite - nimmt Gehäuse bis 30 mm auf
+pusher_h = 26;         // Wannentiefe
+pusher_spiel = 0.4;    // Luft an den Wänden
+binder_b = 4.0;        // Schlitzbreite für den Kabelbinder (3-mm-Binder)
+binder_h = 2.2;        // Schlitzhöhe
 
 // Die Feder wickelt NICHT auf der 3-mm-Achse: ihr natürlicher
 // Innendurchmesser liegt bei 11-17 mm. Der Hersteller verlangt eine
@@ -630,14 +637,15 @@ module schieber() {
                 rotate([24, 0, 0]) cube([32, d, 25]);
         }
         if (ist_pusher) {
-            // Tasche für das Federgehäuse, nach oben offen zum Einlegen
+            // Wanne für das Federgehäuse, nach oben offen zum Einlegen
             translate([kx, d + 1, 3.0])
                 cube([kb, pusher_l + pusher_spiel, pusher_h + pusher_spiel + 1]);
-            // Zwei Klemmnasen halten es unten fest - sie federn beim
-            // Einlegen kurz zurück
-            for (yp = [d + 8, d + pusher_l - 6])
-                translate([kx - 1, yp, 3.0 + pusher_h * 0.6])
-                    cube([kb + 2, 4, 1.2]);
+            // Zwei Querschlitze für Kabelbinder. Sie laufen unter dem
+            // Wannenboden durch und um das Gehäuse herum - damit hält
+            // jedes Teil, dessen Maße wir nicht kennen.
+            for (yp = [d + 9, d + pusher_l - 11])
+                translate([kx - 3.2 - 1, yp, 0.8])
+                    cube([kb + 6.4 + 2, binder_b, binder_h]);
         } else {
             // Achsbohrung durch beide Wangen
             translate([-1, ay, ax]) rotate([0, 90, 0])
