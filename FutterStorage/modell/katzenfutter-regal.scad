@@ -29,10 +29,26 @@
 // test = Kollisionsprüfung gestapelter Ebenen (Ergebnis muss leer sein)
 TEIL = "segment";  // [segment, schieber, schild, schild_text, verbinder, trommel, probe, layout, schnitt, test]
 
-// front = vorderstes Segment mit Anschlagkante und Schildhalter
-// mitte = beidseitig offenes Zwischenstück, beliebig oft
-// end   = hinterstes Segment mit Rückwand und Bandhaken
+// Ein Segment sitzt an drei Stellen zugleich - in der Tiefe, in der Höhe
+// und in der Breite. Jede Achse hat ihren eigenen Typ, weil an jedem Rand
+// des Verbunds etwas weggelassen wird, das im Inneren gebraucht wird.
+
+// Tiefe (Y): front = vorderstes Segment mit Anschlagkante und Schildhalter
+//            mitte = beidseitig offenes Zwischenstück, beliebig oft
+//            end   = hinterstes Segment mit Rückwand und Bandhaken
 segment_typ = "front";  // [front, mitte, end]
+
+// Höhe (Z): oben  = oberste Ebene, ohne Stapelzapfen - sonst stünden
+//                   Zapfen frei nach oben ab
+//           unten = unterste Ebene, ohne Zapfentaschen im Boden - dort
+//                   kommt nichts mehr darunter
+//           mitte = beides, Zapfen oben und Taschen unten
+ebene_typ = "mitte";  // [unten, mitte, oben]
+
+// Breite (X): links  = linke Randspalte, ohne Verbindertasche nach links
+//             rechts = rechte Randspalte, ohne Tasche nach rechts
+//             mitte  = beide Taschen, verbindet nach beiden Seiten
+spalte_typ = "mitte";  // [links, mitte, rechts]
 
 /* [Beutel-Maße] */
 // Gemessen an einem echten 85-g-Beutel, ungequetscht.
@@ -177,6 +193,13 @@ aussen_z = boden_dick + innen_z;
 ist_front = segment_typ == "front";
 ist_end   = segment_typ == "end";
 
+// Was an welchem Rand des Verbunds wegfällt. Im Inneren ist alles da;
+// nach außen hin bleibt weg, was ins Leere greifen würde.
+hat_zapfen   = stapel_zapfen && ebene_typ != "oben";    // Zapfen nach oben
+hat_taschen  = stapel_zapfen && ebene_typ != "unten";   // Taschen im Boden
+nase_links   = seiten_nase && spalte_typ != "links";    // Tasche nach links
+nase_rechts  = seiten_nase && spalte_typ != "rechts";   // Tasche nach rechts
+
 // Bauteillänge: Stirnwand nur dort, wo das Segment endet
 aussen_y = segment_laenge + (ist_front ? anschlag_dicke() : 0)
                           + (ist_end ? wand : 0);
@@ -320,7 +343,8 @@ module segment() {
                     cube([innen_x - 0.6, zunge_l, zunge_h]);
 
             // --- Zapfen für die Ebene darüber ---
-            if (stapel_zapfen)
+            // In der obersten Ebene weggelassen: dort stünden sie frei ab.
+            if (hat_zapfen)
                 for (yz = zapfen_y())
                     for (xz = [0, aussen_x - wand])
                         zapfen(xz, yz);
@@ -373,17 +397,19 @@ module segment() {
         }
 
         // --- Taschen für die Zapfen der Ebene darunter ---
-        if (stapel_zapfen)
+        // In der untersten Ebene weggelassen: dort kommt nichts mehr drunter.
+        if (hat_taschen)
             for (yz = zapfen_y())
                 for (xz = [0, aussen_x - wand])
                     zapfentasche(xz, yz);
 
-        // --- Taschen für die seitlichen Verbinder, beide Seiten gleich ---
-        if (seiten_nase)
-            for (yn = zapfen_y()) {
-                nasentasche(yn + (zapfen_l - nase_l) / 2, true);
-                nasentasche(yn + (zapfen_l - nase_l) / 2, false);
-            }
+        // --- Taschen für die seitlichen Verbinder ---
+        // An den Randspalten fällt die äußere Tasche weg: dort steht kein
+        // Nachbar, und eine offene Tasche an der Außenkante fängt nur Staub.
+        for (yn = zapfen_y()) {
+            if (nase_links)  nasentasche(yn + (zapfen_l - nase_l) / 2, true);
+            if (nase_rechts) nasentasche(yn + (zapfen_l - nase_l) / 2, false);
+        }
 
         // --- Sichtschlitz in der Rückwand ---
         if (ist_end)
