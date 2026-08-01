@@ -199,3 +199,43 @@ def beutel(n, x=0, z=0):
 def schieber_bei(n, x=0, z=0):
     put(s_schb, (x + 1.8, 4 + n * BD + 1, z + BODEN), ORANGE)
 
+# --------------------------------------------------------------- Szenen
+if SZENE == "kanal":
+    kanal(); schild_an(); beutel(11); schieber_bei(11)
+elif SZENE == "explosion":
+    kanal(luecke=70); schild_an()
+    put(s_schb, (1.8, LF + LM + 2 * 70 + 60, BODEN), ORANGE)
+elif SZENE == "gefuellt":
+    kanal(); schild_an(); beutel(13); schieber_bei(13)
+elif SZENE == "ebene":
+    for i in range(5): kanal(x=i * AX); schild_an(x=i * AX, nr=i)
+    beutel(16); schieber_bei(16)
+    beutel(9, x=AX); schieber_bei(9, x=AX)
+elif SZENE == "gesamt":
+    bpy.ops.mesh.primitive_plane_add(size=1, location=(238, 240, -3))
+    bd = bpy.context.object; bd.scale = (700, 700, 1)
+    bd.data.materials.append(HOLZ)
+    fuell = [[18, 11, 15, 7, 13], [14, 17, 9, 12, 6], [10, 8, 16, 5, 13]]
+    for e in range(3):
+        for i in range(5):
+            kanal(x=i * AX, z=e * AZ); schild_an(x=i * AX, z=e * AZ, nr=e * 5 + i)
+            beutel(fuell[e][i], x=i * AX, z=e * AZ)
+            schieber_bei(fuell[e][i], x=i * AX, z=e * AZ)
+elif SZENE == "schild":
+    put(s_schd, (0, 0, 0), ORANGE, bevel=0.1)
+    put(s_txt, (0, 0, 0.02), SCHWARZ, bevel=0)
+elif SZENE.startswith("schild:"):
+    # Ein einzelnes Sortenschild, gerendert wie alle anderen Teile - damit
+    # die Farben zu den uebrigen Bildern passen. Aufruf: schild:03-lachs
+    # Die Schilder sind oben schon geladen - ein zweiter Import derselben
+    # Datei liefert kein neues Objekt und legte sonst zwei Platten uebereinander.
+    pl, tx = SORTE_NACH_NAME[SZENE.split(":", 1)[1]]
+    put(pl, (0, 0, 0), ORANGE, bevel=0)
+    put(tx, (0, 0, 0.03), SCHWARZ, bevel=0)
+elif SZENE == "schieber":
+    put(s_schb, (0, 0, 0), ORANGE)
+elif SZENE in ("front", "mitte", "end"):
+    put({"front": s_front, "mitte": s_mitte, "end": s_end}[SZENE],
+        (0, 0, 0), SCHWARZ)
+    if SZENE == "front": schild_an()
+
