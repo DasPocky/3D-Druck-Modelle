@@ -160,7 +160,7 @@ def main():
 
     # ---- Ergebnis ---------------------------------------------------
     print(f"Modell:   Schild {v['schild_breite']:.0f} x {v['schild_hoehe']:.0f} mm, "
-          f"Greifraum {v['luft_oben']:.0f} mm ueber dem Beutel")
+          f"Greifraum {v['luft_oben']:.0f} mm über dem Beutel")
     print(f"          Segment {v['aussen_x']:.1f} x {v['aussen_z']:.1f} mm, "
           f"Zapfen {v['zapfen_h']:.1f} mm, Nase {v['nase_t']:.1f} mm")
     print(f"          Feder {v['feder_band_b']:.0f} mm Band auf Trommel "

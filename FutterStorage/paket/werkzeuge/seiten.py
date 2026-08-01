@@ -13,7 +13,9 @@ NAMEN = {"b_front": "01-segment-front", "b_mitte": "02-segment-mitte",
          "b_schild": "05-schild", "b_kanal": "06-kanal-komplett",
          "b_explosion": "07-explosion", "b_gefuellt": "08-funktionsprinzip",
          "b_greifraum": "09-greifraum", "b_entnahme": "10-entnahme",
-         "b_ebene": "11-eine-ebene", "b_gesamt": "12-vollausbau"}
+         "b_varianten": "11-varianten-ebene",
+         "b_varianten_spalte": "12-varianten-spalte",
+         "b_ebene": "13-eine-ebene", "b_gesamt": "14-vollausbau"}
 
 TITEL = {"b_front": ("Frontsegment", "Vorderstes Kanalstueck mit Frontwand "
                      "und Schildtasche"),
@@ -29,6 +31,10 @@ TITEL = {"b_front": ("Frontsegment", "Vorderstes Kanalstueck mit Frontwand "
                          "fasst die Hand zu"),
          "b_entnahme": ("Entnahme", "Der vorderste Beutel wird an der Oberkante "
                         "gefasst und nach vorne herausgezogen"),
+         "b_varianten": ("Ebenenlagen", "unten, mitte und oben - oben ohne "
+                         "Stapelzapfen, unten ohne Taschen im Boden"),
+         "b_varianten_spalte": ("Spaltenlagen", "links, mitte und rechts - "
+                                "an den Rändern ohne Verbindertasche"),
          "b_ebene": ("Eine Ebene", "Fuenf Kanaele nebeneinander, unterschiedlich gefuellt"),
          "b_gesamt": ("Vollausbau", "Drei Ebenen mit fuenfzehn Sorten im Schrank")}
 
@@ -1108,6 +1114,9 @@ BAU = f"""
     der naechsten Ebene sitzen die passenden Taschen. Die Ebene von oben aufsetzen,
     bis sie satt auf den Waenden aufliegt &mdash; nicht auf den Zapfen. Kein Sockel,
     kein Kleber, kein Werkzeug.</p>
+    <figure class="gross"><img src="{R['b_varianten']}" alt="Ebenenlagen"></figure>
+    <figcaption>Dieselbe Tiefe in drei Ebenenlagen: unten, mitte, oben.</figcaption>
+
     <p>Jedes Segment gibt es in drei Ebenenlagen: <code>unten</code> ohne
     Taschen im Boden, <code>mitte</code> mit beidem, <code>oben</code> ohne
     Zapfen. Fuer die oberste Lage also die <code>-oben-</code>-Dateien nehmen
@@ -1426,6 +1435,8 @@ BLOECKE = [
      ["b_explosion", "b_kanal", "b_gefuellt"]),
     ("Entnahme", "Wie der Beutel herauskommt und wieviel Platz die Hand hat",
      ["b_greifraum", "b_entnahme"]),
+    ("Die 27 Varianten", "Was an welchem Rand des Verbunds entfällt",
+     ["b_varianten", "b_varianten_spalte"]),
     ("Im Schrank", "Eine Ebene und der volle Ausbau",
      ["b_ebene", "b_gesamt"]),
 ]

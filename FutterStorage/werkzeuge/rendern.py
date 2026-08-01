@@ -272,13 +272,16 @@ def beutel_entnahme(x=0, z=0):
     if _BEUTEL_MESH is None:
         _BEUTEL_MESH = beutel_mesh()
     o = bpy.data.objects.new("beutel_entnahme", _BEUTEL_MESH)
-    # So weit herausgezogen, dass die Oberkante frei vor der Wand steht -
-    # nicht weiter, sonst zeigt das Bild einen Beutel in der Luft statt
-    # den Vorgang.
-    kipp = 11.0
+    # Der Beutel kippt beim Herausziehen ueber die Frontwandkante nach
+    # vorne: der Fuss steht noch im Kanal, die Oberkante steht frei.
+    # Vorher stand er senkrecht bei y = 3 und damit MITTEN in der
+    # Frontwand - das war der sichtbare Durchdringungsfehler im Bild.
+    kipp = 25.0
+    fuss_y = 4.5                       # knapp hinter der Anschlagwand
     o.rotation_euler = (math.radians(-kipp), 0, 0)
-    o.location = (x + WAND + SPIEL / 2 + BB / 2, 3.0,
-                  z + BODEN + BH / 2 * math.cos(math.radians(kipp)) + 34)
+    o.location = (x + WAND + SPIEL / 2 + BB / 2,
+                  fuss_y - BH / 2 * math.sin(math.radians(kipp)),
+                  z + BODEN + BH / 2 * math.cos(math.radians(kipp)))
     o.data.materials.clear()
     o.data.materials.append(FOLIE)
     bpy.context.collection.objects.link(o)
@@ -332,6 +335,17 @@ elif SZENE == "greifraum":
     put(seg("front", "oben", "mitte"), (0, 0, AZ), SCHWARZ)
     schild_an()
     beutel(8)
+elif SZENE == "varianten":
+    # Die drei Ebenenlagen nebeneinander. Der Unterschied sitzt oben und
+    # unten: unten ohne Taschen im Boden, oben ohne Zapfen, mitte mit
+    # beidem. Im Verbund sieht man das nicht mehr - hier schon.
+    for i, lage in enumerate(("unten", "mitte", "oben")):
+        put(seg("front", lage, "mitte"), (i * (AX + 26), 0, 0), SCHWARZ)
+elif SZENE == "varianten_spalte":
+    # Dasselbe fuer die Spaltenlagen. Der Unterschied ist die
+    # Verbindertasche am Bodenrand, deshalb von schraeg unten betrachtet.
+    for i, lage in enumerate(("links", "mitte", "rechts")):
+        put(seg("front", "mitte", lage), (i * (AX + 26), 0, 0), SCHWARZ)
 elif SZENE == "schild":
     put(s_schd, (0, 0, 0), ORANGE, bevel=0.1)
     put(s_txt, (0, 0, 0.02), SCHWARZ, bevel=0)

@@ -817,7 +817,7 @@ def blatt6():
             "Beide Verbindungen sind Materialfortsetzungen und drucken ohne Stützen.",
             f'Ringsum {M["passung"]:.1f} mm Spiel'.replace(".", ",") + ' — bei strammem Sitz die Passung im '
             "Modell erhöhen.",
-            "Die Nase der äußersten Spalte greift ins Leere und darf abgeschnitten werden."]):
+            "An den Randspalten entfällt die äußere Tasche."]):
         b.txt(ox - 90, ly + i * 21, t, 10.5, "start", LINIE if i == 0 else GRAU)
 
     b.legende(ox3 - 34, ly - 8, [
@@ -827,6 +827,38 @@ def blatt6():
         (4, "Nase am Bodenrand", f'{M["nase_l"]:.0f} lang'),
         (5, "Tasche in der Nachbarspalte", "unter dem Innenraum"),
     ], spalten=1)
+
+    # --- Welche Variante wo sitzt --------------------------------------
+    mx, my = ox - 90, ly + 92
+    b.ansicht(mx, my - 22, "DIE 27 VARIANTEN — was an welchem Rand entfällt")
+
+    ZS = 150          # Spaltenbreite der Tabelle
+    ZH2 = 26          # Zeilenhoehe
+    kopf = ["Achse", "Werte", "Was sich ändert"]
+    zeilen = [
+        ("Tiefe (Y)", "front · mitte · end",
+         "Anschlagwand vorne, Rückwand hinten"),
+        ("Höhe (Z)", "unten · mitte · oben",
+         "oben ohne Zapfen, unten ohne Taschen"),
+        ("Breite (X)", "links · mitte · rechts",
+         "außen ohne Verbindertasche"),
+    ]
+    for i, t in enumerate(kopf):
+        b.txt(mx + i * ZS, my, t, 10.5, "start", LINIE, "700")
+    b.line(mx, my + 8, mx + 2 * ZS + 320, my + 8, LINIE, 1.0)
+    for r, (a, w, aend) in enumerate(zeilen):
+        y = my + 26 + r * ZH2
+        b.txt(mx, y, a, 10.5, "start")
+        b.txt(mx + ZS, y, w, 10.5, "start", MASSL)
+        b.txt(mx + 2 * ZS, y, aend, 10.5, "start", GRAU)
+
+    yv = my + 26 + len(zeilen) * ZH2 + 22
+    b.txt(mx, yv, "3 × 3 × 3 = 27 Varianten. Der Vollausbau aus 5 Spalten und "
+          "3 Ebenen braucht 45 Segmente,", 10.5, "start")
+    b.txt(mx, yv + 19, "und jede der 27 kommt darin mindestens einmal vor. "
+          "Die Dateien liegen unter stl/segmente/.", 10.5, "start", GRAU)
+    b.txt(mx, yv + 42, "Beispiel: das vorderste Segment der untersten Ebene "
+          "ganz links heißt front-unten-links.stl", 10.5, "start", GRAU)
 
     b.titel("Verbindungen", "Wie die Ebenen und die Spalten zusammengehalten werden",
             "TEIL 07")

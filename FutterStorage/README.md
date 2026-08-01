@@ -51,6 +51,7 @@ entsteht daraus neu.
 | `zeichnungen.py` | Bemaßte SVG-Blätter, prüft sich selbst auf Überdeckungen |
 | `rendern.py` | Blender-Szenen mit automatischer Kamerarahmung |
 | `schilder.py` | Ein Schild je Futtersorte, als STL und als Bild |
+| `symbole-holen.py` | Wandelt die OpenMoji-SVG in OpenSCAD-Polygone |
 | `symbole-pruefen.py` | Misst jedes Sortensymbol auf Zentrierung und Größe |
 | `webbilder.py` | Verkleinert die Renderings zu JPEG für die Seiten |
 | `abgleich.py` | Hält Modell, STL, Zeichnungen und Bilder gegeneinander |
@@ -65,7 +66,7 @@ python3 werkzeuge/symbole-pruefen.py
 python3 werkzeuge/schilder.py beide
 python3 werkzeuge/zeichnungen.py
 for s in front mitte end schieber schild kanal explosion gefuellt ebene gesamt \
-         entnahme greifraum; do
+         entnahme greifraum varianten varianten_spalte; do
     blender -b -P werkzeuge/rendern.py -- $s bilder/b_$s.png
 done
 python3 werkzeuge/webbilder.py    # verkleinerte JPEG für die Seiten
@@ -92,6 +93,16 @@ Alle Maße stehen oben in `modell/katzenfutter-regal.scad`. Die wichtigsten:
 
 Nach jeder Änderung `stl-bauen.py` und `pruefen.py` laufen lassen. Zeichnungen
 und Renderings lesen die Maße selbst aus dem Modell und passen sich an.
+
+---
+
+## Sortensymbole
+
+Die acht Tiersilhouetten stammen aus [OpenMoji](https://openmoji.org)
+(CC BY-SA 4.0) und liegen als SVG unter `modell/symbole/`.
+`symbole-holen.py` wandelt sie in OpenSCAD-Polygone — OpenSCAD kann kein
+SVG lesen. Bei Weitergabe gehört die Namensnennung dazu, Einzelheiten in
+[modell/symbole/HERKUNFT.md](modell/symbole/HERKUNFT.md).
 
 ---
 
