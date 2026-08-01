@@ -175,13 +175,17 @@ def beutel_mesh(name="Beutel"):
         # Der Beutel bleibt bis weit oben prall und knickt erst kurz vor der
         # Siegelnaht ab. Eine Potenzkurve liefe kegelfoermig zu, deshalb eine
         # S-Kurve mit Wendepunkt bei 75 % der Resthoehe.
+        # Wendepunkt weit oben (88 %) und steiler Abfall: der Beutel ist
+        # bis kurz unter die Naht prall und knickt dann ab. Mit dem
+        # frueheren Wert 0,75 und Steigung 8 lief er kegelfoermig zu und
+        # sah aus wie ein Zapfen statt wie ein Paeckchen.
         w = (v - 0.12) / 0.88
-        g = lambda t: 1.0 / (1.0 + math.exp(8.0 * (t - 0.75)))
+        g = lambda t: 1.0 / (1.0 + math.exp(15.0 * (t - 0.88)))
         f = (g(w) - g(1.0)) / (g(0.0) - g(1.0))
         # Oben bleibt Restdicke stehen: dort sitzt die Siegelnaht, und
         # die ist flach, nicht spitz. Mit 0,032 lief der Beutel spitz zu
         # und man sah nicht mehr, wo er endet und wo der Greifraum beginnt.
-        return 0.16 + 0.84 * f
+        return 0.22 + 0.78 * f
 
     verts, faces = [], []
     for seite in (1, -1):
@@ -271,10 +275,10 @@ def beutel_entnahme(x=0, z=0):
     # So weit herausgezogen, dass die Oberkante frei vor der Wand steht -
     # nicht weiter, sonst zeigt das Bild einen Beutel in der Luft statt
     # den Vorgang.
-    kipp = 18.0
+    kipp = 11.0
     o.rotation_euler = (math.radians(-kipp), 0, 0)
-    o.location = (x + WAND + SPIEL / 2 + BB / 2, 2.0,
-                  z + BODEN + BH / 2 * math.cos(math.radians(kipp)) + 26)
+    o.location = (x + WAND + SPIEL / 2 + BB / 2, 3.0,
+                  z + BODEN + BH / 2 * math.cos(math.radians(kipp)) + 34)
     o.data.materials.clear()
     o.data.materials.append(FOLIE)
     bpy.context.collection.objects.link(o)
@@ -318,8 +322,9 @@ elif SZENE == "entnahme":
     schild_an()
     beutel(7)
     beutel_entnahme()
-    # Finger an der Oberkante des herausgezogenen Beutels
-    finger(WAND + SPIEL / 2 + BB / 2, -26, BODEN + BH * 0.96 + 26)
+    # Bewusst ohne Hand: zwei Zylinder als Finger sahen aus wie Wuerste
+    # und lagen neben dem Beutel statt an ihm. Den Massnachweis fuehrt
+    # das Zugriffsblatt der Zeichnungen, dort passt eine Silhouette.
 elif SZENE == "greifraum":
     # Derselbe Ausschnitt ohne Hand, dafuer mit freiem Blick auf den Spalt
     # zwischen Beutelkante und der Ebene darueber.

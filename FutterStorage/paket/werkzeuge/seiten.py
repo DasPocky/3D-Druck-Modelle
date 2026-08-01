@@ -12,10 +12,11 @@ NAMEN = {"b_front": "01-segment-front", "b_mitte": "02-segment-mitte",
          "b_end": "03-segment-end", "b_schieber": "04-schieber",
          "b_schild": "05-schild", "b_kanal": "06-kanal-komplett",
          "b_explosion": "07-explosion", "b_gefuellt": "08-funktionsprinzip",
-         "b_ebene": "09-eine-ebene", "b_gesamt": "10-vollausbau"}
+         "b_greifraum": "09-greifraum", "b_entnahme": "10-entnahme",
+         "b_ebene": "11-eine-ebene", "b_gesamt": "12-vollausbau"}
 
-TITEL = {"b_front": ("Frontsegment", "Vorderstes Kanalstueck mit Frontwand, "
-                     "Griffmulde und Schildtasche"),
+TITEL = {"b_front": ("Frontsegment", "Vorderstes Kanalstueck mit Frontwand "
+                     "und Schildtasche"),
          "b_mitte": ("Mittelsegment", "Beliebig oft wiederholbar, verlaengert den Kanal"),
          "b_end": ("Endsegment", "Schliesst den Kanal hinten ab"),
          "b_schieber": ("Schieber", "Traegt die Konstantkraftfeder und schiebt den Stapel"),
@@ -24,6 +25,10 @@ TITEL = {"b_front": ("Frontsegment", "Vorderstes Kanalstueck mit Frontwand, "
          "b_explosion": ("Explosionsdarstellung", "Die drei Segmente und der Schieber "
                          "in Reihenfolge"),
          "b_gefuellt": ("Funktionsprinzip", "Die Feder haelt den Stapel vorne am Anschlag"),
+         "b_greifraum": ("Greifraum", "Ueber dem Beutel bleiben 42 mm - dort "
+                         "fasst die Hand zu"),
+         "b_entnahme": ("Entnahme", "Der vorderste Beutel wird an der Oberkante "
+                        "gefasst und nach vorne herausgezogen"),
          "b_ebene": ("Eine Ebene", "Fuenf Kanaele nebeneinander, unterschiedlich gefuellt"),
          "b_gesamt": ("Vollausbau", "Drei Ebenen mit fuenfzehn Sorten im Schrank")}
 
@@ -31,8 +36,9 @@ ZTITEL = {"01-frontsegment": ("Frontsegment", "Vorder-, Seiten- und Draufsicht "
                               "mit allen Massen"),
           "02-mittel-endsegment": ("Mittel- und Endsegment", "Beide Bauteile plus "
                                    "gemeinsamer Querschnitt"),
-          "03-schieber-schild": ("Schieber, Schild und Achse", "Federkammer, "
-                                 "Schildplatte und Zukaufteil"),
+          "03-schieber-schild": ("Schieber, Schild, Trommel und Achse",
+                                 "Federkammer, Schildplatte, Wickeltrommel "
+                                 "und Zukaufteil"),
           "04-gesamtanordnung": ("Gesamtanordnung", "Wie die Teile im Schrank stehen"),
           "05-beutel-passung": ("Beutel und Passung", "Die gemessenen Beutelmasse "
                                 "als Grundlage"),
@@ -76,12 +82,12 @@ RECHT = {
  "haengt": "hängt", "haette": "hätte", "hinterliessen": "hinterließen",
  "Hoehe": "Höhe", "Innenmass": "Innenmaß", "Kanaele": "Kanäle",
  "Kanalstueck": "Kanalstück", "klaeren": "klären", "Koerper": "Körper",
- "kuerzen": "kürzen", "laedt": "lädt", "Laenge": "Länge", "laengste": "längste",
+ "kürzen": "kürzen", "laedt": "lädt", "Laenge": "Länge", "laengste": "längste",
  "laesst": "lässt", "laeuft": "läuft", "Loecher": "Löcher", "loesen": "lösen",
  "loeste": "löste", "Mass": "Maß", "Massblaetter": "Maßblätter", "Masse": "Maße",
  "Massen": "Maßen", "Masslinie": "Maßlinie", "Masslinien": "Maßlinien",
  "Mittelstuecke": "Mittelstücke", "Modellaenderung": "Modelländerung",
- "Modellmassen": "Modellmaßen", "Moeglichkeit": "Möglichkeit", "muessen": "müssen",
+ "Modellmassen": "Modellmaßen", "Moeglichkeit": "Möglichkeit", "müssen": "müssen",
  "Nachfuellen": "Nachfüllen", "naechste": "nächste", "naechsten": "nächsten",
  "Oeffne": "Öffne", "oeffnen": "öffnen", "Projektuebersicht": "Projektübersicht",
  "pruefen": "prüfen", "Pruefer": "Prüfer", "Pruefinstanz": "Prüfinstanz",
@@ -93,7 +99,7 @@ RECHT = {
  "Schweissdraht": "Schweißdraht", "Seitenverhaeltnis": "Seitenverhältnis",
  "Staerken": "Stärken", "staerkere": "stärkere", "Standflaeche": "Standfläche",
  "stiess": "stieß", "Stossflaechen": "Stoßflächen", "Stueck": "Stück",
- "Stueckliste": "Stückliste", "Stuecks": "Stücks", "Stuetzen": "Stützen",
+ "Stueckliste": "Stückliste", "Stuecks": "Stücks", "Stützen": "Stützen",
  "Traegt": "Trägt", "ueber": "über", "Ueber": "Über", "ueberbrueckt": "überbrückt",
  "ueberdeckt": "überdeckt", "uebereinander": "übereinander",
  "Ueberhaenge": "Überhänge", "Ueberhang": "Überhang",
@@ -103,7 +109,7 @@ RECHT = {
  "vergroessern": "vergrößern", "vergroessert": "vergrößert",
  "verlaengert": "verlängert", "veroeffentlicht": "veröffentlicht",
  "Verpackungsmasse": "Verpackungsmaße", "Vollkoerper": "Vollkörper",
- "Vorgaenger": "Vorgänger", "waechst": "wächst", "waehlen": "wählen",
+ "Vorgaenger": "Vorgänger", "wächst": "wächst", "waehlen": "wählen",
  "waehrend": "während", "Waende": "Wände", "Waenden": "Wänden", "waere": "wäre",
  "waeren": "wären", "Wandstaerke": "Wandstärke", "Wandstaerken": "Wandstärken",
  "weiss": "weiß", "wofuer": "wofür", "Zeichnungsblaetter": "Zeichnungsblätter",
@@ -118,7 +124,7 @@ RECHT = {
  "schwaecht": "schwächt", "ueberall": "überall", "wuerde": "würde",
  "wuerden": "würden", "zaehlt": "zählt", "zusammenhaelt": "zusammenhält",
  "naechster": "nächster", "spaeter": "später", "waehlt": "wählt",
- "erhoehen": "erhöhen", "erhoeht": "erhöht", "koennen": "können",
+ "erhoehen": "erhöhen", "erhöht": "erhöht", "koennen": "können",
  "koennte": "könnte", "moeglich": "möglich", "noetig": "nötig",
  "groesser": "größer", "kuerzer": "kürzer", "laenger": "länger",
  "haeufig": "häufig", "ungefaehr": "ungefähr", "Aussenkante": "Außenkante",
@@ -309,7 +315,7 @@ ERLAUBT = {
     "quer", "querschnitt", "quersteg", "zuerst", "neues", "neuer", "neue", "neu",
     "teuerste", "teuer", "umbauen", "steuert", "gesteuert", "steuerung",
     "silhouette", "sequenz", "aequivalent", "abenteuer", "erneuern", "feuer",
-    "dass", "muss", "muessen", "lassen", "laesst", "passen", "passt", "passung",
+    "dass", "muss", "müssen", "lassen", "laesst", "passen", "passt", "passung",
     "passprobe", "passung", "presst", "fasst", "fassung", "messing", "wissen",
     "weiss", "gross", "bewusste", "kompromiss", "durchmesser", "loslassen",
     "passieren", "passiert", "musste", "quelle", "aussahen", "anfassen",
@@ -321,6 +327,12 @@ ERLAUBT = {
     "bildausschnitt", "neuen", "beutel-passung", "g-nassfutterbeutel",
     "aufbauen", "einbauen", "umbauen", "anbauen", "zusammenbauen", "erbauen",
     "voraussetzung", "ausserdem", "ausser",
+    # Woerter mit doppeltem s, die keine Umschrift sind - die
+    # Regel "ss" allein trifft sie sonst faelschlich.
+    "gefasst", "hinfasst", "fasst", "passt", "passte", "misst",
+    "dass", "muss", "musste", "wusste", "gross",
+    "innendurchmesser", "aussendurchmesser", "lebensdauer",
+    "durchmesser", "messer",
 }
 _VERDACHT = re.compile(r"\b[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß-]{2,}\b")
 
@@ -750,7 +762,7 @@ INDEX = f"""
       <tbody>
         <tr><td>Schrankbreite nutzbar</td><td class="num">540 mm</td></tr>
         <tr><td>Schranktiefe</td><td class="num">500 mm</td></tr>
-        <tr><td>Hoehe ohne Regalboden</td><td class="num">520 mm</td></tr>
+        <tr><td>Fachhöhe, Regalboden hoeher gesetzt</td><td class="num">550 mm</td></tr>
         <tr><td>Beutel (gemessen)</td><td class="num">88 &times; 136 &times; 20 mm</td></tr>
       </tbody>
     </table></div>
@@ -782,25 +794,33 @@ BAU = f"""
 
   <div class="text">
     <h3>Entnehmen</h3>
-    <p>Der vorderste Beutel lehnt an der Frontwand und ragt 44 mm darueber hinaus. Du
-    greifst ihn dort und durch die Griffmulde und ziehst ihn nach vorne heraus. Nichts
-    muss nach oben angehoben werden.</p>
+    <p>Gefasst wird der Beutel an seiner <strong>Oberkante</strong>: Daumen und
+    Zeigefinger greifen dort zu und ziehen ihn nach vorne heraus. Der vorderste
+    Beutel ragt 44 mm ueber die Frontwand hinaus und kippt beim Herausziehen
+    ueber deren Kante.</p>
 
-    <h4>Kommt man ueberall mit den Fingern hin?</h4>
-    <p>Ja &mdash; aber nur von vorne, und das ist Absicht. Zwei Oeffnungen sorgen
-    dafuer:</p>
-    <ul>
-      <li>Ueber der Frontwand bleiben <strong>48 mm</strong> Luft bis zur naechsten
-        Ebene. In diesen Spalt greifst du von vorne hinein und fasst den Beutel an
-        seiner duennen Oberkante.</li>
-      <li>Die <strong>Griffmulde</strong> schneidet 50 mm tief und 58 mm breit in die
-        Frontwand. Dort bekommst du den Beutel auf halber Hoehe zu fassen und kippst
-        ihn nach vorne heraus.</li>
-    </ul>
-    <p>Seitlich neben den Beutel kommt man nicht &mdash; dort sind nur zwei
-    Millimeter Luft, und der Nachbarkanal steht unmittelbar daneben. Eine seitliche
-    Aussparung wuerde deshalb nichts bringen: Sie wuerde direkt in die Wand des
-    Nachbarn zeigen. Genau deswegen ist die Mulde vorne so gross ausgefallen.</p>
+    <figure class="gross"><img src="{R['b_entnahme']}" alt="Entnahme"></figure>
+    <figcaption>Der vorderste Beutel, an der Oberkante gefasst und nach vorne
+    herausgezogen.</figcaption>
+
+    <h4>Kommt man mit den Fingern hin?</h4>
+    <p>Das entscheidet ein einziges Mass: der <strong>Greifraum</strong> von
+    42 mm zwischen der Beutelkante und dem Boden der Ebene darueber. Ein
+    Erwachsenenfinger ist rund 17,5 mm dick, zwei davon passen also neben die
+    Kante. Unter 40 mm wird es zur Fummelei &mdash; deshalb ist der Regalboden
+    hoeher gesetzt, damit 550 mm Fachhöhe zur Verfügung stehen.</p>
+
+    <figure class="gross"><img src="{R['b_greifraum']}" alt="Greifraum"></figure>
+    <figcaption>Der Spalt ueber dem Beutelstapel. Er bestimmt die Ebenenhoehe
+    von 182,8 mm.</figcaption>
+
+    <p>Vorne ist der Kanal oberhalb der Frontwand ohnehin offen &mdash; dort
+    steht nichts im Weg. Die Frontwand braucht deshalb <em>keine</em>
+    Griffmulde; eine solche säße dort, wo die Hand gar nicht hinfasst, und
+    nähme nur dem Schild Platz weg.</p>
+
+    <p>Seitlich neben den Beutel kommt man nicht: dort sind nur zwei Millimeter
+    Luft, und der Nachbarkanal steht unmittelbar daneben.</p>
 
     <h3>Nachfuellen</h3>
     <p>Schieber an der Grifflasche nach hinten ziehen, Beutel hochkant von oben
@@ -844,7 +864,7 @@ BAU = f"""
       <div class="txt"><span class="anz">1&times; je Kanal</span>
       <h4>Frontsegment</h4>
       <div class="dat">95 &times; 175 &times; 145 mm &middot; 100 g</div>
-      <p>Kommt nach vorne. Traegt die 92 mm hohe Frontwand mit Griffmulde, die
+      <p>Kommt nach vorne. Traegt die 92 mm hohe Frontwand, die
       Schildtasche und den Haken fuer das Federband.</p></div>
     </article>
     <article class="karte">
@@ -900,11 +920,11 @@ BAU = f"""
       <th>Filament</th></tr></thead>
     <tbody>
       <tr><td>kurz</td><td class="w">Front + End</td><td class="num">325 mm</td>
-        <td class="num">16</td><td class="num">234 g</td></tr>
+        <td class="num">16</td><td class="num">263 g</td></tr>
       <tr><td>mittel</td><td class="w">Front + 1&times; Mitte + End</td>
-        <td class="num">485 mm</td><td class="num">25</td><td class="num">304 g</td></tr>
+        <td class="num">485 mm</td><td class="num">25</td><td class="num">336 g</td></tr>
       <tr><td>lang</td><td class="w">Front + 2&times; Mitte + End</td>
-        <td class="num">645 mm</td><td class="num">33</td><td class="num">374 g</td></tr>
+        <td class="num">645 mm</td><td class="num">33</td><td class="num">409 g</td></tr>
     </tbody>
   </table></div>
   <p class="unter">In deinen Schrank passt der mittlere Kanal genau.</p>
@@ -915,77 +935,91 @@ BAU = f"""
       <th>Filament</th><th>Druckzeit ca.</th></tr></thead>
     <tbody>
       <tr><td>Testkanal, kurz</td><td class="num">1</td><td class="num">16</td>
-        <td class="num">5</td><td class="num">234 g</td><td class="num">14 h</td></tr>
+        <td class="num">5</td><td class="num">263 g</td><td class="num">15 h</td></tr>
       <tr><td>Eine Ebene</td><td class="num">5</td><td class="num">125</td>
-        <td class="num">30</td><td class="num">1,52 kg</td><td class="num">89 h</td></tr>
+        <td class="num">30</td><td class="num">1,68 kg</td><td class="num">99 h</td></tr>
       <tr><td>Zwei Ebenen</td><td class="num">10</td><td class="num">250</td>
-        <td class="num">60</td><td class="num">3,04 kg</td><td class="num">179 h</td></tr>
+        <td class="num">60</td><td class="num">3,36 kg</td><td class="num">198 h</td></tr>
     </tbody>
     <tfoot><tr><td>Drei Ebenen</td><td class="num">15</td><td class="num">375</td>
-      <td class="num">90</td><td class="num">4,56 kg</td><td class="num">268 h</td></tr></tfoot>
+      <td class="num">90</td><td class="num">5,04 kg</td><td class="num">297 h</td></tr></tfoot>
   </table></div>
-  <p class="unter">Druckzeit grob mit 17 g/h. Bei zehn Sorten reichen zwei Ebenen.</p>
+  <p class="unter">Je Kanal sechs Druckteile: Front-, Mittel- und Endsegment, Schieber, Schild und Wickeltrommel. Druckzeit grob mit 17 g/h. Bei zehn Sorten reichen zwei Ebenen.</p>
 </section>
 
 <section>
   <h2 data-nr="04">Einkaufsliste</h2>
-  <p class="unter">Zwei Kleinteile je Kanal. Keine Schrauben, keine Muttern, kein Kleber.</p>
+  <p class="unter">Zwei Zukaufteile je Kanal. Keine Schrauben, keine Muttern,
+  kein Kleber &mdash; alles Übrige wird gedruckt.</p>
 
   <div class="tab"><table>
-    <thead><tr><th>Teil</th><th>Anforderung</th><th>Menge</th><th>Preis</th></tr></thead>
+    <thead><tr><th>Teil</th><th>Was genau</th><th>Menge</th><th>Preis</th></tr></thead>
     <tbody>
       <tr>
         <td class="w"><strong>Konstantkraftfeder</strong><br>
           <span class="klein">aufgerolltes Federstahlband</span></td>
-        <td class="w">Zugkraft <strong>8&ndash;12 N</strong> &middot;
-          Auszug <strong>&ge; 500 mm</strong> &middot;
-          Band <strong>16 mm</strong> breit &middot;
-          Rolle <strong>&le; 26 mm</strong></td>
+        <td class="w"><strong>CF030-0237</strong> &middot; 10,5 N &middot;
+          Auszug 610 mm &middot; Band 15,0 mm &middot; Rolle 22 mm &middot;
+          Federstahl 1.4310, rostfrei</td>
         <td class="num">1 je Kanal</td>
-        <td class="num">3&ndash;8 &euro;</td>
+        <td class="num">16,40 &euro;</td>
       </tr>
       <tr>
         <td class="w"><strong>Achse</strong><br>
-          <span class="klein">haelt die Federrolle</span></td>
-        <td class="w">Rundstab <strong>3 mm</strong>, 90 mm lang &mdash; Stahldraht,
-          Messing oder ein Stueck 3-mm-Filament</td>
+          <span class="klein">trägt die Wickeltrommel</span></td>
+        <td class="w">Rundstab <strong>3 mm</strong>, 90 mm lang &mdash;
+          Edelstahl V2A (1.4301), blank gezogen, Toleranz h9.
+          Ein 500-mm-Stab reicht fuer fuenf Achsen.</td>
         <td class="num">1 je Kanal</td>
-        <td class="num">&lt; 1 &euro;</td>
+        <td class="num">1,05 &euro;<br>
+          <span class="klein">je 500-mm-Stab</span></td>
       </tr>
     </tbody>
-    <tfoot><tr><td>Fuer 15 Kanaele</td><td>&nbsp;</td><td class="num">15 + 15</td>
-      <td class="num">45&ndash;135 &euro;</td></tr></tfoot>
+    <tfoot><tr><td>Material je Kanal</td><td>&nbsp;</td><td class="num">1 + 1</td>
+      <td class="num">ca. 17,45 &euro;</td></tr></tfoot>
   </table></div>
 
   <div class="text">
+    <h3>Warum kein 16-mm-Band?</h3>
+    <p>Die erste Auslegung ging von 16 mm aus. <strong>Das gibt es bei
+    8&ndash;12 N nicht ab Lager.</strong> Die Kraft einer Rollfeder wächst mit
+    Bandbreite mal Banddicke im Quadrat: Bei 15,87 mm Band liegt die
+    Standardfeder schon bei 14,7 N &mdash; zu stark. Im Zielbereich sind die
+    Bänder 12,7 bis 15,0 mm breit. Das Modell ist auf 15,0 mm ausgelegt.</p>
+
+    <h3>Die Trommel wird gedruckt</h3>
+    <div class="hinweis">Die Feder darf <strong>nicht</strong> auf der 3-mm-Achse
+    aufwickeln. Ihr natürlicher Innendurchmesser liegt bei 11&ndash;17 mm, der
+    Hersteller verlangt eine Trommel 10&ndash;20 % darueber. Ein zu enger Wickel
+    erhöht die Biegespannung im Band und verkürzt die Lebensdauer.</div>
+    <p>Deshalb liegt <code>stl/trommel.stl</code> bei: 20,7 mm Wickelfläche,
+    17 mm breit, mit Bordscheiben gegen seitliches Ablaufen, Bohrung 3,5 mm.
+    Sie laeuft frei auf der Achse. <strong>Liegend drucken</strong> &mdash; dann
+    ist die Bohrung rund und es braucht keine Stützen.</p>
+
     <h3>Wo es die Feder gibt</h3>
     <p>Der Fachbegriff ist entscheidend: <strong>Konstantkraftfeder</strong>, auch
     Rollfeder, englisch <em>constant force spring</em>. Dasselbe Bauteil steckt in
     den Warenschiebern im Supermarktregal.</p>
     <ul class="quellen">
-      <li><a href="https://www.google.com/search?q=Konstantkraftfeder+16mm+Band+8N"
-        rel="noopener">Konstantkraftfeder 16 mm Band, 8 N</a>
-        <span class="klein">allgemeine Suche</span></li>
-      <li><a href="https://www.ebay.de/sch/i.html?_nkw=konstantkraftfeder+rollfeder"
-        rel="noopener">eBay: Konstantkraftfeder / Rollfeder</a>
-        <span class="klein">guenstig, oft als Restposten</span></li>
-      <li><a href="https://www.amazon.de/s?k=konstantkraftfeder" rel="noopener">Amazon:
-        Konstantkraftfeder</a> <span class="klein">schnell, kleine Auswahl</span></li>
-      <li><a href="https://www.gutekunst-federn.de/federn/konstantkraftfedern.html"
-        rel="noopener">Gutekunst Federn</a>
-        <span class="klein">Hersteller, Katalogware und Sonderanfertigung</span></li>
-      <li><a href="https://www.sodemann-federn.de/konstantkraftfedern.html"
-        rel="noopener">Sodemann Federn</a>
-        <span class="klein">Hersteller, Datenblaetter mit Kraftangabe</span></li>
+      <li><a href="https://www.sodemann-federn.de/cf030-0237"
+        rel="noopener">Sodemann Federn &mdash; CF030-0237</a>
+        <span class="klein">deutscher Shop, Preise sichtbar, Lagerware</span></li>
+      <li><a href="https://www.febrotec.de/de-DE/konstantkraftfedern-rollfedern"
+        rel="noopener">Febrotec, Halver</a>
+        <span class="klein">dieselbe Feder als 0CF030-0237, Sonderfertigung moeglich</span></li>
+      <li><a href="https://www.stahl-shop24.de/Edelstahl/Edelstahl-rund/"
+        rel="noopener">Stahl-Shop24 &mdash; Rundstab 3 mm</a>
+        <span class="klein">fuer die Achse</span></li>
     </ul>
-    <div class="hinweis">Beim Kauf zaehlt nur dreierlei: Die <strong>Bandbreite</strong>
-    muss unter 17 mm liegen, der <strong>Rollendurchmesser</strong> unter 26 mm, und
-    der <strong>Auszug</strong> mindestens 500 mm betragen. Die Kraft darf hoeher als
-    12 N sein &mdash; dann laesst sich der Schieber nur schwerer zurueckziehen.</div>
-    <p>Der Kraftbedarf liegt bei etwa 0,25 N je Beutel: rund 4 N bei 16 Beuteln,
-    6 N bei 25. Wenn du zwischen zwei Staerken waehlen kannst, nimm die staerkere.
-    Von Hand nachschieben funktioniert nicht &mdash; der Schieber steht im vollen
-    Kanal fast einen halben Meter tief drin.</p>
+    <div class="hinweis"><strong>Vorsicht bei der Montage:</strong> Die Bandkanten
+    sind scharf &mdash; Handschuhe und Schutzbrille tragen. Die Rolle kontrolliert
+    halten, sie wickelt sich beim Loslassen schlagartig zurueck. Das Band nie
+    knicken, kürzen oder ueber scharfe Kanten laufen lassen, und bei vollem
+    Auszug müssen mindestens anderthalb Windungen auf der Trommel bleiben.</div>
+    <p>Reichen 10,5 N nicht, ist der Weg <em>nicht</em> ein breiteres Band,
+    sondern zwei schmalere Federn nebeneinander &mdash; ihre Kräfte addieren
+    sich.</p>
   </div>
 </section>
 
@@ -1001,7 +1035,7 @@ BAU = f"""
         <td class="w">Wandstaerke 1,6 mm geht exakt in vier Linien auf</td></tr>
       <tr><td>Infill</td><td class="num">15 %</td>
         <td class="w">die Waende tragen, viel Fuellung gibt es nicht</td></tr>
-      <tr><td>Stuetzen</td><td class="num">nein</td>
+      <tr><td>Stützen</td><td class="num">nein</td>
         <td class="w">Ueberhaenge unter 3 %, nur kurze Bruecken</td></tr>
       <tr><td>Ausrichtung</td><td class="num">wie modelliert</td>
         <td class="w">Boden aufs Bett, nichts drehen</td></tr>
@@ -1074,10 +1108,13 @@ BAU = f"""
     der naechsten Ebene sitzen die passenden Taschen. Die Ebene von oben aufsetzen,
     bis sie satt auf den Waenden aufliegt &mdash; nicht auf den Zapfen. Kein Sockel,
     kein Kleber, kein Werkzeug.</p>
-    <p>Fuer die <strong>oberste Lage</strong> liegt in <code>stl/oben/</code> derselbe
-    Satz ohne Zapfen. Damit schliesst der Stapel oben glatt ab. Wer das nicht
-    braucht, nimmt einfach die normalen Segmente &mdash; die 2,6 mm stehen dort
-    frei nach oben und stoeren nicht.</p></li>
+    <p>Jedes Segment gibt es in drei Ebenenlagen: <code>unten</code> ohne
+    Taschen im Boden, <code>mitte</code> mit beidem, <code>oben</code> ohne
+    Zapfen. Fuer die oberste Lage also die <code>-oben-</code>-Dateien nehmen
+    &mdash; dann schliesst der Stapel glatt ab und es steht nichts frei nach
+    oben. Ebenso gibt es <code>links</code>, <code>mitte</code> und
+    <code>rechts</code> fuer die Spalten: an den Aussenkanten entfällt die
+    Verbindertasche, die dort ins Leere zeigen wuerde.</p></li>
   </ol>
 </section>
 
@@ -1092,7 +1129,7 @@ BAU = f"""
     <ul>
       <li><strong>Nach oben</strong> laufen die Seitenwaende als Zapfen weiter und
         stecken in Taschen im Boden der Ebene darueber. Der Zapfen ist genauso breit
-        wie die Wand &mdash; er schwaecht sie also nicht und druckt ohne Stuetzen.</li>
+        wie die Wand &mdash; er schwaecht sie also nicht und druckt ohne Stützen.</li>
       <li><strong>Zur Seite</strong> greift eine Nase am Bodenrand in die Tasche der
         Nachbarspalte. Beide liegen unterhalb des Innenraums und nehmen dem Beutel
         keinen Platz weg.</li>
@@ -1120,7 +1157,7 @@ BAU = f"""
     <p>Die Bodenzunge sitzt nicht sauber unter dem naechsten Segment. Segmente fest
     zusammenschieben, notfalls <code>passung</code> auf 0,25 erhoehen.</p>
     <h4>Der Schieber verkantet</h4>
-    <p>Die Achse steht seitlich ueber und schleift. Buendig kuerzen.</p>
+    <p>Die Achse steht seitlich ueber und schleift. Buendig kürzen.</p>
     <h4>Der vorderste Beutel faellt heraus</h4>
     <p>Sollte nicht passieren, die Frontwand ist mit 92 mm hoch genug. Falls doch:
     Feder ist zu stark.</p>
@@ -1198,7 +1235,7 @@ TECHNIK = f"""
   <div class="text">
     <h3>Ein Vollkoerper, aus dem alles herausgestochen wird</h3>
     <p>Jedes Segment entsteht als ein einziger Grundkoerper, aus dem Innenraum,
-    Fenster, Bodennut und Griffmulde herausgeschnitten werden. Das ist eine bewusste
+    Fenster, Bodennut und Steckverbindungen herausgeschnitten werden. Das ist eine bewusste
     Entscheidung: Eine fruehere Fassung setzte den Kanal aus einzelnen Waenden
     zusammen, und an den Stossflaechen entstanden 28 Netzfehler.</p>
 
@@ -1206,7 +1243,7 @@ TECHNIK = f"""
     <p>Ganz oben in der Datei stehen die Masse als Variablen, alles Weitere leitet
     sich ab:</p>
     {code('beutel_breit = 88;\nwand         = 1.6;\nspiel        = 4;\ninnen_x  = beutel_breit + spiel;     // 92\naussen_x = innen_x + 2 * wand;       // 95,2', 'openscad')}
-    <p>Aendert sich die gemessene Beutelbreite, waechst das ganze Modell mit &mdash;
+    <p>Aendert sich die gemessene Beutelbreite, wächst das ganze Modell mit &mdash;
     Wandstaerken, Fensterpositionen, Spaltenzahl. Genau das ist passiert: Die erste
     Auslegung ging von 72 mm aus, gemessen wurden 88. Ein Wert geaendert, alles
     andere folgte automatisch.</p>
@@ -1238,7 +1275,7 @@ TECHNIK = f"""
     Klicken, sondern ein Skript, das die STLs importiert, Materialien zuweist, Licht
     und Kamera setzt und rendert.</p>
 
-    {code('bpy.ops.wm.stl_import(filepath="stl/segment-front.stl")\nmaterial.inputs["Base Color"].default_value = (0.022, 0.022, 0.026, 1)\nscene.cycles.samples = 320\nbpy.ops.render.render(write_still=True)', 'openscad')}
+    {code('bpy.ops.wm.stl_import(filepath="stl/segmente/front-mitte-mitte.stl")\nmaterial.inputs["Base Color"].default_value = (0.022, 0.022, 0.026, 1)\nscene.cycles.samples = 320\nbpy.ops.render.render(write_still=True)', 'openscad')}
 
     <p>Gerendert wird mit <strong>Cycles</strong>, einem Pathtracer: Er verfolgt
     Lichtstrahlen physikalisch. Deshalb wirken die Bilder wie Fotos &mdash; die weichen
@@ -1317,7 +1354,7 @@ TECHNIK = f"""
 <section>
   <h2 data-nr="06">Die Bruchstellen zwischen den Programmen</h2>
   <div class="text">
-    <p>OpenSCAD und Blender teilen sich nur die STL-Datei. Alle Positionen muessen
+    <p>OpenSCAD und Blender teilen sich nur die STL-Datei. Alle Positionen müssen
     doppelt gepflegt werden:</p>
     {code('# render2.py — muss zu katzenfutter-regal.scad passen\nAX, AZ = 95.2, 144.8       # Spaltenbreite, Ebenenhoehe\nLF, LM, LE = 163.0, 160.0, 161.6\nBODEN = 4.8', 'openscad')}
     <p>Aendert sich ein Mass im Modell und das Skript zieht nicht nach, stehen die
@@ -1387,6 +1424,8 @@ BLOECKE = [
      ["b_front", "b_mitte", "b_end", "b_schieber", "b_schild"]),
     ("Zusammengebaut", "Wie die Teile ineinandergreifen",
      ["b_explosion", "b_kanal", "b_gefuellt"]),
+    ("Entnahme", "Wie der Beutel herauskommt und wieviel Platz die Hand hat",
+     ["b_greifraum", "b_entnahme"]),
     ("Im Schrank", "Eine Ebene und der volle Ausbau",
      ["b_ebene", "b_gesamt"]),
 ]

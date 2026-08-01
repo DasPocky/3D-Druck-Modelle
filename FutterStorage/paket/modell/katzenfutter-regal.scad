@@ -3,14 +3,19 @@
 //
 //  Prinzip: waagerechte Kanäle über die volle Schranktiefe. Die Beutel
 //  stehen hochkant hintereinander, ein Schieber drückt sie nach vorne.
-//  Entnommen wird NACH VORNE: der Beutel ragt 30 mm über die Frontwand
-//  hinaus, wird dort und durch die Griffmulde gefasst und nach vorne
-//  herausgezogen. Die Frontwand ist 70 mm hoch - hoch genug, dass der
-//  Schiebedruck den vordersten Beutel nicht darüber hinauskippt.
 //
-//  Weil beim Herausziehen nichts nach oben muss, brauchen die Ebenen
-//  keinen Greifraum und lassen sich direkt stapeln: kein Sockel,
-//  kein Hohlraum darunter.
+//  Entnommen wird NACH VORNE: der Beutel ragt 44 mm über die Frontwand
+//  hinaus. Gefasst wird er an seiner OBERKANTE - dort greifen Daumen und
+//  Zeigefinger zu und ziehen ihn nach vorne heraus. Der Platz dafür ist
+//  der Greifraum über dem Beutel (luft_oben), nicht die Frontwand: vorne
+//  ist der Kanal oberhalb der Wand ohnehin offen.
+//
+//  Deshalb hat die Frontwand auch keine Griffmulde. Sie säße dort, wo die
+//  Hand gar nicht hinfasst, und nähme nur dem Schild Platz weg.
+//
+//  Die Frontwand ist 92 mm hoch - hoch genug, dass der Schiebedruck den
+//  vordersten Beutel nicht darüber hinauskippt (Angriffspunkt bei halber
+//  Beutelhöhe, also 68 mm).
 //
 //  Koordinaten: X = Breite, Y = Tiefe (nach hinten), Z = Höhe.
 //               Y = 0 ist vorne, dort wird entnommen.
@@ -19,14 +24,31 @@
 
 /* [Was soll gerendert werden] */
 // segment = Kanalsegment (Typ über segment_typ), schieber, schild,
-// probe = Passprobe, layout = Vorschau im Schrank, schnitt = Längsschnitt,
+// trommel = Wickeltrommel für die Feder, probe = Passprobe,
+// layout = Vorschau im Schrank, schnitt = Längsschnitt,
 // test = Kollisionsprüfung gestapelter Ebenen (Ergebnis muss leer sein)
-TEIL = "segment";  // [segment, schieber, schild, schild_text, verbinder, probe, layout, schnitt, test]
+TEIL = "segment";  // [segment, schieber, schild, schild_text, verbinder, trommel, probe, layout, schnitt, test]
 
-// front = vorderstes Segment mit Anschlagkante und Schildhalter
-// mitte = beidseitig offenes Zwischenstück, beliebig oft
-// end   = hinterstes Segment mit Rückwand und Bandhaken
+// Ein Segment sitzt an drei Stellen zugleich - in der Tiefe, in der Höhe
+// und in der Breite. Jede Achse hat ihren eigenen Typ, weil an jedem Rand
+// des Verbunds etwas weggelassen wird, das im Inneren gebraucht wird.
+
+// Tiefe (Y): front = vorderstes Segment mit Anschlagkante und Schildhalter
+//            mitte = beidseitig offenes Zwischenstück, beliebig oft
+//            end   = hinterstes Segment mit Rückwand und Bandhaken
 segment_typ = "front";  // [front, mitte, end]
+
+// Höhe (Z): oben  = oberste Ebene, ohne Stapelzapfen - sonst stünden
+//                   Zapfen frei nach oben ab
+//           unten = unterste Ebene, ohne Zapfentaschen im Boden - dort
+//                   kommt nichts mehr darunter
+//           mitte = beides, Zapfen oben und Taschen unten
+ebene_typ = "mitte";  // [unten, mitte, oben]
+
+// Breite (X): links  = linke Randspalte, ohne Verbindertasche nach links
+//             rechts = rechte Randspalte, ohne Tasche nach rechts
+//             mitte  = beide Taschen, verbindet nach beiden Seiten
+spalte_typ = "mitte";  // [links, mitte, rechts]
 
 /* [Beutel-Maße] */
 // Gemessen an einem echten 85-g-Beutel, ungequetscht.
@@ -39,8 +61,12 @@ beutel_breit = 88;
 beutel_dicke = 19;
 // Luft in der Breite
 spiel = 4;
-// Luft über dem Beutel
-luft_oben = 28;
+// Luft über dem Beutel. Das ist der Greifraum: Entnommen wird, indem man
+// den Beutel an seiner Oberkante fasst und nach vorne herauszieht. Dafür
+// müssen zwei Finger neben die Beutelkante passen - unter 40 mm wird das
+// zur Fummelei. 42 mm ergibt eine Ebenenhöhe von 182,8 mm; drei Ebenen
+// brauchen damit 548,4 mm Fachhöhe.
+luft_oben = 42;
 
 /* [Kanal] */
 // Länge eines Segments. 160 mm passt auf ein 180er Druckbett.
@@ -48,21 +74,22 @@ segment_laenge = 160;
 // Wie viele Segmente bilden einen Kanal (nur für Layout und Kapazität)
 segment_anzahl = 3;
 // Höhe der Frontwand. Muss über dem Angriffspunkt des Schiebedrucks
-// liegen (halbe Beutelhöhe), sonst kippt der vorderste Beutel darüber
-// hinaus. 70 mm gibt Sicherheit und lässt den Beutel 30 mm herausragen.
+// liegen (halbe Beutelhöhe = 68 mm), sonst kippt der vorderste Beutel
+// darüber hinaus. 92 mm gibt Sicherheit und lässt den Beutel 44 mm
+// herausragen. Eine Griffmulde hat die Wand nicht - gegriffen wird oben
+// an der Beutelkante, siehe luft_oben.
 anschlag_hoehe = 92;
-// Griffmulde in der Frontwand: dort greift man den Beutel
-mulde_breite = 58;
-// bis auf welche Höhe die Mulde herunterreicht
-mulde_bis = 66;
 
 /* [Schrank] */
 // Nutzbare Breite: 545 mm abzüglich Scharnier, sicherheitshalber 540
 schrank_breite = 540;
 schrank_tiefe = 500;
-// Höhe ohne Regalboden. Mit Boden wären es 220 mm unten bzw. 280 mm im Fach
-// darüber - dann passt nur eine Ebene.
-schrank_hoehe = 520;
+// Fachhöhe von der Standfläche bis zur Unterkante dessen, was darüber kommt.
+// Der Regalboden wird dafür höher gesetzt: 550 mm reichen für drei Ebenen
+// à 182,8 mm (548,4 mm) und lassen jeder Ebene 42 mm Greifraum über dem
+// Beutel. Mit den ursprünglichen 520 mm blieben nur 28 mm - zu wenig, um
+// den Beutel oben zu fassen.
+schrank_hoehe = 550;
 // nur für die layout-Vorschau
 spalten = 5;
 ebenen = 3;
@@ -83,12 +110,27 @@ boden_offen = true;
 // das Bandende hängt vorne im Haken des Frontsegments.
 bandnut = true;
 // Nut im Boden, in der das Federband läuft
-bandnut_breite = 18;
+bandnut_breite = 17;
 bandnut_tiefe = 1.6;
-// Maße der Federrolle - nach dem Kauf hier eintragen
-feder_rolle_d = 26;    // Durchmesser der aufgerollten Feder
-feder_band_b  = 16;    // Bandbreite
-feder_achse_d = 3.2;   // Bohrung für die Achse (3 mm Stab oder Filament)
+
+// Gewählte Feder: Sodemann/Febrotec CF030-0237
+//   10,5 N | Auszug 610 mm | Band 14,99 mm | Rolle 22,0 mm außen
+// Band mit 16 mm bei 8-12 N gibt es nicht ab Lager: die Kraft wächst mit
+// Bandbreite mal Banddicke im Quadrat, bei 15,87 mm Band liegt die
+// Standardfeder schon bei 14,7 N. 15 mm Band ist das nächstliegende Maß.
+feder_rolle_d = 22.0;  // Außendurchmesser der aufgerollten Feder
+feder_band_b  = 15.0;  // Bandbreite
+feder_achse_d = 3.2;   // Bohrung für die Achse: 3-mm-Rundstab, Spielpassung
+feder_auszug  = 610;   // Lmax laut Datenblatt - darüber reißt die Feder
+
+// Die Feder wickelt NICHT auf der 3-mm-Achse: ihr natürlicher
+// Innendurchmesser liegt bei 11-17 mm. Der Hersteller verlangt eine
+// Trommel 10-20 % über diesem Maß, für die CF030-0237 sind das 20,7 mm.
+// Zu klein heißt höhere Biegespannung und kürzere Lebensdauer.
+// Die Trommel wird mitgedruckt (TEIL="trommel") und läuft frei auf der Achse.
+trommel_d = 20.7;      // Wickeldurchmesser
+trommel_b = 17.0;      // Breite - etwas mehr als das Band
+trommel_spiel = 0.25;  // Luft auf der Achse, damit sie frei dreht
 
 /* [Verbindungen] */
 // Die Ebenen stehen aufeinander, die Spalten nebeneinander. Beides wird
@@ -125,10 +167,18 @@ schild_text = "HUHN";
 schild_symbol = "huhn";
 schild_breite = 78;
 schild_hoehe = 62;
-// Laengster vorkommender Sortenname in Zeichen. Danach richtet sich die
-// Schriftgroesse aller Schilder, damit sie einheitlich aussehen.
-schild_namen_max = 9;
+// Breitester vorkommender Sortenname. Danach richtet sich die Schriftgröße
+// ALLER Schilder, damit sie einheitlich aussehen. Nicht die Zeichenzahl
+// zählt, sondern die tatsächliche Breite - gemessen bei Größe 10:
+// KANINCHEN 83,3 mm, GEFLÜGEL 75,6 mm, TRUTHAHN 77,1 mm.
+schild_ref_name = "KANINCHEN";
 schild_dicke = 1.5;
+// Randabstand rings um Symbol und Schrift - überall gleich
+schild_rand = 5;
+// Höhe der Textzeile am unteren Rand
+schild_text_h = 13;
+// Luft zwischen Schrift und Symbol
+schild_steg = 3;
 
 /* [FDM-Toleranzen] */
 // Spiel je Flanke bei Steckverbindungen. Mit einem Toleranztest von
@@ -150,6 +200,13 @@ aussen_z = boden_dick + innen_z;
 
 ist_front = segment_typ == "front";
 ist_end   = segment_typ == "end";
+
+// Was an welchem Rand des Verbunds wegfällt. Im Inneren ist alles da;
+// nach außen hin bleibt weg, was ins Leere greifen würde.
+hat_zapfen   = stapel_zapfen && ebene_typ != "oben";    // Zapfen nach oben
+hat_taschen  = stapel_zapfen && ebene_typ != "unten";   // Taschen im Boden
+nase_links   = seiten_nase && spalte_typ != "links";    // Tasche nach links
+nase_rechts  = seiten_nase && spalte_typ != "rechts";   // Tasche nach rechts
 
 // Bauteillänge: Stirnwand nur dort, wo das Segment endet
 aussen_y = segment_laenge + (ist_front ? anschlag_dicke() : 0)
@@ -211,9 +268,9 @@ function zapfen_y() = [zapfen_rand, aussen_y - zapfen_rand - zapfen_l];
 // Ein Zapfen: Fortsetzung der Seitenwand nach oben, oben angefast,
 // damit er sich beim Aufsetzen von selbst fängt.
 module zapfen(x0, y0) {
-    // Die Fase darf hoechstens ein Viertel der Wandstaerke betragen - bei
-    // wand/2 wuerde der obere Querschnitt zu null und der Zapfen verschwaende
-    // spurlos aus dem Koerper.
+    // Die Fase darf höchstens ein Viertel der Wandstärke betragen - bei
+    // wand/2 würde der obere Querschnitt zu null und der Zapfen verschwände
+    // spurlos aus dem Körper.
     fase = min(0.5, wand / 4);
     union() {
         hull() {
@@ -294,7 +351,8 @@ module segment() {
                     cube([innen_x - 0.6, zunge_l, zunge_h]);
 
             // --- Zapfen für die Ebene darüber ---
-            if (stapel_zapfen)
+            // In der obersten Ebene weggelassen: dort stünden sie frei ab.
+            if (hat_zapfen)
                 for (yz = zapfen_y())
                     for (xz = [0, aussen_x - wand])
                         zapfen(xz, yz);
@@ -306,26 +364,12 @@ module segment() {
         translate([wand, y0, boden_dick])
             cube([innen_x, y1 - y0 + (ist_end ? 0 : zunge_l + 1), innen_z + 1]);
 
-        // --- Front: oberhalb der Wand offen, plus Griffmulde in der Mitte ---
-        if (ist_front) {
+        // --- Front: oberhalb der Anschlagwand ist der Kanal offen ---
+        // Hier greift die Hand an die Beutelkante. Keine Mulde in der Wand:
+        // gefasst wird oben, nicht durch die Wand hindurch.
+        if (ist_front)
             translate([wand, -1, boden_dick + anschlag_hoehe])
                 cube([innen_x, anschlag_dicke() + 1, innen_z + 1]);
-            // Mulde mit 45-Grad-Auslauf unten, damit sie stützenfrei druckt
-            cx = aussen_x / 2;
-            zt = boden_dick + mulde_bis;
-            fa = 11;
-            translate([0, anschlag_dicke() + 1, 0])
-                rotate([90, 0, 0])
-                    linear_extrude(height = anschlag_dicke() + 2)
-                        polygon([
-                            [cx - mulde_breite/2, boden_dick + anschlag_hoehe + 1],
-                            [cx + mulde_breite/2, boden_dick + anschlag_hoehe + 1],
-                            [cx + mulde_breite/2, zt + fa],
-                            [cx + mulde_breite/2 - fa, zt],
-                            [cx - mulde_breite/2 + fa, zt],
-                            [cx - mulde_breite/2, zt + fa]
-                        ]);
-        }
 
         // --- Aufnahme für die Zunge des vorderen Nachbarn ---
         if (!ist_front)
@@ -361,17 +405,19 @@ module segment() {
         }
 
         // --- Taschen für die Zapfen der Ebene darunter ---
-        if (stapel_zapfen)
+        // In der untersten Ebene weggelassen: dort kommt nichts mehr drunter.
+        if (hat_taschen)
             for (yz = zapfen_y())
                 for (xz = [0, aussen_x - wand])
                     zapfentasche(xz, yz);
 
-        // --- Taschen für die seitlichen Verbinder, beide Seiten gleich ---
-        if (seiten_nase)
-            for (yn = zapfen_y()) {
-                nasentasche(yn + (zapfen_l - nase_l) / 2, true);
-                nasentasche(yn + (zapfen_l - nase_l) / 2, false);
-            }
+        // --- Taschen für die seitlichen Verbinder ---
+        // An den Randspalten fällt die äußere Tasche weg: dort steht kein
+        // Nachbar, und eine offene Tasche an der Außenkante fängt nur Staub.
+        for (yn = zapfen_y()) {
+            if (nase_links)  nasentasche(yn + (zapfen_l - nase_l) / 2, true);
+            if (nase_rechts) nasentasche(yn + (zapfen_l - nase_l) / 2, false);
+        }
 
         // --- Sichtschlitz in der Rückwand ---
         if (ist_end)
@@ -400,8 +446,8 @@ module schildhalter() {
     rb = 1.2;
     b  = schild_breite + 3.2;
     x0 = (aussen_x - b) / 2;
-    // nur so hoch wie das Schild plus etwas Einfuehrung, sonst bleibt
-    // ueber der Tafel ein leerer Rahmen stehen
+    // nur so hoch wie das Schild plus etwas Einführung, sonst bleibt
+    // über der Tafel ein leerer Rahmen stehen
     h  = min(anschlag_hoehe - 2, schild_hoehe + 3);
     difference() {
         // taucht 0,6 mm in die Anschlagkante ein
@@ -415,21 +461,61 @@ module schildhalter() {
 }
 
 // ---------------------------------------------------------------------
+//  Wickeltrommel für die Konstantkraftfeder
+//
+//  Die Feder darf nicht auf der 3-mm-Achse aufwickeln - ihr natürlicher
+//  Innendurchmesser ist um ein Vielfaches größer, und ein zu enger Wickel
+//  erhöht die Biegespannung im Band. Diese Trommel bringt sie auf das vom
+//  Hersteller verlangte Maß und läuft frei auf der Achse.
+//
+//  Liegend drucken (Achse senkrecht): dann ist die Bohrung rund und es
+//  braucht keine Stützen.
+// ---------------------------------------------------------------------
+function trommel_bord_d() = trommel_d + 3.0;   // Bordscheiben-Durchmesser
+function trommel_bord_b() = 1.2;               // Dicke einer Bordscheibe
+function trommel_ganz_b() = trommel_b + 2 * trommel_bord_b();
+
+module trommel() {
+    bohrung = 3.0 + 2 * trommel_spiel;
+    difference() {
+        union() {
+            // Wickelkörper
+            translate([0, 0, trommel_bord_b()])
+                cylinder(d = trommel_d, h = trommel_b);
+            // Bordscheiben, damit das Band nicht seitlich von der Rolle läuft
+            for (zp = [0, trommel_bord_b() + trommel_b])
+                translate([0, 0, zp])
+                    cylinder(d = trommel_bord_d(), h = trommel_bord_b());
+        }
+        // Achsbohrung, durchgehend
+        translate([0, 0, -1])
+            cylinder(d = bohrung, h = trommel_ganz_b() + 2);
+        // Fase an beiden Enden, damit sie sich auf die Achse fädeln lässt
+        for (zp = [0, trommel_ganz_b()])
+            translate([0, 0, zp])
+                rotate([zp > 0 ? 0 : 180, 0, 0])
+                    cylinder(d1 = bohrung + 1.2, d2 = bohrung, h = 0.6);
+    }
+}
+
+// ---------------------------------------------------------------------
 //  Schieber
 //
-//  Drückt die Beutel nach vorne. Unten ein Haken für ein Gummiband, das
-//  in der Bodennut nach vorne läuft; die Grifflasche erlaubt zusätzlich
-//  das Nachschieben von Hand.
+//  Drückt die Beutel nach vorne. Im Fuß sitzt die Federtrommel auf einer
+//  3-mm-Achse; das Band läuft unten nach vorne in die Bodennut. Die
+//  Grifflasche erlaubt zusätzlich das Nachschieben von Hand.
 // ---------------------------------------------------------------------
 module schieber() {
     b   = innen_x - 1.2;
     h   = beutel_hoch - 8;
     d   = 2.6;
     fu  = 36;                         // Fußlänge, nimmt die Federrolle auf
-    kb  = feder_band_b + 1.6;         // lichte Breite der Federkammer
+    kb  = trommel_ganz_b() + 1.2;     // lichte Breite der Federkammer
     kx  = (b - kb) / 2;               // Kammer mittig
-    ax  = feder_rolle_d / 2 + 4;      // Achshöhe über dem Boden
-    ay  = 4 + feder_rolle_d / 2;      // Achsposition in der Tiefe
+    // Achse so hoch, dass Trommel und aufgewickelte Feder frei laufen
+    rmax = max(feder_rolle_d, trommel_bord_d()) / 2;
+    ax  = rmax + 4;                   // Achshöhe über dem Boden
+    ay  = 4 + rmax;                   // Achsposition in der Tiefe
 
     difference() {
         union() {
@@ -443,11 +529,15 @@ module schieber() {
             // Wangen der Federkammer, tragen die Achse
             for (xp = [kx - 3.2, kx + kb])
                 translate([xp, d, 0])
-                    cube([3.2, fu - d, ax + feder_rolle_d / 2 + 4]);
+                    cube([3.2, fu - d, ax + rmax + 4]);
             // Aussteifungen außerhalb der Kammer. Sie greifen 0,6 mm in die
             // Stützfläche hinein - eine bloße Berührung ergäbe zwei Flächen
             // auf derselben Ebene und damit ein undichtes Netz.
-            for (xp = [4, b - 12])
+            // Achtung Richtung: rotate([0,-90,0]) legt die Extrusion nach
+            // -X, jede Rippe wächst also von xp aus nach links. Deshalb
+            // xp = 12 und nicht 4 - sonst ragt die linke Rippe über die
+            // Bauteilkante hinaus und der Schieber klemmt im Kanal.
+            for (xp = [12, b - 4])
                 translate([xp, 0, 0])
                     rotate([0, -90, 0])
                         linear_extrude(height = 8)
@@ -464,8 +554,8 @@ module schieber() {
         translate([(b - feder_band_b - 0.8) / 2, -1, 3.2])
             cube([feder_band_b + 0.8, d + 2, 3.0]);
         // Gewicht sparen, oberhalb der Kammer
-        translate([10, -1, ax + feder_rolle_d / 2 + 10])
-            cube([b - 20, d + 2, h - ax - feder_rolle_d / 2 - 24]);
+        translate([10, -1, ax + rmax + 10])
+            cube([b - 20, d + 2, h - ax - rmax - 24]);
     }
 }
 
@@ -490,155 +580,24 @@ module schild_platte() {
 // ---------------------------------------------------------------------
 //  Sortensymbole
 // ---------------------------------------------------------------------
-// Jedes Symbol zeichnet in ein Feld von 20 x 20 um den Nullpunkt. Sie
-// sind aus Kreisen und Polygonen zusammengesetzt statt aus einer langen
-// Punktliste - so bleibt jede Form einzeln nachvollziehbar und änderbar.
-module sym_huhn() {
-    union() {
-        scale([1.0, 0.85]) circle(r = 6.2);              // Rumpf
-        translate([3.6, 6.2]) circle(r = 3.3);           // Kopf
-        hull() { translate([3.6, 6.2]) circle(r = 2.6);
-                 translate([1.6, 1.0]) circle(r = 3.4); }// Hals
-        translate([6.4, 6.8]) polygon([[0,1.6],[3.9,0],[0,-1.6]]);   // Schnabel
-        for (k = [0, 1, 2])                              // Kamm
-            translate([2.2 + k * 1.5, 9.2 + (k == 1 ? 0.7 : 0)]) circle(r = 1.25);
-        translate([1.0, 3.4]) circle(r = 1.0);           // Kehllappen
-        hull() { translate([-5.2, 1.4]) circle(r = 2.2);  // Schwanzfedern
-                 translate([-9.4, 7.6]) circle(r = 1.0);
-                 translate([-8.6, 3.0]) circle(r = 1.0); }
-        for (bx = [-1.8, 1.8])                           // Beine
-            translate([bx - 0.7, -9.4]) square([1.5, 5.0]);
-        for (bx = [-2.5, 1.1])
-            translate([bx, -9.8]) square([3.0, 1.4]);
-    }
-}
-
-module sym_rind() {
-    union() {
-        translate([-0.5, 0.6]) scale([1.25, 0.78]) circle(r = 6.4);  // Rumpf
-        translate([6.0, 3.4]) scale([0.95, 1.0]) circle(r = 3.5);    // Kopf
-        translate([7.4, 0.6]) scale([0.8, 1.0]) circle(r = 2.3);     // Maul
-        for (s = [-1, 1])                                            // Hörner
-            translate([5.2, 6.4]) rotate(s * 34)
-                hull() { circle(r = 1.15); translate([0, 3.6]) circle(r = 0.62); }
-        for (bx = [-6.2, -3.0, 2.4, 5.2])                            // Beine
-            translate([bx, -10.2]) square([2.1, 6.2]);
-        hull() { translate([-7.4, 3.6]) circle(r = 1.0);             // Schwanz
-                 translate([-9.6, -3.4]) circle(r = 0.55); }
-        translate([-9.9, -4.6]) circle(r = 1.25);                    // Quaste
-    }
-}
-
-module sym_fisch() {
-    union() {
-        // Rumpf: vorne rund, hinten spitz zulaufend
-        hull() { translate([-1.0, 0]) scale([1.0, 0.92]) circle(r = 6.0);
-                 translate([8.6, 0]) circle(r = 1.6); }
-        hull() { translate([-1.0, 0]) scale([1.0, 0.92]) circle(r = 5.8);
-                 translate([-7.4, 0]) circle(r = 1.4); }
-        translate([-7.0, 0])                                          // Schwanzflosse
-            polygon([[0,1.8],[-4.8,5.6],[-3.6,0],[-4.8,-5.6],[0,-1.8]]);
-        translate([-1.2, 4.4]) polygon([[-3.4,0.6],[1.2,4.6],[4.0,0.2]]);  // Rücken
-        translate([-0.6, -4.4]) polygon([[-2.6,-0.4],[0.6,-3.6],[3.2,-0.2]]); // Bauch
-        translate([5.6, 1.6]) circle(r = 1.05);                      // Auge
-    }
-}
-
-module sym_kaninchen() {
-    union() {
-        // Sitzendes Kaninchen im Profil: runder Rumpf, Kopf deutlich höher
-        // abgesetzt, darüber zwei senkrechte Ohren mit sichtbarer Lücke.
-        translate([-2.4, -3.4]) scale([1.1, 1.0]) circle(r = 5.4);   // Rumpf
-        translate([3.8, 3.0]) circle(r = 3.1);                       // Kopf
-        hull() { translate([3.8, 3.0]) circle(r = 2.4);              // Hals
-                 translate([0.6, -1.6]) circle(r = 3.0); }
-        for (s = [0, 1])                                             // Ohren
-            translate([2.4 + s * 3.4, 5.4])
-                hull() { scale([0.58, 1]) circle(r = 1.2);
-                         translate([s ? 0.9 : -0.9, 6.6])
-                             scale([0.46, 1]) circle(r = 0.85); }
-        translate([6.6, 2.0]) scale([1.0, 0.82]) circle(r = 1.5);    // Schnauze
-        translate([-8.0, -2.6]) circle(r = 2.1);                     // Blume
-        for (bx = [-5.0, -0.6])                                      // Läufe
-            translate([bx, -9.6]) scale([1.7, 0.62]) circle(r = 2.2);
-    }
-}
-
-module sym_ente() {
-    union() {
-        translate([-1.0, -1.4]) scale([1.35, 0.8]) circle(r = 6.0);  // Rumpf
-        translate([4.4, 5.0]) circle(r = 3.0);                       // Kopf
-        hull() { translate([4.4, 5.0]) circle(r = 2.4);
-                 translate([2.4, -0.6]) circle(r = 3.0); }           // Hals
-        translate([6.8, 4.6]) polygon([[0,1.5],[4.6,0.4],[4.6,-0.8],[0,-1.5]]); // Schnabel
-        hull() { translate([-6.0, 0.4]) circle(r = 2.0);             // Schwanz
-                 translate([-10.2, 3.2]) circle(r = 0.7); }
-        translate([-1.0, -1.0]) rotate(-16) scale([1.0, 0.45]) circle(r = 4.0); // Flügel
-    }
-}
-
-module sym_truthahn() {
-    union() {
-        // Radschlagender Schwanz: ein Halbkreis hinter dem Körper, aus dem
-        // schmale Kerben die einzelnen Federn schneiden
-        translate([-1.8, 0.6]) difference() {
-            scale([0.92, 1.0]) circle(r = 10.4);
-            for (k = [-3 : 3]) rotate(96 + k * 24)
-                translate([5.0, 0]) square([12, 1.5], center = true);
-            translate([0, -12]) square([26, 12], center = true);
-            circle(r = 4.2);
-        }
-        translate([2.0, -1.6]) scale([1.0, 0.92]) circle(r = 5.2);   // Rumpf
-        translate([5.8, 3.8]) circle(r = 2.6);                       // Kopf
-        hull() { translate([5.8, 3.8]) circle(r = 2.1);
-                 translate([3.4, -1.0]) circle(r = 2.8); }           // Hals
-        translate([8.0, 4.0]) polygon([[0,1.3],[3.2,0],[0,-1.3]]);   // Schnabel
-        hull() { translate([7.4, 2.4]) circle(r = 0.85);             // Stirnlappen
-                 translate([8.6, -1.0]) circle(r = 0.62); }
-        for (bx = [0.6, 3.4]) translate([bx, -9.8]) square([1.5, 4.2]);
-    }
-}
-
-module sym_lamm() {
-    union() {
-        for (p = [[-4.6,1.4],[-1.4,3.4],[2.0,2.6],[-3.0,-1.6],[0.4,-0.8]])
-            translate(p) circle(r = 3.5);                            // Wollrücken
-        translate([5.6, 2.6]) scale([0.86, 1.0]) circle(r = 3.0);    // Kopf
-        for (s = [-1, 1])                                            // Ohren
-            translate([5.0, 4.4 * s + 1.0]) rotate(s * 26)
-                scale([1.0, 0.44]) circle(r = 2.6);
-        translate([7.2, 0.6]) circle(r = 1.5);                       // Schnauze
-        for (bx = [-4.4, -1.2, 2.0, 4.6])
-            translate([bx, -9.0]) square([1.7, 5.0]);
-    }
-}
-
-module sym_wild() {                                                   // Hirsch
-    union() {
-        translate([-0.8, 0]) scale([1.2, 0.8]) circle(r = 5.8);      // Rumpf
-        translate([5.6, 4.2]) scale([0.8, 1.0]) circle(r = 2.8);     // Kopf
-        hull() { translate([5.6, 4.2]) circle(r = 2.2);
-                 translate([3.0, -0.6]) circle(r = 3.0); }           // Hals
-        translate([7.4, 2.0]) scale([0.9, 0.7]) circle(r = 1.8);     // Nase
-        for (s = [0, 1])                                             // Geweih
-            translate([4.6 + s * 2.2, 6.6]) rotate(s ? 22 : -16) {
-                hull() { circle(r = 0.85); translate([0, 4.2]) circle(r = 0.5); }
-                translate([0, 2.0]) rotate(s ? 42 : -42)
-                    hull() { circle(r = 0.7); translate([0, 2.6]) circle(r = 0.42); }
-            }
-        for (bx = [-5.4, -2.4, 1.8, 4.4])
-            translate([bx, -9.8]) square([1.7, 6.0]);
-        hull() { translate([-6.4, 2.6]) circle(r = 1.4);
-                 translate([-7.6, 5.0]) circle(r = 0.8); }           // Wedel
-    }
-}
+// Die Silhouetten stehen in einer eigenen Datei - acht Tiere mit je einem
+// Dutzend Formen machten die Hauptdatei unübersichtlich, und geändert
+// wird an ihnen unabhängig von der Geometrie des Regals.
+include <sortensymbole.scad>
 
 // Sortensymbol nach Name. Unbekannte Namen ergeben kein Symbol.
 module schild_sym(name) {
-    if      (name == "huhn"      || name == "gefluegel") sym_huhn();
+    // Fische bekommen ein ausgespartes Auge, damit es auch einfarbig
+    // sichtbar bleibt - deshalb hier ein difference() statt eines Aufrufs.
+    if (name == "lachs" || name == "thunfisch"
+        || name == "fisch" || name == "forelle") {
+        difference() {
+            sym_fisch();
+            sym_fisch_auge();
+        }
+    }
+    else if (name == "huhn"      || name == "gefluegel") sym_huhn();
     else if (name == "rind")                             sym_rind();
-    else if (name == "lachs"     || name == "thunfisch"
-          || name == "fisch"     || name == "forelle")   sym_fisch();
     else if (name == "kaninchen")                        sym_kaninchen();
     else if (name == "ente")                             sym_ente();
     else if (name == "truthahn")                         sym_truthahn();
@@ -650,34 +609,59 @@ module schild_sym(name) {
 // Frontwand über die ganze Höhe aus und ist schon von weitem zu erkennen.
 // Lange Sortennamen wie KANINCHEN werden schmaler gesetzt, damit sie nicht
 // über den Rand laufen.
+// Breite eines Schriftzugs. textmetrics() misst exakt, ist aber ein
+// experimentelles Feature - ohne --enable=textmetrics gibt es undef
+// zurück. Dann greift die Schätzung: 1,0 em je Versalie liegt über dem
+// breitesten gemessenen Wert (LAMM mit 1,04 em ist kurz genug, dass die
+// Reserve reicht) und lässt lieber etwas Luft, als über den Rand zu laufen.
+function text_breite(t, groesse) =
+    let (tm = textmetrics(text = t, size = groesse, font = schild_font))
+    is_undef(tm) ? len(t) * groesse * 1.0 : tm.advance[0];
+
+schild_font = "Helvetica:style=Bold";
+
 module schild_schrift(h = schild_gravur) {
     hat_sym = schild_symbol != "leer" && schild_symbol != "";
-    rand    = 4;
+    rand    = schild_rand;
     breite  = schild_breite - 2 * rand;
-    // untere Zone für den Namen, der Rest gehört dem Symbol
-    text_h  = hat_sym ? schild_hoehe * 0.30 : schild_hoehe - 2 * rand;
-    sym_h   = schild_hoehe - text_h - 2 * rand;
-    // Die Schriftgröße richtet sich nach dem längsten vorkommenden Namen,
-    // nicht nach dem gerade gesetzten. Sonst stünde auf jedem Schild eine
-    // andere Größe und die Tafeln wirkten uneinheitlich.
-    // Versalien in Helvetica Bold sind rund 0,78 em breit.
-    groesse = min(text_h * 0.92, breite / (schild_namen_max * 0.78));
+
+    // Höhe der Textzeile und des Symbolfeldes. Zwischen beiden bleibt ein
+    // Steg, damit das Symbol nicht auf der Schrift sitzt.
+    text_h  = hat_sym ? schild_text_h : schild_hoehe - 2 * rand;
+    sym_h   = schild_hoehe - text_h - 2 * rand - schild_steg;
+
+    // Die Schriftgröße richtet sich nach dem BREITESTEN vorkommenden Namen,
+    // nicht nach dem gerade gesetzten - sonst stünde auf jedem Schild eine
+    // andere Größe und die Tafeln wirkten uneinheitlich. Gemessen wird der
+    // Referenzname bei Größe 10, daraus skaliert.
+    ref_b   = text_breite(schild_ref_name, 10);
+    // 3 % Reserve: der Referenzname soll nicht exakt bis an die
+    // Randlinie laufen, sondern sichtbar Luft lassen.
+    groesse = min(text_h, breite * 10 / ref_b * 0.97);
+
     translate([0, 0, schild_dicke - schild_gravur]) linear_extrude(height = h) {
         if (hat_sym)
             // resize bringt jedes Symbol auf dasselbe Feld. Ohne das wäre
             // der breite Fisch groß und das schmale Huhn klein, weil die
-            // Zeichnungen unterschiedliche Eigenmaße haben.
-            translate([schild_breite / 2, rand + text_h + sym_h / 2])
+            // Zeichnungen unterschiedliche Eigenmaße haben. Dass die
+            // Silhouette dabei mittig bleibt, hängt daran, dass sie um
+            // (0,0) zentriert gezeichnet ist - resize verschiebt nicht.
+            translate([schild_breite / 2,
+                       rand + text_h + schild_steg + sym_h / 2])
                 resize([sym_feld(), sym_feld()], auto = true)
                     schild_sym(schild_symbol);
         translate([schild_breite / 2, rand + text_h / 2])
             text(schild_text, size = groesse, halign = "center",
-                 valign = "center", font = "Helvetica:style=Bold");
+                 valign = "center", font = schild_font);
     }
 }
 
-// Kantenlänge des quadratischen Symbolfelds - für alle Sorten gleich
-function sym_feld() = min(schild_hoehe * 0.70 - 8, schild_breite - 8) * 0.94;
+// Kantenlänge des quadratischen Symbolfelds - für alle Sorten gleich.
+// Sie folgt der Zone, die nach Rand, Textzeile und Steg übrig bleibt,
+// damit das Symbol den Platz ausfüllt statt darin zu schwimmen.
+function sym_feld() = min(schild_hoehe - 2 * schild_rand - schild_text_h
+                          - schild_steg,
+                          schild_breite - 2 * schild_rand);
 
 module schild() {
     difference() {
@@ -782,20 +766,9 @@ module kanal_vorschau() {
         // Innenraum
         translate([wand, anschlag_dicke(), boden_dick])
             cube([innen_x, L - anschlag_dicke() - wand, innen_z + 1]);
-        // Front oberhalb der Wand offen, plus Griffmulde
+        // Front oberhalb der Wand offen - dort wird gegriffen
         translate([wand, -1, boden_dick + anschlag_hoehe])
             cube([innen_x, anschlag_dicke() + 1, innen_z + 1]);
-        translate([0, anschlag_dicke() + 1, 0])
-            rotate([90, 0, 0])
-                linear_extrude(height = anschlag_dicke() + 2)
-                    polygon([
-                        [aussen_x/2 - mulde_breite/2, boden_dick + anschlag_hoehe + 1],
-                        [aussen_x/2 + mulde_breite/2, boden_dick + anschlag_hoehe + 1],
-                        [aussen_x/2 + mulde_breite/2, boden_dick + mulde_bis + 11],
-                        [aussen_x/2 + mulde_breite/2 - 11, boden_dick + mulde_bis],
-                        [aussen_x/2 - mulde_breite/2 + 11, boden_dick + mulde_bis],
-                        [aussen_x/2 - mulde_breite/2, boden_dick + mulde_bis + 11]
-                    ]);
         // Bandnut
         if (bandnut)
             translate([(aussen_x - bandnut_breite) / 2, -1,
@@ -823,6 +796,12 @@ if (TEIL == "segment")       segment();
 else if (TEIL == "schieber") schieber();
 else if (TEIL == "schild")   schild();
 else if (TEIL == "verbinder") verbinder();
+else if (TEIL == "trommel")  trommel();
+else if (TEIL == "symbol")
+    // Nur das nackte Sortensymbol, 1 mm dick. Damit misst
+    // werkzeuge/symbole-pruefen.py nach, ob es mittig sitzt und wie
+    // groß es wirklich ist - beides sieht man dem Schild nicht an.
+    linear_extrude(height = 1) schild_sym(schild_symbol);
 else if (TEIL == "schild_text") schild_schrift();
 else if (TEIL == "probe")    probe();
 else if (TEIL == "schnitt")  schnitt();

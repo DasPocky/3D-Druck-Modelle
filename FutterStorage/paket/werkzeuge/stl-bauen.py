@@ -16,25 +16,48 @@ SCAD = "/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD"
 MODELL = os.path.join(PROJ, "modell", "katzenfutter-regal.scad")
 STL = os.path.join(PROJ, "stl")
 
+# Ein Segment sitzt an drei Stellen zugleich: in der Tiefe, in der Hoehe
+# und in der Breite. Jede Achse hat eigene Randfaelle, deshalb wird die
+# volle Matrix erzeugt - im 5x3-Ausbau kommt jede der 27 Kombinationen
+# tatsaechlich vor.
+TIEFE  = ["front", "mitte", "end"]      # segment_typ
+EBENE  = ["unten", "mitte", "oben"]     # ebene_typ
+SPALTE = ["links", "mitte", "rechts"]   # spalte_typ
+
+SEGMENTE = [
+    (f"segmente/{t}-{e}-{s}.stl",
+     {"TEIL": "segment", "segment_typ": t, "ebene_typ": e, "spalte_typ": s})
+    for t in TIEFE for e in EBENE for s in SPALTE
+]
+
 # (Zieldatei, Variablen)
-TEILE = [
-    ("segment-front.stl", {"TEIL": "segment", "segment_typ": "front"}),
-    ("segment-mitte.stl", {"TEIL": "segment", "segment_typ": "mitte"}),
-    ("segment-end.stl",   {"TEIL": "segment", "segment_typ": "end"}),
+TEILE = SEGMENTE + [
     ("schieber.stl",      {"TEIL": "schieber"}),
     ("schild.stl",        {"TEIL": "schild"}),
     ("schild-text.stl",   {"TEIL": "schild_text"}),
     ("verbinder.stl",     {"TEIL": "verbinder"}),
-    # Fuer die oberste Lage: dieselben Segmente ohne die Stapelzapfen,
-    # damit oben nichts uebersteht. Nur noetig, wenn es buendig sein soll.
-    ("oben/segment-front.stl", {"TEIL": "segment", "segment_typ": "front",
-                                "stapel_zapfen": "false"}),
-    ("oben/segment-mitte.stl", {"TEIL": "segment", "segment_typ": "mitte",
-                                "stapel_zapfen": "false"}),
-    ("oben/segment-end.stl",   {"TEIL": "segment", "segment_typ": "end",
-                                "stapel_zapfen": "false"}),
+    # Wickeltrommel fuer die Konstantkraftfeder. Liegend drucken.
+    ("trommel.stl",       {"TEIL": "trommel"}),
     ("probe.stl",         {"TEIL": "probe"}),
 ]
+
+
+def stueckliste(spalten=5, ebenen=3, segmente=3):
+    """Welche Variante wie oft gebraucht wird. Aus derselben Matrix wie die
+    STL-Namen gerechnet, damit Druckliste und Dateien nicht auseinanderlaufen."""
+    def rand(i, n, namen):
+        return namen[0] if i == 0 else (namen[2] if i == n - 1 else namen[1])
+
+    zaehler = {}
+    for sp in range(spalten):
+        for eb in range(ebenen):
+            for sg in range(segmente):
+                name = (TIEFE[0] if sg == 0 else
+                        (TIEFE[2] if sg == segmente - 1 else TIEFE[1]))
+                schluessel = (name, rand(eb, ebenen, EBENE),
+                              rand(sp, spalten, SPALTE))
+                zaehler[schluessel] = zaehler.get(schluessel, 0) + 1
+    return zaehler
 
 # Diese Prüfungen müssen leer bleiben: Ebenen und Spalten dürfen sich
 # nicht durchdringen.
@@ -66,11 +89,19 @@ def main():
     for name, werte in TEILE:
         fehler = scad(os.path.join(STL, name), werte)
         gr = os.path.getsize(os.path.join(STL, name)) / 1024
-        print(f"  {name:<22}{gr:>8.0f} kB" + ("  FEHLER" if fehler else ""))
+        print(f"  {name:<30}{gr:>8.0f} kB" + ("  FEHLER" if fehler else ""))
         for f in fehler:
             print("     ", f)
         schlecht += len(fehler)
 
+    # Was der Vollausbau an Segmenten braucht - aus derselben Matrix
+    liste = stueckliste()
+    print(f"\n  Stueckliste fuer {5} Spalten x {3} Ebenen "
+          f"({sum(liste.values())} Segmente):")
+    for (t, e, s), n in sorted(liste.items()):
+        print(f"    {n:>2} x  segmente/{t}-{e}-{s}.stl")
+
+    print()
     for teil, was in KOLLISION:
         ziel = os.path.join("/tmp", f"kollision-{teil}.stl")
         scad(ziel, {"TEIL": teil})

@@ -287,7 +287,7 @@ section.block{padding-top:56px}
   <div class="text">
     <h3>Ein Vollk&ouml;rper, aus dem alles herausgestochen wird</h3>
     <p>Jedes Segment entsteht als ein einziger Grundk&ouml;rper, aus dem Innenraum,
-    Fenster, Bodennut und Griffmulde herausgeschnitten werden. Das ist eine bewusste
+    Fenster, Bodennut und Steckverbindungen herausgeschnitten werden. Das ist eine bewusste
     Entscheidung: Eine fr&uuml;here Fassung setzte den Kanal aus einzelnen W&auml;nden
     zusammen, und an den Sto&szlig;fl&auml;chen entstanden 28 Netzfehler.</p>
 
@@ -333,7 +333,7 @@ aussen_x = innen_x + <span class="c-zahl">2</span> * wand;       <span class="c-
     Klicken, sondern ein Skript, das die STLs importiert, Materialien zuweist, Licht
     und Kamera setzt und rendert.</p>
 
-    <figure class="cd"><div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span><span class="spr">openscad</span></div><pre><code>bpy.ops.wm.<span class="c-fn">stl_import</span>(filepath=<span class="c-str">"stl/segment-front.stl"</span>)
+    <figure class="cd"><div class="kopf"><span class="punkt"></span><span class="punkt"></span><span class="punkt"></span><span class="spr">openscad</span></div><pre><code>bpy.ops.wm.<span class="c-fn">stl_import</span>(filepath=<span class="c-str">"stl/segmente/front-mitte-mitte.stl"</span>)
 material.inputs[<span class="c-str">"Base Color"</span>].default_value = (<span class="c-zahl">0.022</span>, <span class="c-zahl">0.022</span>, <span class="c-zahl">0.026</span>, <span class="c-zahl">1</span>)
 scene.cycles.samples = <span class="c-zahl">320</span>
 bpy.ops.render.<span class="c-fn">render</span>(write_still=True)</code></pre></figure>

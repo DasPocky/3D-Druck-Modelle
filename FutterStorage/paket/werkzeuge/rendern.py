@@ -21,12 +21,22 @@ def _scad(name, standard):
     return standard
 
 
-AX, AZ = 95.2, 144.8
+# Alle Masse aus der Quelle rechnen, nicht fest eintragen. AZ stand hier
+# mit 144,8 mm - dem Wert von vor der Greifraum-Aenderung. Die Ebenen sassen
+# dadurch 38 mm zu tief und durchdrangen einander.
+BB   = _scad("beutel_breit", 88.0)
+BH   = _scad("beutel_hoch", 136.0)
+BD   = _scad("beutel_dicke", 19.0)
+WAND = _scad("wand", 1.6)
+SPIEL = _scad("spiel", 4.0)
+LUFT = _scad("luft_oben", 42.0)
+BODEN = _scad("boden", 2.4) + _scad("bandnut_tiefe", 1.6) + 0.8
+AX = BB + SPIEL + 2 * WAND                 # Spaltenbreite
+AZ = BODEN + BH + LUFT                     # Ebenenhoehe
+SEGL = _scad("segment_laenge", 160.0)
+LF, LM = SEGL + 3.0, SEGL                  # Front- und Mittelsegment
+LE = SEGL + WAND                           # Endsegment
 SCHILD_B = _scad("schild_breite", 78.0)
-LF, LM, LE = 163.0, 160.0, 161.6
-BODEN = 4.8
-BB, BH, BD = 88.0, 136.0, 19.0
-WAND, SPIEL = 1.6, 4.0
 
 def clear():
     bpy.ops.object.select_all(action='SELECT')
@@ -70,12 +80,37 @@ clear()
 
 SCHWARZ = mat("PLA schwarz", (0.022, 0.022, 0.026), rough=0.45)
 ORANGE  = mat("PLA orange",  (0.72, 0.24, 0.03),   rough=0.42)
-FOLIE   = mat("Beutel",      (0.44, 0.45, 0.48),   rough=0.38, metal=0.25)
+# Der Beutel muss sich auf einen Blick vom Bauteil unterscheiden. Vorher
+# war er fast so grau wie das PLA, dadurch sah es aus, als fuelle er die
+# ganze Kanalhoehe aus. Jetzt ein helles Folienbeige mit wenig Glanz.
+# Warmes Folienbeige: hell genug, um sich vom dunklen PLA abzuheben, aber
+# nicht so hell, dass die Beutel im Licht wie Papierblaetter ausbrennen.
+# Kein Metallic - der Glanz liess sie zusaetzlich weiss erscheinen.
+FOLIE   = mat("Beutel",      (0.60, 0.52, 0.40),   rough=0.44)
+HAUT    = mat("Hand",        (0.86, 0.66, 0.52),   rough=0.62)
 HOLZ    = mat("Boden",       (0.26, 0.19, 0.13),   rough=0.65)
 
-s_front = imp("segment-front.stl")
-s_mitte = imp("segment-mitte.stl")
-s_end   = imp("segment-end.stl")
+# Die Segmente liegen jetzt als Matrix aus Tiefe x Ebene x Spalte vor.
+# Fuer die Bilder wird je Position die Variante genommen, die dort auch
+# wirklich verbaut wird - sonst zeigte das Rendering Zapfen an Stellen,
+# an denen im Ausbau keine sitzen.
+_SEG = {}
+
+
+def seg(tiefe, ebene="mitte", spalte="mitte"):
+    schluessel = (tiefe, ebene, spalte)
+    if schluessel not in _SEG:
+        _SEG[schluessel] = imp(f"segmente/{tiefe}-{ebene}-{spalte}.stl")
+    return _SEG[schluessel]
+
+
+def rand(i, n):
+    """Randlage einer Position: erste, letzte oder mittlere."""
+    return 0 if i == 0 else (2 if i == n - 1 else 1)
+
+
+EBENEN_N = ["unten", "mitte", "oben"]
+SPALTEN_N = ["links", "mitte", "rechts"]
 s_schb  = imp("schieber.stl")
 s_schd  = imp("schild.stl")
 s_txt   = imp("schild-text.stl")
@@ -100,11 +135,13 @@ def _sorten():
 
 SORTEN, SORTE_NACH_NAME = _sorten()
 
-def kanal(x=0, z=0, luecke=0, segmente=3):
-    put(s_front, (x, 0, z), SCHWARZ)
+def kanal(x=0, z=0, luecke=0, segmente=3, ebene="mitte", spalte="mitte"):
+    put(seg("front", ebene, spalte), (x, 0, z), SCHWARZ)
     for i in range(1, segmente - 1):
-        put(s_mitte, (x, LF + i * (LM + luecke) - LM + luecke, z), SCHWARZ)
-    put(s_end, (x, LF + (segmente - 2) * LM + (segmente - 1) * luecke, z), SCHWARZ)
+        put(seg("mitte", ebene, spalte),
+            (x, LF + i * (LM + luecke) - LM + luecke, z), SCHWARZ)
+    put(seg("end", ebene, spalte),
+        (x, LF + (segmente - 2) * LM + (segmente - 1) * luecke, z), SCHWARZ)
 
 def schild_an(x=0, z=0, nr=None):
     # Grundplatte orange, Schrift schwarz - Schild steht senkrecht in der Tasche
@@ -138,10 +175,17 @@ def beutel_mesh(name="Beutel"):
         # Der Beutel bleibt bis weit oben prall und knickt erst kurz vor der
         # Siegelnaht ab. Eine Potenzkurve liefe kegelfoermig zu, deshalb eine
         # S-Kurve mit Wendepunkt bei 75 % der Resthoehe.
+        # Wendepunkt weit oben (88 %) und steiler Abfall: der Beutel ist
+        # bis kurz unter die Naht prall und knickt dann ab. Mit dem
+        # frueheren Wert 0,75 und Steigung 8 lief er kegelfoermig zu und
+        # sah aus wie ein Zapfen statt wie ein Paeckchen.
         w = (v - 0.12) / 0.88
-        g = lambda t: 1.0 / (1.0 + math.exp(8.0 * (t - 0.75)))
+        g = lambda t: 1.0 / (1.0 + math.exp(15.0 * (t - 0.88)))
         f = (g(w) - g(1.0)) / (g(0.0) - g(1.0))
-        return 0.032 + 0.968 * f
+        # Oben bleibt Restdicke stehen: dort sitzt die Siegelnaht, und
+        # die ist flach, nicht spitz. Mit 0,032 lief der Beutel spitz zu
+        # und man sah nicht mehr, wo er endet und wo der Greifraum beginnt.
+        return 0.22 + 0.78 * f
 
     verts, faces = [], []
     for seite in (1, -1):
@@ -199,6 +243,48 @@ def beutel(n, x=0, z=0):
 def schieber_bei(n, x=0, z=0):
     put(s_schb, (x + 1.8, 4 + n * BD + 1, z + BODEN), ORANGE)
 
+
+def finger(x, y, z, laenge=62, d=17.5):
+    """Zwei Finger als masstaebliche Zylinder.
+
+    Kein Modellierkunststueck, sondern ein Massstab: 17,5 mm ist die Dicke
+    eines Erwachsenenfingers. Wer im Bild sieht, dass beide Finger neben
+    die Beutelkante passen, braucht die Rechnung nicht nachzuvollziehen.
+    """
+    for k, versatz in enumerate((-11.0, 11.0)):
+        bpy.ops.mesh.primitive_cylinder_add(radius=d / 2, depth=laenge,
+                                            location=(x + versatz, y, z))
+        o = bpy.context.object
+        o.rotation_euler = (math.radians(90), 0, 0)
+        o.name = f"finger_{k}"
+        # Kuppe abrunden, sonst wirkt es wie ein Rohr
+        m = o.modifiers.new("bev", 'BEVEL')
+        m.width = 4.0; m.segments = 4; m.limit_method = 'ANGLE'
+        m.angle_limit = math.radians(40); m.use_clamp_overlap = True
+        o.data.materials.clear()
+        o.data.materials.append(HAUT)
+
+
+def beutel_entnahme(x=0, z=0):
+    """Der vorderste Beutel, an der Oberkante gefasst und nach vorne
+    herausgezogen - der Vorgang, um den es beim Greifraum geht."""
+    global _BEUTEL_MESH
+    if _BEUTEL_MESH is None:
+        _BEUTEL_MESH = beutel_mesh()
+    o = bpy.data.objects.new("beutel_entnahme", _BEUTEL_MESH)
+    # So weit herausgezogen, dass die Oberkante frei vor der Wand steht -
+    # nicht weiter, sonst zeigt das Bild einen Beutel in der Luft statt
+    # den Vorgang.
+    kipp = 11.0
+    o.rotation_euler = (math.radians(-kipp), 0, 0)
+    o.location = (x + WAND + SPIEL / 2 + BB / 2, 3.0,
+                  z + BODEN + BH / 2 * math.cos(math.radians(kipp)) + 34)
+    o.data.materials.clear()
+    o.data.materials.append(FOLIE)
+    bpy.context.collection.objects.link(o)
+    return o
+
+
 # --------------------------------------------------------------- Szenen
 if SZENE == "kanal":
     kanal(); schild_an(); beutel(11); schieber_bei(11)
@@ -208,7 +294,11 @@ elif SZENE == "explosion":
 elif SZENE == "gefuellt":
     kanal(); schild_an(); beutel(13); schieber_bei(13)
 elif SZENE == "ebene":
-    for i in range(5): kanal(x=i * AX); schild_an(x=i * AX, nr=i)
+    # Eine vollstaendige Ebene. Die aeusseren Spalten sind links- bzw.
+    # rechts-Varianten, sonst zeigte das Bild Taschen ins Leere.
+    for i in range(5):
+        kanal(x=i * AX, ebene="unten", spalte=SPALTEN_N[rand(i, 5)])
+        schild_an(x=i * AX, nr=i)
     beutel(16); schieber_bei(16)
     beutel(9, x=AX); schieber_bei(9, x=AX)
 elif SZENE == "gesamt":
@@ -218,9 +308,30 @@ elif SZENE == "gesamt":
     fuell = [[18, 11, 15, 7, 13], [14, 17, 9, 12, 6], [10, 8, 16, 5, 13]]
     for e in range(3):
         for i in range(5):
-            kanal(x=i * AX, z=e * AZ); schild_an(x=i * AX, z=e * AZ, nr=e * 5 + i)
+            kanal(x=i * AX, z=e * AZ,
+                  ebene=EBENEN_N[rand(e, 3)], spalte=SPALTEN_N[rand(i, 5)])
+            schild_an(x=i * AX, z=e * AZ, nr=e * 5 + i)
             beutel(fuell[e][i], x=i * AX, z=e * AZ)
             schieber_bei(fuell[e][i], x=i * AX, z=e * AZ)
+elif SZENE == "entnahme":
+    # Nur der vordere Ausschnitt: ein Frontsegment und darueber das
+    # naechste. Der ganze Kanal wuerde die Kamera so weit zuruecknehmen,
+    # dass vom Vorgang nichts mehr zu erkennen ist.
+    put(seg("front", "mitte", "mitte"), (0, 0, 0), SCHWARZ)
+    put(seg("front", "oben", "mitte"), (0, 0, AZ), SCHWARZ)
+    schild_an()
+    beutel(7)
+    beutel_entnahme()
+    # Bewusst ohne Hand: zwei Zylinder als Finger sahen aus wie Wuerste
+    # und lagen neben dem Beutel statt an ihm. Den Massnachweis fuehrt
+    # das Zugriffsblatt der Zeichnungen, dort passt eine Silhouette.
+elif SZENE == "greifraum":
+    # Derselbe Ausschnitt ohne Hand, dafuer mit freiem Blick auf den Spalt
+    # zwischen Beutelkante und der Ebene darueber.
+    put(seg("front", "mitte", "mitte"), (0, 0, 0), SCHWARZ)
+    put(seg("front", "oben", "mitte"), (0, 0, AZ), SCHWARZ)
+    schild_an()
+    beutel(8)
 elif SZENE == "schild":
     put(s_schd, (0, 0, 0), ORANGE, bevel=0.1)
     put(s_txt, (0, 0, 0.02), SCHWARZ, bevel=0)
@@ -235,8 +346,9 @@ elif SZENE.startswith("schild:"):
 elif SZENE == "schieber":
     put(s_schb, (0, 0, 0), ORANGE)
 elif SZENE in ("front", "mitte", "end"):
-    put({"front": s_front, "mitte": s_mitte, "end": s_end}[SZENE],
-        (0, 0, 0), SCHWARZ)
+    # Einzelteil in der Mittellage - die Variante mit allen Merkmalen:
+    # Zapfen oben, Taschen unten, Verbindertaschen zu beiden Seiten.
+    put(seg(SZENE, "mitte", "mitte"), (0, 0, 0), SCHWARZ)
     if SZENE == "front": schild_an()
 
 # --------------------------------------------------------------- Licht
