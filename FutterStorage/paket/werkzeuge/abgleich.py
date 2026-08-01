@@ -41,6 +41,17 @@ def werte():
     return v
 
 
+def bauart(v):
+    """Eingestellte Federaufnahme. Bei "pusher" gibt es keine gedruckte
+    Trommel - sie dann zu vermissen waere ein Fehlalarm."""
+    quelle = os.path.join(PROJ, "modell", "katzenfutter-regal.scad")
+    for zeile in open(quelle, encoding="utf-8"):
+        t = zeile.split("//")[0].strip().rstrip(";")
+        if t.startswith("feder_bauart"):
+            return t.split("=")[1].strip().strip('"')
+    return "rolle"
+
+
 def main():
     v = werte()
     fehler, hinweise = [], []
@@ -60,7 +71,8 @@ def main():
     # Die uebrigen 24 Varianten entstehen im selben Lauf.
     for f in ("segmente/front-mitte-mitte.stl", "segmente/mitte-mitte-mitte.stl",
               "segmente/end-mitte-mitte.stl", "schieber.stl", "schild.stl",
-              "schild-text.stl", "trommel.stl", "probe.stl"):
+              "schild-text.stl", "probe.stl") + (
+              ("trommel.stl",) if bauart(v) == "rolle" else ()):
         p = os.path.join(PROJ, "stl", f)
         juenger(p, "STL", t_modell, "das Modell")
         if os.path.exists(p):
@@ -92,9 +104,10 @@ def main():
         "schild.stl": (v["schild_breite"], v["schild_hoehe"], v["schild_dicke"]),
         # Trommel liegend: X und Y sind der Bordscheiben-Durchmesser,
         # Z die Wickelbreite mit beiden Scheiben
-        "trommel.stl": (v["trommel_d"] + 3.0, v["trommel_d"] + 3.0,
-                        v["trommel_b"] + 2 * 1.2),
     }
+    if bauart(v) == "rolle":
+        soll["trommel.stl"] = (v["trommel_d"] + 3.0, v["trommel_d"] + 3.0,
+                               v["trommel_b"] + 2 * 1.2)
     for datei, (sx, sy, sz) in soll.items():
         p = os.path.join(PROJ, "stl", datei)
         if not os.path.exists(p):

@@ -163,6 +163,17 @@ EINBAUTEILE = {
 }
 
 
+def bauart():
+    """Eingestellte Federaufnahme. Sie entscheidet, welche Teile es
+    ueberhaupt gibt - die Trommel entfaellt beim Warenpusher."""
+    quelle = os.path.join(PROJ, "modell", "katzenfutter-regal.scad")
+    for zeile in open(quelle, encoding="utf-8"):
+        t = zeile.split("//")[0].strip().rstrip(";")
+        if t.startswith("feder_bauart"):
+            return t.split("=")[1].strip().strip('"')
+    return "rolle"
+
+
 # Reibbeiwert Folie auf PLA. 0,4 ist der ungünstige Fall - gemessen wird
 # er erst am gedruckten Teil, deshalb hier die sichere Annahme.
 REIBUNG = 0.40
@@ -180,8 +191,7 @@ def feder():
     w = modellwerte()
     # Der Schieber steht hinter dem Stapel und braucht selbst Platz -
     # dieselbe Rechnung wie im Modell.
-    schieber_l = (w.get("pusher_l", 42) + 10 if w.get("feder_bauart_pusher", 1)
-                  else 36)
+    schieber_l = w.get("pusher_l", 42) + 10 if bauart() == "pusher" else 36
     nutz = (w.get("segment_anzahl", 3) * w.get("segment_laenge", 160)
             - schieber_l - 8)
     kap = int(nutz // w.get("beutel_dicke", 19))
@@ -219,6 +229,9 @@ def einbau():
 
     fehler, zeilen = [], []
     for datei, (wohin, luft, achse) in EINBAUTEILE.items():
+        # Beim Warenpusher gibt es keine gedruckte Trommel
+        if datei == "trommel.stl" and bauart() != "rolle":
+            continue
         pfad = os.path.join(STL, datei)
         if not os.path.exists(pfad):
             continue

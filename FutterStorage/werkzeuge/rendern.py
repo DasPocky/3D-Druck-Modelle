@@ -42,6 +42,24 @@ SCHILD_B = _scad("schild_breite", 78.0)
 # hoch, der Rahmen verdeckte oben 6 und unten 2 mm statt gleichmaessig.
 SCHILD_Z = _scad("schild_z0", 4.0)
 
+# Federaufnahme: "pusher" = gekauftes Gehaeuse in der Klemmtasche,
+# "rolle" = gedruckte Trommel auf einer Achse.
+def _bauart():
+    q = os.path.join(PROJ, "modell", "katzenfutter-regal.scad")
+    if not os.path.exists(q):
+        q = os.path.join(PROJ, "katzenfutter-regal.scad")
+    for zeile in open(q, encoding="utf-8"):
+        t = zeile.split("//")[0].strip().rstrip(";")
+        if t.startswith("feder_bauart"):
+            return t.split("=")[1].strip().strip('"')
+    return "rolle"
+
+
+BAUART = _bauart()
+PUSH_L = _scad("pusher_l", 42.0)
+PUSH_B = _scad("pusher_b", 24.0)
+PUSH_H = _scad("pusher_h", 22.0)
+
 def clear():
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete(use_global=False)
@@ -92,6 +110,9 @@ ORANGE  = mat("PLA orange",  (0.72, 0.24, 0.03),   rough=0.42)
 # Kein Metallic - der Glanz liess sie zusaetzlich weiss erscheinen.
 FOLIE   = mat("Beutel",      (0.60, 0.52, 0.40),   rough=0.44)
 HAUT    = mat("Hand",        (0.86, 0.66, 0.52),   rough=0.62)
+# Das gekaufte Federgehaeuse ist grauer Kunststoff - deutlich heller
+# als das schwarze PLA, damit man sieht, dass es ein Zukaufteil ist.
+GEHAEUSE = mat("Federgehäuse", (0.55, 0.56, 0.58), rough=0.55)
 HOLZ    = mat("Boden",       (0.26, 0.19, 0.13),   rough=0.65)
 
 # Die Segmente liegen jetzt als Matrix aus Tiefe x Ebene x Spalte vor.
@@ -245,7 +266,20 @@ def beutel(n, x=0, z=0):
 
 
 def schieber_bei(n, x=0, z=0):
-    put(s_schb, (x + 1.8, 4 + n * BD + 1, z + BODEN), ORANGE)
+    y = 4 + n * BD + 1
+    put(s_schb, (x + 1.8, y, z + BODEN), ORANGE)
+    # Beim Warenpusher steckt das gekaufte Gehaeuse in der Klemmtasche.
+    # Es als Quader anzudeuten ist ehrlicher, als die Tasche leer zu
+    # zeigen - die genaue Form kennen wir erst am Teil.
+    if BAUART == "pusher":
+        bpy.ops.mesh.primitive_cube_add(size=1)
+        o = bpy.context.object
+        o.scale = (PUSH_B, PUSH_L, PUSH_H)
+        o.location = (x + 1.8 + (BB + SPIEL) / 2, y + 4 + PUSH_L / 2,
+                      z + BODEN + 3.0 + PUSH_H / 2)
+        o.name = "federgehaeuse"
+        o.data.materials.clear()
+        o.data.materials.append(GEHAEUSE)
 
 
 def finger(x, y, z, laenge=62, d=17.5):

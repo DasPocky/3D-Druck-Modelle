@@ -51,7 +51,9 @@ ZTITEL = {"01-frontsegment": ("Frontsegment", "Vorder-, Seiten- und Draufsicht "
           "06-verbindungen": ("Verbindungen", "Stapelzapfen und Seitennase im "
                               "Schnitt"),
           "07-zugriff": ("Zugriff", "Wo die Hand hinkommt, auch bei "
-                         "gestapelten Ebenen")}
+                         "gestapelten Ebenen"),
+          "08-positionsplan": ("Positionsplan", "Welche der 27 "
+                               "Segmentvarianten an welche Stelle gehört")}
 
 R = {n: f"web/{NAMEN[n]}.jpg" for n in NAMEN}          # fuer die Seiten
 V = {n: f"bilder/{NAMEN[n]}.png" for n in NAMEN}       # volle Aufloesung
@@ -218,6 +220,36 @@ def diagramm(titel, knoten, breite=760):
     return f'<figure class="dia">{"".join(el)}<figcaption>{titel}</figcaption></figure>'
 
 
+# Welche Segmentvariante wie oft gebraucht wird - dieselbe Rechnung wie in
+# stl-bauen.py und auf dem Positionsplan.
+def _stueckliste(spalten=5, ebenen=3):
+    T = ["front", "mitte", "end"]
+    E = ["unten", "mitte", "oben"]
+    S = ["links", "mitte", "rechts"]
+    rand = lambda i, n: 0 if i == 0 else (2 if i == n - 1 else 1)
+    z = {}
+    for sp in range(spalten):
+        for eb in range(ebenen):
+            for sg in range(3):
+                k = (T[sg], E[rand(eb, ebenen)], S[rand(sp, spalten)])
+                z[k] = z.get(k, 0) + 1
+    eintraege = sorted(z, key=lambda x: (T.index(x[0]), E.index(x[1]),
+                                         S.index(x[2])))
+    # drei Spalten nebeneinander, je neun Zeilen
+    zeilen = []
+    for i in range(9):
+        felder = []
+        for sp in range(3):
+            k = eintraege[sp * 9 + i]
+            felder.append(f'<td class="w"><code>{"-".join(k)}</code></td>'
+                          f'<td class="num">{z[k]} &times;</td>')
+        zeilen.append("<tr>" + "".join(felder) + "</tr>")
+    return "".join(zeilen)
+
+
+STUECKLISTE = _stueckliste()
+
+
 # ---------------------------------------------------------------- Projekt
 # Was jede Datei tut. Der Baum selbst wird aus dem Dateisystem gelesen,
 # damit die Seite nicht behaupten kann, was gar nicht da ist.
@@ -336,7 +368,9 @@ ERLAUBT = {
     # Woerter mit doppeltem s, die keine Umschrift sind - die
     # Regel "ss" allein trifft sie sonst faelschlich.
     "gefasst", "hinfasst", "fasst", "passt", "passte", "misst",
-    "dass", "muss", "musste", "wusste", "gross",
+    "dass", "muss", "musste", "wusste", "gross", "messen", "misst",
+    "gemessen", "nachmessen", "abmessen", "vermessen",
+    "massenware", "masse", "wasser", "presse", "klasse",
     "innendurchmesser", "aussendurchmesser", "lebensdauer",
     "durchmesser", "messer",
 }

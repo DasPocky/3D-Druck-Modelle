@@ -16,6 +16,20 @@ SCAD = "/Applications/OpenSCAD.app/Contents/MacOS/OpenSCAD"
 MODELL = os.path.join(PROJ, "modell", "katzenfutter-regal.scad")
 STL = os.path.join(PROJ, "stl")
 
+
+def bauart():
+    """Welche Federaufnahme im Modell eingestellt ist.
+
+    Bei "pusher" sitzt ein gekauftes Federgehäuse in der Klemmtasche des
+    Schiebers - dann gibt es nichts zu drucken. Bei "rolle" braucht es die
+    Trommel. Sie trotzdem zu erzeugen hiesse, eine Datei mitzuliefern, die
+    zum eingestellten Modell nicht passt."""
+    for zeile in open(MODELL, encoding="utf-8"):
+        t = zeile.split("//")[0].strip().rstrip(";")
+        if t.startswith("feder_bauart"):
+            return t.split("=")[1].strip().strip('"')
+    return "rolle"
+
 # Ein Segment sitzt an drei Stellen zugleich: in der Tiefe, in der Hoehe
 # und in der Breite. Jede Achse hat eigene Randfaelle, deshalb wird die
 # volle Matrix erzeugt - im 5x3-Ausbau kommt jede der 27 Kombinationen
@@ -36,10 +50,13 @@ TEILE = SEGMENTE + [
     ("schild.stl",        {"TEIL": "schild"}),
     ("schild-text.stl",   {"TEIL": "schild_text"}),
     ("verbinder.stl",     {"TEIL": "verbinder"}),
-    # Wickeltrommel fuer die Konstantkraftfeder. Liegend drucken.
-    ("trommel.stl",       {"TEIL": "trommel"}),
     ("probe.stl",         {"TEIL": "probe"}),
 ]
+
+# Die Wickeltrommel braucht nur, wer die lose Feder verwendet. Beim
+# Warenpusher bringt das gekaufte Gehaeuse die Rolle schon mit.
+if bauart() == "rolle":
+    TEILE.append(("trommel.stl", {"TEIL": "trommel"}))
 
 
 def stueckliste(spalten=5, ebenen=3, segmente=3):

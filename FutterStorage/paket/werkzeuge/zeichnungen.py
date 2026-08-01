@@ -963,9 +963,109 @@ def blatt7():
     return b.save("07-zugriff.svg")
 
 
+# =====================================================================
+def blatt8():
+    """Welche der 27 Segmentvarianten an welche Position gehört.
+
+    Die Matrix auf Blatt 6 nennt die Regel, dieses Blatt die Anwendung:
+    Wer vor dem Regal steht und ein Segment in der Hand hält, will wissen,
+    wo es hinkommt - nicht, welche Systematik dahintersteht."""
+    K = 1.0
+    b = Blatt()
+    ox, oy = 150, 150
+
+    TIEFE = ["front", "mitte", "end"]
+    EBENE = ["unten", "mitte", "oben"]
+    SPALTE = ["links", "mitte", "rechts"]
+
+    def rand(i, n):
+        return 0 if i == 0 else (2 if i == n - 1 else 1)
+
+    # ---------- Ansicht von vorne: welche Spalten- und Ebenenlage --------
+    b.ansicht(ox, oy - 78, "VON VORNE — Spalten- und Ebenenlage")
+    ZB, ZH = 132, 84          # Zellgröße im Raster
+    for eb in range(3):
+        for sp in range(5):
+            x = ox + sp * ZB
+            y = oy + (2 - eb) * ZH
+            e_name = EBENE[rand(eb, 3)]
+            s_name = SPALTE[rand(sp, 5)]
+            aussen = e_name != "mitte" or s_name != "mitte"
+            b.rect(x, y, ZB - 6, ZH - 6, "#f6ddc8" if aussen else FLAECHE,
+                   MASSL if aussen else LINIE, 1.2)
+            b.txt(x + (ZB - 6) / 2, y + 26, s_name, 11, "middle",
+                  MASSL if s_name != "mitte" else LINIE, "700")
+            b.txt(x + (ZB - 6) / 2, y + 46, e_name, 11, "middle",
+                  MASSL if e_name != "mitte" else LINIE, "700")
+            b.txt(x + (ZB - 6) / 2, y + 66, f"Spalte {sp + 1}, Ebene {eb + 1}",
+                  9, "middle", GRAU)
+
+    b.mv(oy, oy + 3 * ZH - 6, ox - 40, "3", "Ebenen", von=ox)
+    b.mh(ox, ox + 5 * ZB - 6, oy + 3 * ZH + 30, "5", "Spalten",
+         von=oy + 3 * ZH - 6)
+    b.txt(ox, oy - 26, "Orange hinterlegt: Randlage — dort entfällt etwas.",
+          10.5, "start", MASSL)
+
+    # ---------- Ansicht von der Seite: welche Tiefenlage -----------------
+    oy2 = oy + 3 * ZH + 96
+    b.ansicht(ox, oy2 - 34, "VON DER SEITE — Tiefenlage")
+    TB = 190
+    for sg, name in enumerate(TIEFE):
+        x = ox + sg * TB
+        b.rect(x, oy2, TB - 6, 66, FLAECHE, LINIE, 1.2)
+        b.txt(x + (TB - 6) / 2, oy2 + 28, name, 12, "middle", LINIE, "700")
+        b.txt(x + (TB - 6) / 2, oy2 + 48,
+              ["vorne, mit Schild", "beliebig oft", "hinten, geschlossen"][sg],
+              9.5, "middle", GRAU)
+    b.txt(ox + 3 * TB + 20, oy2 + 30,
+          "Ein Kanal besteht immer aus diesen drei Stücken.",
+          10.5, "start")
+    b.txt(ox + 3 * TB + 20, oy2 + 50,
+          "Der Dateiname setzt sich zusammen aus Tiefe, Ebene und Spalte.",
+          10.5, "start", GRAU)
+
+    # ---------- Beispiel -------------------------------------------------
+    oy3 = oy2 + 120
+    b.txt(ox, oy3, "Beispiel: das vorderste Segment der untersten Ebene, "
+          "ganz links außen", 11, "start", LINIE, "700")
+    b.txt(ox, oy3 + 22, "→  segmente/front-unten-links.stl", 12, "start", MASSL)
+
+    # ---------- Vollständige Stückliste ----------------------------------
+    oy4 = oy3 + 62
+    b.ansicht(ox, oy4 - 22, "ALLE 27 VARIANTEN — Stückliste für 5 × 3")
+    zaehler = {}
+    for sp in range(5):
+        for eb in range(3):
+            for sg in range(3):
+                k = (TIEFE[sg], EBENE[rand(eb, 3)], SPALTE[rand(sp, 5)])
+                zaehler[k] = zaehler.get(k, 0) + 1
+
+    SP_B, ZE_H = 232, 20
+    eintraege = sorted(zaehler, key=lambda x: (TIEFE.index(x[0]),
+                                               EBENE.index(x[1]),
+                                               SPALTE.index(x[2])))
+    for i, k in enumerate(eintraege):
+        spalte, zeile = i // 9, i % 9
+        x = ox + spalte * SP_B
+        y = oy4 + 14 + zeile * ZE_H
+        b.txt(x, y, "-".join(k), 10, "start", LINIE)
+        b.txt(x + SP_B - 40, y, f"{zaehler[k]} ×", 10, "end", MASSL, "700")
+
+    b.txt(ox, oy4 + 14 + 9 * ZE_H + 24,
+          f"Zusammen {sum(zaehler.values())} Segmente. Jede der 27 Varianten "
+          "kommt mindestens einmal vor.", 10.5, "start")
+    b.txt(ox, oy4 + 14 + 9 * ZE_H + 44,
+          "stl-bauen.py gibt dieselbe Liste am Ende seines Laufs aus.",
+          10.5, "start", GRAU)
+
+    b.titel("Positionsplan", "Welche der 27 Segmentvarianten an welche Stelle "
+            "gehört", "TEIL 01-03")
+    return b.save("08-positionsplan.svg")
+
+
 warnungen = []
 for f, k in (blatt1(), blatt2(), blatt3(), blatt4(), blatt5(), blatt6(),
-             blatt7()):
+             blatt7(), blatt8()):
     print("  " + f)
     warnungen += k
 if warnungen:
