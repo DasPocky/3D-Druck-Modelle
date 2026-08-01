@@ -206,6 +206,94 @@ def diagramm(titel, knoten, breite=760):
     return f'<figure class="dia">{"".join(el)}<figcaption>{titel}</figcaption></figure>'
 
 
+# ---------------------------------------------------------------- Projekt
+# Was jede Datei tut. Der Baum selbst wird aus dem Dateisystem gelesen,
+# damit die Seite nicht behaupten kann, was gar nicht da ist.
+ERKLAERT = {
+    "modell/": "Die einzige Quelle der Geometrie",
+    "modell/katzenfutter-regal.scad":
+        "Das ganze Regal als Programm — alle Maße als Variablen",
+    "werkzeuge/": "Skripte, die aus dem Modell alles Weitere erzeugen",
+    "werkzeuge/stl-bauen.py":
+        "Ruft OpenSCAD je Bauteil auf, prüft auf Kollision",
+    "werkzeuge/pruefen.py":
+        "Wasserdicht, Volumen, Überhänge, Bauraum, Passung",
+    "werkzeuge/zeichnungen.py":
+        "Bemaßte SVG-Blätter, prüft sich auf Überdeckungen",
+    "werkzeuge/rendern.py":
+        "Blender-Szene mit automatischer Kamerarahmung",
+    "werkzeuge/schilder.py":
+        "Ein Schild je Futtersorte, als STL und als Bild",
+    "werkzeuge/seiten.py":
+        "Baut diese Seiten und schnürt das ZIP",
+    "stl/": "Druckfertige Dateien, direkt in den Slicer",
+    "stl/schilder/": "Ein fertiges Schild je Sorte",
+    "zeichnungen/": "Sieben bemaßte Blätter, beliebig skalierbar",
+    "bilder/": "Renderings in voller Auflösung",
+    "bilder/web/": "Dieselben Bilder klein, für die Seiten",
+    "bilder/schilder/": "Alle Sortenschilder als Bild",
+    "README.md": "Kurzfassung fürs Verzeichnis",
+    "werkzeuge/abgleich.py": "Vergleicht Modell, STL, Zeichnungen und Bilder",
+    "futterstorage.zip": "Alles zusammen, zum Verschicken",
+}
+
+
+def _uml(t):
+    """Nur Umlaute zu Entities - ohne die Wortersetzung aus ent()."""
+    for k, v in UML.items():
+        t = t.replace(k, v)
+    return t
+
+
+def dateibaum(wurzel, tiefe=2):
+    """Liest das Projektverzeichnis und gibt es als zweispaltige Liste aus:
+    links der Baum, rechts die Erklaerung. Frueher stand beides in einer
+    Zeile - lange Beschreibungen brachen um und zerrissen die Struktur."""
+    ueber = {"paket", ".git", "__pycache__", ".DS_Store"}
+    zeilen = []
+
+    def geh(pfad, rel, ebene, praefix=""):
+        try:
+            eintraege = sorted(os.listdir(pfad))
+        except OSError:
+            return
+        sicht = [e for e in eintraege if not e.startswith(".") and e not in ueber]
+        ordner = [e for e in sicht if os.path.isdir(os.path.join(pfad, e))]
+        dateien = [e for e in sicht if not os.path.isdir(os.path.join(pfad, e))]
+        if len(dateien) > 4:
+            dateien = dateien[:3] + [f"&#8230; und {len(dateien)-3} weitere"]
+        alle = ordner + dateien
+        for i, e in enumerate(alle):
+            letzte = i == len(alle) - 1
+            ast = "&#9492;&#9472;&#160;" if letzte else "&#9500;&#9472;&#160;"
+            if e.startswith("&#8230;"):
+                zeilen.append((f'{praefix}&#9492;&#9472;&#160;'
+                               f'<span class="rest">{e}</span>', "", ""))
+                continue
+            voll = os.path.join(pfad, e)
+            r = rel + e + ("/" if os.path.isdir(voll) else "")
+            was = _uml(ERKLAERT.get(r, ""))
+            if os.path.isdir(voll):
+                n = len([x for x in os.listdir(voll) if not x.startswith(".")])
+                zeilen.append((f'{praefix}{ast}<span class="ord">{e}/</span>',
+                               was or f"{n} Dateien", ""))
+                if ebene < tiefe:
+                    geh(voll, r, ebene + 1,
+                        praefix + ("&#160;&#160;&#160;&#160;" if letzte
+                                   else "&#9474;&#160;&#160;&#160;"))
+            else:
+                gr = os.path.getsize(voll)
+                grt = f"{gr/1024:.0f} kB" if gr < 1e6 else f"{gr/1048576:.1f} MB"
+                zeilen.append((f"{praefix}{ast}{e}", was, grt))
+
+    geh(wurzel, "", 0)
+    reihen = "".join(
+        f'<tr><td class="pf">{p}</td><td class="gr">{g}</td>'
+        f'<td class="be">{w}</td></tr>' for p, w, g in zeilen)
+    return ('<div class="baum"><table><thead><tr><th>Datei</th><th>Gr&#246;&#223;e</th>'
+            f'<th>Wozu</th></tr></thead><tbody>{reihen}</tbody></table></div>')
+
+
 _WORT = re.compile(r"[A-Za-z][A-Za-z-]*")
 # Attributwerte, CSS, Skript und Codebeispiele bleiben unangetastet - dort
 # stehen Klassennamen und Dateinamen, die nicht "korrigiert" werden duerfen.
@@ -217,7 +305,43 @@ _SCHUTZ = re.compile(r"<style>.*?</style>|<script>.*?</script>"
 
 # Woerter, die tatsaechlich so geschrieben werden - alles andere mit ae/oe/ue
 # oder ss im Fliesstext ist ein Fehler und wird beim Bauen gemeldet.
+ERLAUBT = {
+    "quer", "querschnitt", "quersteg", "zuerst", "neues", "neuer", "neue", "neu",
+    "teuerste", "teuer", "umbauen", "steuert", "gesteuert", "steuerung",
+    "silhouette", "sequenz", "aequivalent", "abenteuer", "erneuern", "feuer",
+    "dass", "muss", "muessen", "lassen", "laesst", "passen", "passt", "passung",
+    "passprobe", "passung", "presst", "fasst", "fassung", "messing", "wissen",
+    "weiss", "gross", "bewusste", "kompromiss", "durchmesser", "loslassen",
+    "passieren", "passiert", "musste", "quelle", "aussahen", "anfassen",
+    "wasserdicht", "essen", "klasse", "prozess", "adresse", "interesse",
+    "openscad-quelldatei", "gnu", "eu", "queue",
+    "gemessen", "gemessene", "gemessenen", "gemessener", "bauen", "stl-bauen",
+    "passend", "passende", "passenden", "zueinander", "quelldatei",
+    "rollendurchmesser", "aussparung", "aussparungen", "fassen", "dasselbe",
+    "bildausschnitt", "neuen", "beutel-passung", "g-nassfutterbeutel",
+    "aufbauen", "einbauen", "umbauen", "anbauen", "zusammenbauen", "erbauen",
+    "voraussetzung", "ausserdem", "ausser",
+}
+_VERDACHT = re.compile(r"\b[A-Za-zÄÖÜäöüß][A-Za-zÄÖÜäöüß-]{2,}\b")
+
+
+FUNDE = []
 _AKT = {"datei": "?"}
+
+
+def rechtschreibpruefung(html, datei):
+    """Meldet Woerter, die noch in ASCII-Umschrift stehen. Attribute, Code
+    und der Dateibaum bleiben aussen vor - dort sind es echte Bezeichner.
+    Laeuft vor der Entity-Wandlung, solange die Umlaute noch Umlaute sind."""
+    sicht = _SCHUTZ.sub(" ", html)
+    fund = set()
+    for w in _VERDACHT.findall(sicht):
+        k = w.lower()
+        if k in ERLAUBT or "&" in w:
+            continue
+        if re.search(r"ae|oe|ue|ss", k) and not re.search(r"[äöüß]", w):
+            fund.add(w)
+    return [f"{datei}: {w}" for w in sorted(fund)]
 
 
 def ent(t):
@@ -229,6 +353,7 @@ def ent(t):
 
     t = _SCHUTZ.sub(merken, t)
     t = _WORT.sub(lambda m: RECHT.get(m.group(0), m.group(0)), t)
+    FUNDE.extend(rechtschreibpruefung(t, _AKT["datei"]))
     t = re.sub(r"\x00(\d+)\x00", lambda m: halde[int(m.group(1))], t)
     for k, v in UML.items():
         t = t.replace(k, v)
