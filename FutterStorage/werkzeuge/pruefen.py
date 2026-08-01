@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """Prüft die erzeugten STL-Dateien, bevor gedruckt wird.
 
-Fünf Prüfungen, alle ohne Fremdbibliothek:
+Sechs Prüfungen, alle ohne Fremdbibliothek:
 
   1. Wasserdicht   - jede Kante gehört zu genau zwei Dreiecken
   2. Volumen       - über den Divergenzsatz, ergibt das Druckgewicht
   3. Überhänge     - Flächennormalen gegen die 45-Grad-Grenze
   4. Bauraum       - Bounding Box gegen das Druckbett
   5. Verbindungen  - Zapfen und Nase gegen ihre Taschen (Maßvergleich)
+  6. Einbau        - bewegliche Teile gegen die Aufnahme, in die sie müssen
 
 Aufruf:  python3 werkzeuge/pruefen.py
 """
@@ -103,10 +104,9 @@ def kasten(dreiecke):
     return (max(xs) - min(xs), max(ys) - min(ys), max(zs) - min(zs))
 
 
-def verbindungen():
-    """Liest die Maße aus dem Modell und prüft, ob Zapfen und Nase mit Spiel
-    in ihre Taschen passen - beide Seiten kommen aus derselben Quelle, aber
-    ein Zahlendreher fiele hier auf."""
+def modellwerte():
+    """Alle Zahlenwerte aus der OpenSCAD-Quelle. Eine Stelle, damit jede
+    Prüfung mit denselben Maßen rechnet wie das gedruckte Teil."""
     quelle = os.path.join(PROJ, "modell", "katzenfutter-regal.scad")
     if not os.path.exists(quelle):
         quelle = os.path.join(PROJ, "katzenfutter-regal.scad")
@@ -120,6 +120,14 @@ def verbindungen():
                     werte[k.strip()] = float(v.strip())
                 except ValueError:
                     pass
+    return werte
+
+
+def verbindungen():
+    """Prüft, ob Zapfen und Nase mit Spiel in ihre Taschen passen - beide
+    Seiten kommen aus derselben Quelle, aber ein Zahlendreher fiele hier
+    auf."""
+    werte = modellwerte()
     p = werte.get("passung", 0.2)
     fehler = []
     # Zapfen (Breite = Wandstärke) in Tasche (Wandstärke + 2 * Passung)
@@ -137,6 +145,43 @@ def verbindungen():
         fehler.append(f"Nase ({nh} + {p} Passung) reicht in den Innenraum "
                       f"(Boden {bd:.1f})")
     return fehler, {"passung": p, "zapfen_h": zh, "nase_h": nh, "boden_dick": bd}
+
+
+# Was in den Kanal hineinmuss, und wieviel Luft es dort mindestens braucht.
+# Der Schieber gleitet, die Trommel liegt in seiner Kammer - beides darf
+# nicht klemmen.
+EINBAUTEILE = {
+    "schieber.stl": ("Kanal", 0.8),
+    "trommel.stl": ("Federkammer", 0.4),
+}
+
+
+def einbau():
+    """Prüft, ob jedes bewegliche Teil in seine Aufnahme passt.
+
+    Der Schieber war lange 2,8 mm breiter als der Kanal, ohne dass es
+    auffiel: Renderings zeigen ihn einzeln, und die Kollisionsprüfung hält
+    nur Segmente gegeneinander. Ein Maßvergleich findet so etwas sofort."""
+    werte = modellwerte()
+    innen_x = werte.get("beutel_breit", 88) + werte.get("spiel", 4)
+    kammer = (werte.get("trommel_b", 17.0)
+              + 2 * 1.2 + 1.2)          # Bordscheiben + Luft, wie im Modell
+    aufnahme = {"Kanal": innen_x, "Federkammer": kammer}
+
+    fehler, zeilen = [], []
+    for datei, (wohin, luft) in EINBAUTEILE.items():
+        pfad = os.path.join(STL, datei)
+        if not os.path.exists(pfad):
+            continue
+        breit = kasten(lade(pfad))[0]
+        passt_in = aufnahme[wohin]
+        rest = passt_in - breit
+        zeilen.append((datei, wohin, breit, passt_in, rest))
+        if rest < luft:
+            fehler.append(f"{datei}: {breit:.1f} mm breit, {wohin} misst "
+                          f"{passt_in:.1f} mm - {rest:.1f} mm Luft, "
+                          f"noetig sind {luft:.1f} mm")
+    return fehler, zeilen
 
 
 def main():
@@ -176,6 +221,14 @@ def main():
     for f in fehler:
         print("  FEHLER:", f)
     schlecht += len(fehler)
+
+    e_fehler, e_zeilen = einbau()
+    for datei, wohin, breit, aufnahme, rest in e_zeilen:
+        print(f"Einbau {datei:<16}{breit:6.1f} mm in {wohin} {aufnahme:5.1f} mm"
+              f"  ->{rest:5.1f} mm Luft")
+    for f in e_fehler:
+        print("  FEHLER:", f)
+    schlecht += len(e_fehler)
 
     print()
     print("alles in Ordnung" if not schlecht else f"{schlecht} Probleme gefunden")
