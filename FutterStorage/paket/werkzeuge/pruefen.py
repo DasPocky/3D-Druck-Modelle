@@ -178,8 +178,13 @@ def feder():
     egal wie viele dahinterstehen. Zu viel drückt ihn flach, er weicht
     seitlich aus und klemmt - im 92er Kanal hat ein 88er Beutel 4 mm Spiel."""
     w = modellwerte()
-    kap = int(w.get("segment_anzahl", 3) * w.get("segment_laenge", 160)
-              // w.get("beutel_dicke", 19))
+    # Der Schieber steht hinter dem Stapel und braucht selbst Platz -
+    # dieselbe Rechnung wie im Modell.
+    schieber_l = (w.get("pusher_l", 42) + 10 if w.get("feder_bauart_pusher", 1)
+                  else 36)
+    nutz = (w.get("segment_anzahl", 3) * w.get("segment_laenge", 160)
+            - schieber_l - 8)
+    kap = int(nutz // w.get("beutel_dicke", 19))
     noetig = REIBUNG * kap * BEUTEL_KG * 9.81
     kraft = w.get("feder_kraft", 0)
     weg = w.get("segment_anzahl", 3) * w.get("segment_laenge", 160) - 10

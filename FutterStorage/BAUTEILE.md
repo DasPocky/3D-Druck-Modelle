@@ -16,9 +16,9 @@ und nicht nur das Ergebnis.
 
 | | |
 |---|---|
-| 25 Beutel × 85 g | 2,125 kg = 20,9 N Gewichtskraft |
+| 22 Beutel × 85 g | 1,870 kg = 18,3 N Gewichtskraft |
 | Reibbeiwert Folie auf PLA | 0,3 bis 0,4 (am Teil zu messen) |
-| **nötige Schubkraft** | **6,3 bis 8,3 N** |
+| **nötige Schubkraft** | **5,5 bis 7,3 N** |
 
 **Nach oben** begrenzt der Beutel selbst. Die volle Federkraft liegt
 *immer* auf dem vordersten — egal ob fünf oder fünfundzwanzig dahinter
@@ -38,7 +38,7 @@ Gewählt ist deshalb eine Feder in der Mitte dieses Fensters.
 
 | Kennwert | Wert | Bedarf |
 |---|---|---|
-| Zugkraft | 8,8 N | 8,3 N nötig, 12 N Obergrenze |
+| Zugkraft | 8,8 N | 7,3 N nötig, 12 N Obergrenze |
 | Auszug Lmax | 557 mm | 470 mm gebraucht |
 | Bandbreite | 12,70 mm | bestimmt Bandnut und Trommel |
 | Rolle Ø außen | 15,5 mm | |
@@ -99,13 +99,13 @@ lässt sich abschätzen:
 - Der Auszug muss zu den Hakenlängen passen, also mindestens **400 mm**.
   Wir brauchen 470 mm — knapp, aber in der richtigen Größenordnung.
 - Die Kraft dürfte bei **2 bis 5 N** liegen (Blisterware auf Lochwandhaken).
-  Wir brauchen 8,3 N. Falls sie zu schwach ist: **zwei Federn parallel**,
+  Wir brauchen 7,3 N. Falls sie zu schwach ist: **zwei Federn parallel**,
   ihre Kräfte addieren sich. Dann 18 € statt 9 €.
 
 **Vorgehen:** Bei 0,60 € kostet ein Zehnerpack 6 €. Bestellen, messen,
 dann entscheiden. Die Federkraft misst man ohne Werkzeug: Feder senkrecht
 an einer Küchenwaage ausziehen, angezeigte Masse in Gramm mal 0,00981
-ergibt Newton. 850 g Anzeige entsprechen 8,3 N.
+ergibt Newton. 750 g Anzeige entsprechen 7,3 N.
 
 Das Modell ist auf einen Bereich von 8 bis 12 N ausgelegt und braucht nur
 vier geänderte Zahlen — es funktioniert mit jeder Feder, die passt.

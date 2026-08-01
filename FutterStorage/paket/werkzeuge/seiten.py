@@ -699,7 +699,7 @@ INDEX = f"""
   entnommen wird immer der vorderste. Die Ebenen stapeln direkt aufeinander.</p>
   <div class="kz-reihe">
     <div class="kz"><b>15</b><span>Sorten</span></div>
-    <div class="kz"><b>375</b><span>Beutel maximal</span></div>
+    <div class="kz"><b>330</b><span>Beutel maximal</span></div>
     <div class="kz"><b>5&times;3</b><span>Spalten &times; Ebenen</span></div>
     <div class="kz"><b>0 L</b><span>toter Raum</span></div>
     <div class="kz"><b>8</b><span>Teiletypen</span></div>
@@ -740,7 +740,7 @@ INDEX = f"""
   <h2 data-nr="">Das fertige Regal</h2>
   <figure class="gross"><img src="{R['b_gesamt']}" alt="Das komplette Regal"></figure>
   <figcaption>Fuenf Kanaele nebeneinander, drei Ebenen uebereinander. Jeder Kanal
-  fasst 25 Beutel einer Sorte.</figcaption>
+  fasst 22 Beutel einer Sorte.</figcaption>
 </section>
 
 <section>
@@ -927,7 +927,7 @@ BAU = f"""
       <h4>Ein fertiger Kanal</h4>
       <div class="dat">95 &times; 485 &times; 185 mm &middot; 336 g</div>
       <p>Front + Mitte + End + Schieber + Schild. Eine Sorte mit Platz fuer
-      25 Beutel.</p></div>
+      22 Beutel.</p></div>
     </article>
   </div>
 
@@ -963,7 +963,7 @@ BAU = f"""
       <tr><td>Zwei Ebenen</td><td class="num">10</td><td class="num">250</td>
         <td class="num">60</td><td class="num">3,36 kg</td><td class="num">198 h</td></tr>
     </tbody>
-    <tfoot><tr><td>Drei Ebenen</td><td class="num">15</td><td class="num">375</td>
+    <tfoot><tr><td>Drei Ebenen</td><td class="num">15</td><td class="num">330</td>
       <td class="num">90</td><td class="num">5,04 kg</td><td class="num">297 h</td></tr></tfoot>
   </table></div>
   <p class="unter">Je Kanal sechs Druckteile: Front-, Mittel- und Endsegment, Schieber, Schild und Wickeltrommel. Druckzeit grob mit 17 g/h. Bei zehn Sorten reichen zwei Ebenen.</p>
@@ -1004,9 +1004,9 @@ BAU = f"""
   <div class="text">
     <h3>Wie die Federkraft zustande kommt</h3>
     <p>Die Feder muss zwei Grenzen einhalten. <strong>Nach unten</strong>
-    begrenzt die Reibung des vollen Stapels: 25 Beutel zu 85 g sind 2,125 kg
-    oder 20,9 N Gewichtskraft; bei einem Reibbeiwert von 0,3 bis 0,4 für
-    Folie auf PLA braucht es <strong>6,3 bis 8,3 N</strong> Schub.</p>
+    begrenzt die Reibung des vollen Stapels: 22 Beutel zu 85 g sind 1,87 kg
+    oder 18,3 N Gewichtskraft; bei einem Reibbeiwert von 0,3 bis 0,4 für
+    Folie auf PLA braucht es <strong>5,5 bis 7,3 N</strong> Schub.</p>
     <p><strong>Nach oben</strong> begrenzt der Beutel selbst. Die volle
     Federkraft liegt <em>immer</em> auf dem vordersten &mdash; egal ob fünf
     oder fünfundzwanzig dahinterstehen. Zu viel Kraft drückt ihn flach, er
@@ -1067,12 +1067,12 @@ BAU = f"""
     <div class="hinweis">Was dabei noch zu klären ist: Weder Zugkraft noch
     Auszugslänge stehen in den Shops. Aus dem Verwendungszweck geschätzt
     liegt der Auszug bei mindestens 400 mm (Hakenlängen bis 400 mm) und die
-    Kraft bei 2 bis 5 N. Gebraucht werden 470 mm und 8,3 N &mdash; bei zu
+    Kraft bei 2 bis 5 N. Gebraucht werden 470 mm und 7,3 N &mdash; bei zu
     schwacher Feder helfen zwei parallel, ihre Kräfte addieren sich.</div>
     <p>Bei 0,60 &euro; kostet ein Zehnerpack 6 &euro;: bestellen, messen,
     entscheiden. Die Kraft misst man ohne Werkzeug &mdash; Feder senkrecht an
     einer Küchenwaage ausziehen, angezeigte Gramm mal 0,00981 ergibt Newton.
-    850 g entsprechen 8,3 N.</p>
+    750 g entsprechen 7,3 N.</p>
   </div>
 </section>
 

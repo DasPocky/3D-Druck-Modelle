@@ -10,7 +10,7 @@ STLs, Zeichnungen und Anleitung gehören zusammen.
 
 | Projekt | Worum es geht | Druckbett ab |
 |---|---|---|
-| [FutterStorage](FutterStorage/) | Regalsystem für 85-g-Nassfutterbeutel. Waagerechte Kanäle, eine Konstantkraftfeder schiebt die Beutel nach vorn. 5 × 3 Ebenen = 375 Beutel. | 180 × 180 mm |
+| [FutterStorage](FutterStorage/) | Regalsystem für 85-g-Nassfutterbeutel. Waagerechte Kanäle, eine Konstantkraftfeder schiebt die Beutel nach vorn. 5 × 3 Ebenen = 330 Beutel. | 180 × 180 mm |
 
 ---
 

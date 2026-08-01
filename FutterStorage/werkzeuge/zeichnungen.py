@@ -679,7 +679,7 @@ def blatt4():
 
     ly = oy + SH * K + 118
     for i, t in enumerate([
-            "Ein Kanal = Frontsegment + Mittelsegment + Endsegment = 485 mm = 25 Beutel",
+            "Ein Kanal = Frontsegment + Mittelsegment + Endsegment = 485 mm = 22 Beutel",
             "Fünf Kanäle nebeneinander ergeben eine Ebene, drei Ebenen stehen direkt aufeinander",
             "Ohne Regalboden: 15 Sorten. Bleibt der Boden drin, passt unten nur eine Ebene mit 5 Sorten"]):
         b.txt(ox, ly + i * 20, t, 10.5, "start", LINIE if i == 0 else GRAU)
@@ -712,7 +712,7 @@ def blatt5():
     b.txt(ox2 + M["beutel_d"] * K + 30, oy + 38,
           "Für die Kapazität mit 19 mm gerechnet.", 10.5, "start", GRAU)
     b.txt(ox2 + M["beutel_d"] * K + 30, oy + 66,
-          "25 Beutel je Kanal bei 485 mm Kanallänge", 10.5, "start")
+          "22 Beutel je Kanal — der Schieber braucht selbst Platz", 10.5, "start")
 
     ox3 = ox + 700
     K2 = 1.9

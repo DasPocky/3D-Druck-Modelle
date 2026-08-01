@@ -141,6 +141,28 @@ feder_rolle_d = 15.5;  // Außendurchmesser der aufgerollten Feder
 
 feder_achse_d = 3.2;   // Bohrung für die Achse: 3-mm-Rundstab, Spielpassung
 
+// Zwei Wege, dieselbe Feder unterzubringen:
+//
+//   "pusher" - Fertiges Federgehäuse aus einem Warenpusher für Ladenregale
+//              (z. B. Sommer International, Art. 950005801411, 0,60 €).
+//              Darin sitzt dieselbe Konstantkraftfeder wie unten, nur als
+//              Massenware statt als Industrie-Ersatzteil - Faktor 27 im
+//              Preis. Der Schieber bekommt dafür eine Klemmtasche; Trommel
+//              und Achse entfallen ganz.
+//
+//   "rolle"  - Lose Feder auf gedruckter Trommel und 3-mm-Achse. Braucht
+//              zwei Teile mehr, dafür sind die Federdaten dokumentiert.
+//
+// ACHTUNG: Die Pushermaße unten sind GESCHÄTZT - der Hersteller gibt sie
+// nicht an. Vor dem Druck am gekauften Teil nachmessen und hier eintragen.
+// Der Schieber ist der einzige Teil, der davon abhängt.
+feder_bauart = "pusher";  // [pusher, rolle]
+
+pusher_l = 42;         // Gehäuselänge in Bandrichtung   \
+pusher_b = 24;         // Gehäusebreite                   > nachmessen!
+pusher_h = 22;         // Gehäusehöhe                    /
+pusher_spiel = 0.4;    // Luft in der Tasche, damit es sich einlegen lässt
+
 // Die Feder wickelt NICHT auf der 3-mm-Achse: ihr natürlicher
 // Innendurchmesser liegt bei 11-17 mm. Der Hersteller verlangt eine
 // Trommel 10-20 % über diesem Maß. Zu klein heißt höhere Biegespannung
@@ -234,7 +256,12 @@ aussen_y = segment_laenge + (ist_front ? anschlag_dicke() : 0)
 function anschlag_dicke() = 3.0;
 
 kanal_laenge = segment_anzahl * segment_laenge;
-kapazitaet   = floor(kanal_laenge / beutel_dicke);
+// Der Schieber steht hinter dem Stapel und braucht selbst Platz - das
+// fehlte in der Rechnung, die Kapazität war um drei Beutel zu hoch
+// angesetzt. Seine Länge hängt an der Bauart der Federaufnahme.
+schieber_l   = feder_bauart == "pusher" ? pusher_l + 10 : 36;
+nutz_laenge  = kanal_laenge - schieber_l - 8;   // 8 mm Luft zum Endsegment
+kapazitaet   = floor(nutz_laenge / beutel_dicke);
 
 // Bodenzunge: überlappt die Fuge zum Nachbarsegment, damit die Beutel
 // nicht an einer Stufe hängenbleiben
@@ -553,13 +580,21 @@ module schieber() {
     b   = innen_x - 1.2;
     h   = beutel_hoch - 8;
     d   = 2.6;
-    fu  = 36;                         // Fußlänge, nimmt die Federrolle auf
-    kb  = trommel_ganz_b() + 1.2;     // lichte Breite der Federkammer
-    kx  = (b - kb) / 2;               // Kammer mittig
-    // Achse so hoch, dass Trommel und aufgewickelte Feder frei laufen
+    ist_pusher = feder_bauart == "pusher";
+
+    // Fußlänge: beim Pusher richtet sie sich nach dem Gehäuse, sonst nach
+    // der Trommel.
+    fu  = ist_pusher ? pusher_l + 10 : 36;
+    // Lichte Breite der Aufnahme
+    kb  = ist_pusher ? pusher_b + 2 * pusher_spiel : trommel_ganz_b() + 1.2;
+    kx  = (b - kb) / 2;               // Aufnahme mittig
+    // Nur für die Rollen-Bauart: Achse so hoch, dass Trommel und
+    // aufgewickelte Feder frei laufen
     rmax = max(feder_rolle_d, trommel_bord_d()) / 2;
-    ax  = rmax + 4;                   // Achshöhe über dem Boden
-    ay  = 4 + rmax;                   // Achsposition in der Tiefe
+    ax  = rmax + 4;
+    ay  = 4 + rmax;
+    // Höhe der Seitenwangen
+    wh  = ist_pusher ? pusher_h + pusher_spiel + 2 : ax + rmax + 4;
 
     difference() {
         union() {
@@ -570,13 +605,16 @@ module schieber() {
             // Gleitkufen, damit nur wenig Fläche schleift
             for (xp = [2.5, b - 8.5])
                 translate([xp, 0, 0]) cube([6, fu, 3.6]);
-            // Wangen der Federkammer, tragen die Achse
+            // Wangen der Federaufnahme
             for (xp = [kx - 3.2, kx + kb])
-                translate([xp, d, 0])
-                    cube([3.2, fu - d, ax + rmax + 4]);
-            // Aussteifungen außerhalb der Kammer. Sie greifen 0,6 mm in die
-            // Stützfläche hinein - eine bloße Berührung ergäbe zwei Flächen
-            // auf derselben Ebene und damit ein undichtes Netz.
+                translate([xp, d, 0]) cube([3.2, fu - d, wh]);
+            // Beim Pusher hinten ein Steg, der das Gehäuse hält
+            if (ist_pusher)
+                translate([kx - 3.2, fu - 3.0, 0])
+                    cube([kb + 6.4, 3.0, wh]);
+            // Aussteifungen außerhalb der Aufnahme. Sie greifen 0,6 mm in
+            // die Stützfläche hinein - eine bloße Berührung ergäbe zwei
+            // Flächen auf derselben Ebene und damit ein undichtes Netz.
             // Achtung Richtung: rotate([0,-90,0]) legt die Extrusion nach
             // -X, jede Rippe wächst also von xp aus nach links. Deshalb
             // xp = 12 und nicht 4 - sonst ragt die linke Rippe über die
@@ -591,15 +629,26 @@ module schieber() {
             translate([b / 2 - 16, d, h - 3])
                 rotate([24, 0, 0]) cube([32, d, 25]);
         }
-        // Achsbohrung durch beide Wangen
-        translate([-1, ay, ax]) rotate([0, 90, 0])
-            cylinder(d = feder_achse_d, h = b + 2);
+        if (ist_pusher) {
+            // Tasche für das Federgehäuse, nach oben offen zum Einlegen
+            translate([kx, d + 1, 3.0])
+                cube([kb, pusher_l + pusher_spiel, pusher_h + pusher_spiel + 1]);
+            // Zwei Klemmnasen halten es unten fest - sie federn beim
+            // Einlegen kurz zurück
+            for (yp = [d + 8, d + pusher_l - 6])
+                translate([kx - 1, yp, 3.0 + pusher_h * 0.6])
+                    cube([kb + 2, 4, 1.2]);
+        } else {
+            // Achsbohrung durch beide Wangen
+            translate([-1, ay, ax]) rotate([0, 90, 0])
+                cylinder(d = feder_achse_d, h = b + 2);
+        }
         // Austrittsschlitz: das Federband läuft unten nach vorne in die Nut
         translate([(b - feder_band_b - 0.8) / 2, -1, 3.2])
             cube([feder_band_b + 0.8, d + 2, 3.0]);
-        // Gewicht sparen, oberhalb der Kammer
-        translate([10, -1, ax + rmax + 10])
-            cube([b - 20, d + 2, h - ax - rmax - 24]);
+        // Gewicht sparen, oberhalb der Aufnahme
+        translate([10, -1, wh + 6])
+            cube([b - 20, d + 2, h - wh - 20]);
     }
 }
 

@@ -10,7 +10,7 @@ Greifraum, gerade so viel, dass zwei Finger neben die Kante passen. Diese
 42 mm bestimmen die Ebenenhöhe von 182,8 mm und damit, dass drei Ebenen
 550 mm Fachhöhe brauchen.
 
-**Ausbau:** 5 Spalten × 3 Ebenen = 15 Sorten, 375 Beutel
+**Ausbau:** 5 Spalten × 3 Ebenen = 15 Sorten, 330 Beutel
 **Passt in:** 540 × 500 × 550 mm nutzbaren Schrankraum
 **Druckbett:** ab 180 × 180 mm (Bambu Lab A1 mini)
 
