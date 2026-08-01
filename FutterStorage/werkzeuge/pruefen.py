@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Prüft die erzeugten STL-Dateien, bevor gedruckt wird.
 
-Sechs Prüfungen, alle ohne Fremdbibliothek:
+Sieben Prüfungen, alle ohne Fremdbibliothek:
 
   1. Wasserdicht   - jede Kante gehört zu genau zwei Dreiecken
   2. Volumen       - über den Divergenzsatz, ergibt das Druckgewicht
@@ -9,6 +9,7 @@ Sechs Prüfungen, alle ohne Fremdbibliothek:
   4. Bauraum       - Bounding Box gegen das Druckbett
   5. Verbindungen  - Zapfen und Nase gegen ihre Taschen (Maßvergleich)
   6. Einbau        - bewegliche Teile gegen die Aufnahme, in die sie müssen
+  7. Feder         - Kraft gegen Stapelreibung und gegen die Quetschgrenze
 
 Aufruf:  python3 werkzeuge/pruefen.py
 """
@@ -162,6 +163,43 @@ EINBAUTEILE = {
 }
 
 
+# Reibbeiwert Folie auf PLA. 0,4 ist der ungünstige Fall - gemessen wird
+# er erst am gedruckten Teil, deshalb hier die sichere Annahme.
+REIBUNG = 0.40
+BEUTEL_KG = 0.085
+QUETSCHGRENZE = 12.0     # N, darüber verformt der vorderste Beutel merklich
+
+
+def feder():
+    """Prüft die Federwahl gegen das, was der volle Kanal verlangt.
+
+    Nach unten begrenzt die Reibung des ganzen Stapels, nach oben der
+    Beutel selbst: die volle Federkraft liegt immer auf dem vordersten,
+    egal wie viele dahinterstehen. Zu viel drückt ihn flach, er weicht
+    seitlich aus und klemmt - im 92er Kanal hat ein 88er Beutel 4 mm Spiel."""
+    w = modellwerte()
+    kap = int(w.get("segment_anzahl", 3) * w.get("segment_laenge", 160)
+              // w.get("beutel_dicke", 19))
+    noetig = REIBUNG * kap * BEUTEL_KG * 9.81
+    kraft = w.get("feder_kraft", 0)
+    weg = w.get("segment_anzahl", 3) * w.get("segment_laenge", 160) - 10
+    auszug = w.get("feder_auszug", 0)
+
+    fehler = []
+    if kraft < noetig:
+        fehler.append(f"Feder zu schwach: {kraft:.1f} N vorhanden, "
+                      f"{noetig:.1f} N noetig fuer {kap} Beutel")
+    if kraft > QUETSCHGRENZE:
+        fehler.append(f"Feder zu stark: {kraft:.1f} N ueber der Quetschgrenze "
+                      f"von {QUETSCHGRENZE:.0f} N - der vorderste Beutel "
+                      f"verformt sich und klemmt")
+    if auszug < weg:
+        fehler.append(f"Federweg zu kurz: {auszug:.0f} mm Auszug, "
+                      f"{weg:.0f} mm gebraucht")
+    return fehler, {"kraft": kraft, "noetig": noetig, "kapazitaet": kap,
+                    "auszug": auszug, "weg": weg}
+
+
 def einbau():
     """Prüft, ob jedes bewegliche Teil in seine Aufnahme passt.
 
@@ -227,6 +265,14 @@ def main():
     for f in fehler:
         print("  FEHLER:", f)
     schlecht += len(fehler)
+
+    f_fehler, fw = feder()
+    print(f"Feder:        {fw['kraft']:.1f} N vorhanden, {fw['noetig']:.1f} N "
+          f"noetig fuer {fw['kapazitaet']} Beutel  |  "
+          f"{fw['auszug']:.0f} mm Auszug, {fw['weg']:.0f} mm Weg")
+    for f in f_fehler:
+        print("  FEHLER:", f)
+    schlecht += len(f_fehler)
 
     e_fehler, e_zeilen = einbau()
     for datei, wohin, breit, aufnahme, rest in e_zeilen:

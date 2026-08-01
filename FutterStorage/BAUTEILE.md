@@ -7,45 +7,79 @@ Stand der Recherche: 1. August 2026. Preise und Verfügbarkeit im Shop prüfen.
 
 ---
 
-## 1 · Konstantkraftfeder
+## Wie die Federkraft zustande kommt
 
-**Gewählt: CF030-0237** — 10,5 N · Auszug 610 mm · Band 15,0 mm · Rolle Ø 22 mm
+Die Feder muss zwei Grenzen einhalten — deshalb steht die Rechnung hier
+und nicht nur das Ergebnis.
 
-| Kennwert | Wert |
+**Nach unten** begrenzt die Reibung des vollen Stapels:
+
+| | |
 |---|---|
-| Zugkraft | 10,5 N (über den ganzen Weg gleich) |
-| Auszug Lmax | 610 mm — der Schieber legt 480 mm zurück |
-| Bandbreite | 14,99 mm |
-| Rolle Ø außen | 22,0 mm |
-| Trommel Ø empfohlen | 20,7 mm — **wird mitgedruckt**, siehe unten |
-| Montageloch | 4,7 mm |
-| Werkstoff | Federbandstahl 1.4310 / Typ 301, rostfrei |
-| Lebensdauer | 4.000 Hübe |
-| Preis | ~16,40 € |
+| 25 Beutel × 85 g | 2,125 kg = 20,9 N Gewichtskraft |
+| Reibbeiwert Folie auf PLA | 0,3 bis 0,4 (am Teil zu messen) |
+| **nötige Schubkraft** | **6,3 bis 8,3 N** |
 
-**Bezug:** [sodemann-federn.de](https://www.sodemann-federn.de/cf030-0237) ·
-alternativ [Febrotec, Halver/NRW](https://www.febrotec.de/de-DE/konstantkraftfedern-rollfedern)
-als `0CF030-0237` — deutscher Hersteller, kürzere Lieferstrecke, Sonderfertigung möglich.
+**Nach oben** begrenzt der Beutel selbst. Die volle Federkraft liegt
+*immer* auf dem vordersten — egal ob fünf oder fünfundzwanzig dahinter
+stehen. Zu viel Kraft drückt ihn flach, er weicht seitlich aus und klemmt:
+Im 92-mm-Kanal hat ein 88-mm-Beutel nur 4 mm Spiel. Platzen droht nicht
+(8,8 N verteilen sich auf 81 cm² Anlagefläche, das sind rund 1000 Pa —
+ein Daumendruck ist hundertmal höher), aber die Verformung reicht zum
+Verklemmen. Praktische Obergrenze: **rund 12 N**.
 
-### Warum nicht 16 mm Band?
-
-Die erste Auslegung ging von 16 mm aus. **Das gibt es bei 8–12 N nicht ab Lager.**
-Die Kraft einer Rollfeder wächst mit Bandbreite × Banddicke²: bei 15,87 mm Band
-liegt die Standardfeder schon bei 14,7 N — zu stark. Im Zielbereich 8–12 N sind
-die Bänder 12,7 bis 15,0 mm breit. 15,0 mm ist das nächstliegende Maß, das Modell
-ist darauf ausgelegt.
-
-### Alternativen
-
-| Artikel | Kraft | Auszug | Band | Rolle Ø | Preis |
-|---|---|---|---|---|---|
-| CF030-0263 | 11,7 N | 663 mm | 12,70 mm | 20,5 mm | 16,22 € |
-| CF025-0198 | 8,8 N | 557 mm | 12,70 mm | 15,5 mm | 16,22 € |
-
-Zwei parallel geführte Federn addieren ihre Kräfte. Falls sich 10,5 N am echten
-Teil als zu schwach erweisen, ist das der Weg — nicht eine breitere Feder.
+Gewählt ist deshalb eine Feder in der Mitte dieses Fensters.
 
 ---
+
+## 1 · Konstantkraftfeder
+
+**Gewählt: CF025-0198** — 8,8 N · Auszug 557 mm · Band 12,7 mm · Rolle Ø 15,5 mm
+
+| Kennwert | Wert | Bedarf |
+|---|---|---|
+| Zugkraft | 8,8 N | 8,3 N nötig, 12 N Obergrenze |
+| Auszug Lmax | 557 mm | 470 mm gebraucht |
+| Bandbreite | 12,70 mm | bestimmt Bandnut und Trommel |
+| Rolle Ø außen | 15,5 mm | |
+| Trommel Ø | 14,5 mm | **wird mitgedruckt**, siehe unten |
+| Werkstoff | Federbandstahl 1.4310, rostfrei | |
+| Lebensdauer | 4.000 Hübe | |
+| Preis | ~16,20 € | Kleinmengen-Listenpreis |
+
+**Bezug:** [sodemann-federn.de](https://www.sodemann-federn.de/produkte/konstantkraftfedern/konstantkraftfedern) ·
+alternativ [Febrotec, Halver/NRW](https://www.febrotec.de/de-DE/konstantkraftfedern-rollfedern)
+— deutscher Hersteller, Preise auf Anfrage.
+
+### Warum nicht die stärkere Feder?
+
+Die erste Auslegung nahm die CF030-0237 mit 10,5 N — die stärkste, die ins
+Raster passte. Das ist die 1,26-fache Reserve über dem Bedarf und bringt
+nichts außer mehr Druck auf den vordersten Beutel. Ihr 15-mm-Band verlangte
+zudem eine breitere Nut im Boden und eine größere Trommel.
+
+### Andere Feder einsetzen
+
+Passend ist alles, was **8 bis 12 N** liefert und mindestens **480 mm**
+auszieht. Im Modell sind dafür vier Zeilen zu ändern:
+
+```openscad
+feder_kraft   = 8.8;   // N
+feder_band_b  = 12.7;  // Bandbreite
+feder_auszug  = 557;   // Lmax
+feder_rolle_d = 15.5;  // Rolle außen
+```
+
+Bandnut, Federkammer und Trommel rechnen sich daraus.
+`pruefen.py` schlägt an, wenn die Feder zu schwach, zu stark oder zu kurz ist.
+
+### Preis drücken
+
+Der Listenpreis von ~16 € gilt für Einzelabnahme und ist bei allen Größen
+etwa gleich — er ist ein Mindestpreis, kein Materialpreis. Wer 15 Kanäle
+baut, sollte **beim Hersteller nach Staffelpreisen fragen**. Auch
+Direktimport (AliExpress, Alibaba) führt dieselben Federn deutlich
+günstiger, bei entsprechender Lieferzeit und ohne geprüftes Datenblatt.
 
 ## 2 · Achse Ø 3 mm
 
@@ -78,8 +112,8 @@ Innendurchmesser liegt bei 11–17 mm; der Hersteller verlangt eine Trommel
 10–20 % über diesem Maß. Ein zu enger Wickel erhöht die Biegespannung im Band
 und verkürzt die Lebensdauer.
 
-Deshalb liegt `stl/trommel.stl` bei: Ø 20,7 mm Wickelfläche, 17 mm breit, mit
-Bordscheiben gegen seitliches Ablaufen, Bohrung 3,5 mm — sie läuft frei auf der
+Deshalb liegt `stl/trommel.stl` bei: Ø 14,5 mm Wickelfläche, 14,7 mm breit,
+mit Bordscheiben gegen seitliches Ablaufen, Bohrung 3,5 mm — sie läuft frei auf der
 Achse. Liegend drucken, dann ist die Bohrung rund und es braucht keine Stützen.
 
 ---
@@ -101,9 +135,9 @@ Achse. Liegend drucken, dann ist die Bohrung rund und es braucht keine Stützen.
 
 | Position | Menge | Preis |
 |---|---|---|
-| Konstantkraftfeder CF030-0237 | 1 | ~16,40 € |
+| Konstantkraftfeder CF025-0198 | 1 | ~16,20 € |
 | Edelstahl-Rundstab 3 × 500 mm | 1 | 1,05 € |
-| **Material je Kanal** | | **~17,45 €** |
+| **Material je Kanal** | | **~17,25 €** |
 | Versand (zwei Shops) | | ~10–14 € |
 
 Der Versand macht fast die Hälfte aus. Für den Vollausbau mit 15 Kanälen

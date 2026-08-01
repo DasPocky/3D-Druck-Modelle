@@ -37,6 +37,10 @@ SEGL = _scad("segment_laenge", 160.0)
 LF, LM = SEGL + 3.0, SEGL                  # Front- und Mittelsegment
 LE = SEGL + WAND                           # Endsegment
 SCHILD_B = _scad("schild_breite", 78.0)
+# Hoehe, in der die Tafel in der Tasche steht. Stand hier fest als 6 -
+# das Modell setzt sie auf 4. Dadurch sass das Schild im Bild 2 mm zu
+# hoch, der Rahmen verdeckte oben 6 und unten 2 mm statt gleichmaessig.
+SCHILD_Z = _scad("schild_z0", 4.0)
 
 def clear():
     bpy.ops.object.select_all(action='SELECT')
@@ -146,9 +150,9 @@ def kanal(x=0, z=0, luecke=0, segmente=3, ebene="mitte", spalte="mitte"):
 def schild_an(x=0, z=0, nr=None):
     # Grundplatte orange, Schrift schwarz - Schild steht senkrecht in der Tasche
     pl, tx = SORTEN[nr % len(SORTEN)] if (nr is not None and SORTEN) else (s_schd, s_txt)
-    put(pl, (x + (AX - SCHILD_B) / 2, -0.5, z + 6),
+    put(pl, (x + (AX - SCHILD_B) / 2, -0.5, z + SCHILD_Z),
         ORANGE, rot=(math.radians(90), 0, 0), bevel=0.1)
-    put(tx, (x + (AX - SCHILD_B) / 2, -0.5 - 0.62, z + 6),
+    put(tx, (x + (AX - SCHILD_B) / 2, -0.5 - 0.62, z + SCHILD_Z),
         SCHWARZ, rot=(math.radians(90), 0, 0), bevel=0)
 
 def beutel_mesh(name="Beutel"):

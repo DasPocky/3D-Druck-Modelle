@@ -861,15 +861,22 @@ BAU = f"""
 
 <section>
   <h2 data-nr="03">Die Teile</h2>
-  <p class="unter">Sechs Teiletypen. Die Mengen gelten je Kanal &mdash; und ein Kanal
+  <p class="unter">Sieben Teiletypen. Die Mengen gelten je Kanal &mdash; und ein Kanal
   ist eine Sorte.</p>
+  <div class="hinweis">Die drei Segmente gibt es in je neun Ausf&uuml;hrungen:
+  drei Ebenenlagen (<code>unten</code>, <code>mitte</code>, <code>oben</code>)
+  mal drei Spaltenlagen (<code>links</code>, <code>mitte</code>,
+  <code>rechts</code>). Zusammen <strong>27 Varianten</strong> unter
+  <code>stl/segmente/</code>. Die Bilder zeigen jeweils die Mittellage &mdash;
+  die Variante mit allen Merkmalen. Was an welchem Rand entf&auml;llt, steht
+  weiter unten unter &bdquo;Zusammenbauen&ldquo;.</div>
 
   <div class="karten">
     <article class="karte">
       <figure><img src="{R['b_front']}" alt="Frontsegment"></figure>
       <div class="txt"><span class="anz">1&times; je Kanal</span>
       <h4>Frontsegment</h4>
-      <div class="dat">95 &times; 175 &times; 145 mm &middot; 100 g</div>
+      <div class="dat">95 &times; 175 &times; 185 mm &middot; 112 g</div>
       <p>Kommt nach vorne. Traegt die 92 mm hohe Frontwand, die
       Schildtasche und den Haken fuer das Federband.</p></div>
     </article>
@@ -877,7 +884,7 @@ BAU = f"""
       <figure><img src="{R['b_mitte']}" alt="Mittelsegment"></figure>
       <div class="txt"><span class="anz">beliebig oft</span>
       <h4>Mittelsegment</h4>
-      <div class="dat">95 &times; 169 &times; 145 mm &middot; 70 g</div>
+      <div class="dat">95 &times; 169 &times; 185 mm &middot; 72 g</div>
       <p>Beidseitig offen. Jedes Stueck verlaengert den Kanal um 160 mm, also um
       acht Beutel.</p></div>
     </article>
@@ -885,7 +892,7 @@ BAU = f"""
       <figure><img src="{R['b_end']}" alt="Endsegment"></figure>
       <div class="txt"><span class="anz">1&times; je Kanal</span>
       <h4>Endsegment</h4>
-      <div class="dat">95 &times; 162 &times; 145 mm &middot; 82 g</div>
+      <div class="dat">95 &times; 162 &times; 185 mm &middot; 86 g</div>
       <p>Schliesst hinten ab. Durch den Sichtschlitz siehst du, ob noch Vorrat
       im Kanal ist.</p></div>
     </article>
@@ -893,7 +900,7 @@ BAU = f"""
       <figure><img src="{R['b_schieber']}" alt="Schieber"></figure>
       <div class="txt"><span class="anz">1&times; je Kanal</span>
       <h4>Schieber</h4>
-      <div class="dat">95 &times; 42 &times; 149 mm &middot; 50 g</div>
+      <div class="dat">91 &times; 44 &times; 149 mm &middot; 45 g</div>
       <p>Im Fuss sitzt die Kammer fuer die Federrolle. Unten Gleitkufen, oben die
       Grifflasche zum Zurueckziehen.</p></div>
     </article>
@@ -901,15 +908,24 @@ BAU = f"""
       <figure><img src="{R['b_schild']}" alt="Schild"></figure>
       <div class="txt"><span class="anz">1&times; je Kanal</span>
       <h4>Schild</h4>
-      <div class="dat">74 &times; 18 &times; 2 mm &middot; 2 g</div>
+      <div class="dat">78 &times; 62 &times; 2 mm &middot; 9 g</div>
       <p>Orange Platte, Schrift 0,6 mm vertieft. Mit zwei Farben zusaetzlich
       <code>schild-text.stl</code> in Schwarz drucken und einkleben.</p></div>
+    </article>
+    <article class="karte">
+      <figure><img src="{R['b_schieber']}" alt="Wickeltrommel"></figure>
+      <div class="txt"><span class="anz">1&times; je Kanal</span>
+      <h4>Wickeltrommel</h4>
+      <div class="dat">18 &times; 18 &times; 17 mm &middot; 4 g</div>
+      <p>Darauf wickelt die Feder. Sie darf <strong>nicht</strong> auf der
+      3-mm-Achse laufen &mdash; zu enger Wickel, zu hohe Biegespannung im
+      Band. Liegend drucken, dann wird die Bohrung rund.</p></div>
     </article>
     <article class="karte">
       <figure><img src="{R['b_kanal']}" alt="Fertiger Kanal"></figure>
       <div class="txt"><span class="anz">Ergebnis</span>
       <h4>Ein fertiger Kanal</h4>
-      <div class="dat">95 &times; 485 &times; 145 mm &middot; 304 g</div>
+      <div class="dat">95 &times; 485 &times; 185 mm &middot; 336 g</div>
       <p>Front + Mitte + End + Schieber + Schild. Eine Sorte mit Platz fuer
       25 Beutel.</p></div>
     </article>
@@ -964,11 +980,11 @@ BAU = f"""
       <tr>
         <td class="w"><strong>Konstantkraftfeder</strong><br>
           <span class="klein">aufgerolltes Federstahlband</span></td>
-        <td class="w"><strong>CF030-0237</strong> &middot; 10,5 N &middot;
-          Auszug 610 mm &middot; Band 15,0 mm &middot; Rolle 22 mm &middot;
+        <td class="w"><strong>CF025-0198</strong> &middot; 8,8 N &middot;
+          Auszug 557 mm &middot; Band 12,7 mm &middot; Rolle 15,5 mm &middot;
           Federstahl 1.4310, rostfrei</td>
         <td class="num">1 je Kanal</td>
-        <td class="num">16,40 &euro;</td>
+        <td class="num">16,20 &euro;</td>
       </tr>
       <tr>
         <td class="w"><strong>Achse</strong><br>
@@ -982,24 +998,38 @@ BAU = f"""
       </tr>
     </tbody>
     <tfoot><tr><td>Material je Kanal</td><td>&nbsp;</td><td class="num">1 + 1</td>
-      <td class="num">ca. 17,45 &euro;</td></tr></tfoot>
+      <td class="num">ca. 17,25 &euro;</td></tr></tfoot>
   </table></div>
 
   <div class="text">
-    <h3>Warum kein 16-mm-Band?</h3>
-    <p>Die erste Auslegung ging von 16 mm aus. <strong>Das gibt es bei
-    8&ndash;12 N nicht ab Lager.</strong> Die Kraft einer Rollfeder wächst mit
-    Bandbreite mal Banddicke im Quadrat: Bei 15,87 mm Band liegt die
-    Standardfeder schon bei 14,7 N &mdash; zu stark. Im Zielbereich sind die
-    Bänder 12,7 bis 15,0 mm breit. Das Modell ist auf 15,0 mm ausgelegt.</p>
+    <h3>Wie die Federkraft zustande kommt</h3>
+    <p>Die Feder muss zwei Grenzen einhalten. <strong>Nach unten</strong>
+    begrenzt die Reibung des vollen Stapels: 25 Beutel zu 85 g sind 2,125 kg
+    oder 20,9 N Gewichtskraft; bei einem Reibbeiwert von 0,3 bis 0,4 für
+    Folie auf PLA braucht es <strong>6,3 bis 8,3 N</strong> Schub.</p>
+    <p><strong>Nach oben</strong> begrenzt der Beutel selbst. Die volle
+    Federkraft liegt <em>immer</em> auf dem vordersten &mdash; egal ob fünf
+    oder fünfundzwanzig dahinterstehen. Zu viel Kraft drückt ihn flach, er
+    weicht seitlich aus und klemmt: Im 92-mm-Kanal hat ein 88-mm-Beutel nur
+    4 mm Spiel. Platzen droht nicht (8,8 N verteilen sich auf 81 cm²
+    Anlagefläche, rund 1000 Pa &mdash; ein Daumendruck ist hundertmal höher),
+    aber die Verformung reicht zum Verklemmen. Praktische Obergrenze:
+    <strong>rund 12 N</strong>.</p>
+    <div class="hinweis">Gewählt ist mit 8,8 N eine Feder in der Mitte dieses
+    Fensters. Die zuerst vorgesehene CF030-0237 hatte 10,5 N &mdash; die
+    1,26-fache Reserve, die nichts bringt außer mehr Druck auf den Beutel.</div>
+    <p>Andere Feder? Passend ist alles zwischen <strong>8 und 12 N</strong>
+    mit mindestens 480 mm Auszug. Im Modell sind vier Zeilen zu ändern,
+    Bandnut, Federkammer und Trommel rechnen sich daraus. <code>pruefen.py</code>
+    schlägt an, wenn die Feder zu schwach, zu stark oder zu kurz ist.</p>
 
     <h3>Die Trommel wird gedruckt</h3>
     <div class="hinweis">Die Feder darf <strong>nicht</strong> auf der 3-mm-Achse
     aufwickeln. Ihr natürlicher Innendurchmesser liegt bei 11&ndash;17 mm, der
     Hersteller verlangt eine Trommel 10&ndash;20 % darueber. Ein zu enger Wickel
     erhöht die Biegespannung im Band und verkürzt die Lebensdauer.</div>
-    <p>Deshalb liegt <code>stl/trommel.stl</code> bei: 20,7 mm Wickelfläche,
-    17 mm breit, mit Bordscheiben gegen seitliches Ablaufen, Bohrung 3,5 mm.
+    <p>Deshalb liegt <code>stl/trommel.stl</code> bei: 14,5 mm Wickelfläche,
+    14,7 mm breit, mit Bordscheiben gegen seitliches Ablaufen, Bohrung 3,5 mm.
     Sie laeuft frei auf der Achse. <strong>Liegend drucken</strong> &mdash; dann
     ist die Bohrung rund und es braucht keine Stützen.</p>
 
@@ -1008,12 +1038,12 @@ BAU = f"""
     Rollfeder, englisch <em>constant force spring</em>. Dasselbe Bauteil steckt in
     den Warenschiebern im Supermarktregal.</p>
     <ul class="quellen">
-      <li><a href="https://www.sodemann-federn.de/cf030-0237"
-        rel="noopener">Sodemann Federn &mdash; CF030-0237</a>
+      <li><a href="https://www.sodemann-federn.de/produkte/konstantkraftfedern/konstantkraftfedern"
+        rel="noopener">Sodemann Federn &mdash; CF025-0198</a>
         <span class="klein">deutscher Shop, Preise sichtbar, Lagerware</span></li>
       <li><a href="https://www.febrotec.de/de-DE/konstantkraftfedern-rollfedern"
         rel="noopener">Febrotec, Halver</a>
-        <span class="klein">dieselbe Feder als 0CF030-0237, Sonderfertigung moeglich</span></li>
+        <span class="klein">dieselben Federn, Preise auf Anfrage &mdash; bei 15 Stueck lohnt das</span></li>
       <li><a href="https://www.stahl-shop24.de/Edelstahl/Edelstahl-rund/"
         rel="noopener">Stahl-Shop24 &mdash; Rundstab 3 mm</a>
         <span class="klein">fuer die Achse</span></li>
@@ -1023,9 +1053,10 @@ BAU = f"""
     halten, sie wickelt sich beim Loslassen schlagartig zurueck. Das Band nie
     knicken, kürzen oder ueber scharfe Kanten laufen lassen, und bei vollem
     Auszug müssen mindestens anderthalb Windungen auf der Trommel bleiben.</div>
-    <p>Reichen 10,5 N nicht, ist der Weg <em>nicht</em> ein breiteres Band,
-    sondern zwei schmalere Federn nebeneinander &mdash; ihre Kräfte addieren
-    sich.</p>
+    <p>Der Listenpreis von rund 16 &euro; gilt für Einzelabnahme und ist bei
+    allen Größen etwa gleich &mdash; er ist ein Mindestpreis, kein
+    Materialpreis. Wer 15 Kanäle baut, sollte beim Hersteller nach
+    Staffelpreisen fragen.</p>
   </div>
 </section>
 

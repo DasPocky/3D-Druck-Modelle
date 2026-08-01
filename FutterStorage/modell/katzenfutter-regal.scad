@@ -110,26 +110,46 @@ boden_offen = true;
 // das Bandende hängt vorne im Haken des Frontsegments.
 bandnut = true;
 // Nut im Boden, in der das Federband läuft
-bandnut_breite = 17;
+bandnut_breite = 15;   // Band + 2 mm Luft
 bandnut_tiefe = 1.6;
 
-// Gewählte Feder: Sodemann/Febrotec CF030-0237
-//   10,5 N | Auszug 610 mm | Band 14,99 mm | Rolle 22,0 mm außen
-// Band mit 16 mm bei 8-12 N gibt es nicht ab Lager: die Kraft wächst mit
-// Bandbreite mal Banddicke im Quadrat, bei 15,87 mm Band liegt die
-// Standardfeder schon bei 14,7 N. 15 mm Band ist das nächstliegende Maß.
-feder_rolle_d = 22.0;  // Außendurchmesser der aufgerollten Feder
-feder_band_b  = 15.0;  // Bandbreite
+// ---------------------------------------------------------------------
+//  Federauswahl - die Kraft ergibt sich aus dem Beutelgewicht
+// ---------------------------------------------------------------------
+// Die Feder schiebt gegen die Reibung des ganzen Stapels. Nach unten ist
+// sie also durch den vollen Kanal begrenzt, nach oben durch den Beutel
+// selbst: die volle Federkraft liegt IMMER auf dem vordersten, egal wie
+// viele dahinterstehen. Zu viel Kraft drückt ihn flach, er weicht seitlich
+// aus und klemmt - im 92er Kanal hat ein 88er Beutel nur 4 mm Spiel.
+//
+//   Gewicht im vollen Kanal   25 × 85 g = 2,125 kg = 20,9 N
+//   Reibbeiwert Folie auf PLA 0,3 bis 0,4 (gemessen wird das erst am Teil)
+//   -> nötig                  6,3 bis 8,3 N
+//   -> Obergrenze             rund 12 N, darüber verformt der Beutel merklich
+//
+// Gewählt: CF025-0198 mit 8,8 N. Sie deckt den ungünstigen Reibungsfall ab
+// und bleibt deutlich unter der Quetschgrenze. Die zuvor eingetragene
+// CF030-0237 hatte 10,5 N - unnötig viel, und ihr 15-mm-Band verlangte eine
+// breitere Nut und eine größere Trommel.
+//
+// Andere Feder? Nur diese drei Zeilen ändern, alles Weitere rechnet sich
+// daraus. Passend ist, was 8 bis 12 N liefert und mindestens 480 mm auszieht.
+feder_kraft   = 8.8;   // N, konstant über den Weg
+feder_band_b  = 12.7;  // Bandbreite
+feder_auszug  = 557;   // Lmax laut Datenblatt - darüber reißt die Feder
+feder_rolle_d = 15.5;  // Außendurchmesser der aufgerollten Feder
+
 feder_achse_d = 3.2;   // Bohrung für die Achse: 3-mm-Rundstab, Spielpassung
-feder_auszug  = 610;   // Lmax laut Datenblatt - darüber reißt die Feder
 
 // Die Feder wickelt NICHT auf der 3-mm-Achse: ihr natürlicher
 // Innendurchmesser liegt bei 11-17 mm. Der Hersteller verlangt eine
-// Trommel 10-20 % über diesem Maß, für die CF030-0237 sind das 20,7 mm.
-// Zu klein heißt höhere Biegespannung und kürzere Lebensdauer.
-// Die Trommel wird mitgedruckt (TEIL="trommel") und läuft frei auf der Achse.
-trommel_d = 20.7;      // Wickeldurchmesser
-trommel_b = 17.0;      // Breite - etwas mehr als das Band
+// Trommel 10-20 % über diesem Maß. Zu klein heißt höhere Biegespannung
+// und kürzere Lebensdauer. Die Trommel wird mitgedruckt (TEIL="trommel")
+// und läuft frei auf der Achse.
+trommel_d = 14.5;      // Wickeldurchmesser, 10-20 % über dem Innen-Ø
+trommel_b = 14.7;      // Wickelbreite = Band + 2 mm Luft.
+                       // Fester Wert, keine Formel: die Werkzeuge
+                       // lesen aus dieser Datei nur Zahlen aus.
 trommel_spiel = 0.25;  // Luft auf der Achse, damit sie frei dreht
 
 /* [Verbindungen] */
@@ -231,6 +251,13 @@ echo(str(">>> Kanal aus ", segment_anzahl, " Segmenten = ", kanal_laenge,
          " mm = ", kapazitaet, " Beutel"));
 echo(str(">>> Ausbau ", spalten, " x ", ebenen, " = ", spalten * ebenen,
          " Sorten, ", spalten * ebenen * kapazitaet, " Beutel"));
+// Prüft die Federwahl gegen das, was der volle Kanal verlangt. Der
+// Reibbeiwert 0,4 ist der ungünstige Fall; gemessen wird er erst am Teil.
+feder_noetig = 0.40 * kapazitaet * 0.085 * 9.81;
+echo(str(">>> Feder: ", feder_kraft, " N vorhanden, ", feder_noetig,
+         " N nötig (", kapazitaet, " Beutel, Reibbeiwert 0,4)"));
+echo(str(">>> Federweg: ", feder_auszug, " mm Auszug, ",
+         kanal_laenge - 10, " mm gebraucht"));
 
 // ---------------------------------------------------------------------
 //  Hilfsmodule
@@ -449,7 +476,8 @@ schild_ueberdeckung = 4;
 // Wo das Schild in der Tasche steht und was davon zu sehen ist. Das
 // Layout auf dem Schild richtet sich nach dem SICHTBAREN Ausschnitt,
 // nicht nach der Plattenkante - sonst sitzt das Symbol optisch zu hoch.
-function schild_z0()     = 4;                            // Unterkante Tafel
+schild_z0 = 4;         // Unterkante der Tafel in der Tasche.
+                       // Variable, nicht Funktion: rendern.py liest sie aus.
 function schild_sicht_u() = schild_ueberdeckung;         // ab hier sichtbar
 function schild_sicht_o() = schild_hoehe - schild_ueberdeckung;
 function schild_sicht_h() = schild_sicht_o() - schild_sicht_u();
@@ -470,7 +498,7 @@ module schildhalter() {
         translate([x0 + 1.6, -sp, 4]) cube([b - 3.2, sp, h]);
         // Sichtfenster: ringsum um die Überdeckung kleiner als die Tafel
         translate([x0 + (b - schild_breite) / 2 + u,
-                   -(sp + rb) - 1, schild_z0() + u])
+                   -(sp + rb) - 1, schild_z0 + u])
             fenster_xz(schild_breite - 2 * u, schild_hoehe - 2 * u,
                        2.5, rb + 2);
     }

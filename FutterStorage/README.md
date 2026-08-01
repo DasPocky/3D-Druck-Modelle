@@ -138,8 +138,8 @@ benachbarte Spalten durchdringen.
 
 ## Was gekauft werden muss
 
-Je Kanal eine **Konstantkraftfeder CF030-0237** (10,5 N, Auszug 610 mm,
-Band 15 mm) und einen **3-mm-Rundstab aus Edelstahl** als Achse. Sonst
+Je Kanal eine **Konstantkraftfeder CF025-0198** (8,8 N, Auszug 557 mm,
+Band 12,7 mm) und einen **3-mm-Rundstab aus Edelstahl** als Achse. Sonst
 nichts — keine Schrauben, keine Muttern, kein Kleber.
 
 Die Feder wickelt **nicht** direkt auf der Achse: dafür liegt
