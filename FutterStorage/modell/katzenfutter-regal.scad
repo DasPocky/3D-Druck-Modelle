@@ -18,7 +18,7 @@
 // =====================================================================
 
 /* [Was soll gerendert werden] */
-TEIL = "segment";  // [segment, verbinder, test]
+TEIL = "segment";  // [segment, schieber, verbinder, test]
 
 // front = vorderstes Segment mit Anschlagkante und Schildhalter
 // mitte = beidseitig offenes Zwischenstück, beliebig oft
@@ -70,6 +70,22 @@ boden = 2.4;
 
 /* [Material sparen] */
 fenster = true;
+boden_offen = true;
+
+/* [Konstantkraftfeder] */
+// Der Schieber legt bis zu 480 mm zurück. Ein Gummiband kann das nicht:
+// es müsste vorne schon gespannt sein und wäre hinten um über 1500 %
+// gedehnt. Deshalb eine Konstantkraftfeder - ein aufgerolltes Stahlband,
+// das über den ganzen Weg gleich stark zieht. Die Rolle sitzt im Schieber,
+// das Bandende hängt vorne im Haken des Frontsegments.
+bandnut = true;
+// Nut im Boden, in der das Federband läuft
+bandnut_breite = 18;
+bandnut_tiefe = 1.6;
+// Maße der Federrolle - nach dem Kauf hier eintragen
+feder_rolle_d = 26;    // Durchmesser der aufgerollten Feder
+feder_band_b  = 16;    // Bandbreite
+feder_achse_d = 3.2;   // Bohrung für die Achse (3 mm Stab oder Filament)
 
 /* [Verbindungen] */
 // Die Ebenen stehen aufeinander, die Spalten nebeneinander. Beides wird
@@ -114,7 +130,7 @@ innen_x  = beutel_breit + spiel;
 innen_z  = beutel_hoch + luft_oben;
 aussen_x = innen_x + 2 * wand;
 // Bodenverdickung dort, wo die Bandnut liegt
-boden_dick = boden;
+boden_dick = bandnut ? boden + bandnut_tiefe + 0.8 : boden;
 aussen_z = boden_dick + innen_z;
 
 ist_front = segment_typ == "front";
@@ -301,6 +317,12 @@ module segment() {
             translate([wand, -1, boden_dick - zunge_h - passung])
                 cube([innen_x, zunge_l + 1, zunge_h + passung]);
 
+        // --- Bandnut im Boden ---
+        if (bandnut)
+            translate([(aussen_x - bandnut_breite) / 2, -1,
+                       boden_dick - bandnut_tiefe])
+                cube([bandnut_breite, aussen_y + 2, bandnut_tiefe + 1]);
+
         // --- Fenster in den Seitenwänden ---
         if (fenster) {
             f_von = y0 + 14;
@@ -310,6 +332,17 @@ module segment() {
                 for (xp = [-1, aussen_x - wand - 1])
                     translate([xp, f_von, boden_dick + 14])
                         fenster_yz(f_b, innen_z - 26, 7, wand + 2);
+        }
+
+        // --- Langlöcher im Boden, beidseits der Bandnut ---
+        if (boden_offen) {
+            lb = (innen_x - bandnut_breite) / 2 - 9;
+            ll = (y1 - y0) - 26;
+            if (lb > 8 && ll > 20)
+                for (sx = [wand + 5,
+                           aussen_x - wand - 5 - lb])
+                    translate([sx, y0 + 13, -1])
+                        langloch(lb, ll, 5, boden_dick + 2);
         }
 
         // --- Taschen für die Zapfen der Ebene darunter ---
@@ -332,12 +365,77 @@ module segment() {
                 fenster_xz(innen_x - 24, innen_z - 34, 6, wand + 2);
     }
 
+    // --- Haken für das Gummiband, quer durch die Bodennut ---
+    if (ist_front && bandnut)
+        translate([(aussen_x - bandnut_breite) / 2 - 1.5,
+                   anschlag_dicke() + 7, boden_dick - bandnut_tiefe])
+            difference() {
+                cube([bandnut_breite + 3, 4, bandnut_tiefe + 3.5]);
+                translate([1.5, -1, -1])
+                    cube([bandnut_breite, 6, bandnut_tiefe + 1]);
+            }
+}
+
+// ---------------------------------------------------------------------
+//  Schieber
+//
+//  Drückt die Beutel nach vorne. Unten ein Haken für ein Gummiband, das
+//  in der Bodennut nach vorne läuft; die Grifflasche erlaubt zusätzlich
+//  das Nachschieben von Hand.
+// ---------------------------------------------------------------------
+module schieber() {
+    b   = innen_x - 1.2;
+    h   = beutel_hoch - 8;
+    d   = 2.6;
+    fu  = 36;                         // Fußlänge, nimmt die Federrolle auf
+    kb  = feder_band_b + 1.6;         // lichte Breite der Federkammer
+    kx  = (b - kb) / 2;               // Kammer mittig
+    ax  = feder_rolle_d / 2 + 4;      // Achshöhe über dem Boden
+    ay  = 4 + feder_rolle_d / 2;      // Achsposition in der Tiefe
+
+    difference() {
+        union() {
+            // Stützfläche für die Beutel
+            cube([b, d, h]);
+            // Fuß nach hinten gegen das Kippen
+            cube([b, fu, 3.0]);
+            // Gleitkufen, damit nur wenig Fläche schleift
+            for (xp = [2.5, b - 8.5])
+                translate([xp, 0, 0]) cube([6, fu, 3.6]);
+            // Wangen der Federkammer, tragen die Achse
+            for (xp = [kx - 3.2, kx + kb])
+                translate([xp, d, 0])
+                    cube([3.2, fu - d, ax + feder_rolle_d / 2 + 4]);
+            // Aussteifungen außerhalb der Kammer. Sie greifen 0,6 mm in die
+            // Stützfläche hinein - eine bloße Berührung ergäbe zwei Flächen
+            // auf derselben Ebene und damit ein undichtes Netz.
+            for (xp = [4, b - 12])
+                translate([xp, 0, 0])
+                    rotate([0, -90, 0])
+                        linear_extrude(height = 8)
+                            polygon([[0, d - 0.6], [0, fu - 3], [30, d - 0.6]]);
+            // Grifflasche oben, nach hinten geneigt. Sie taucht 3 mm in die
+            // Stützfläche ein, damit beide Körper sicher verschmelzen.
+            translate([b / 2 - 16, d, h - 3])
+                rotate([24, 0, 0]) cube([32, d, 25]);
+        }
+        // Achsbohrung durch beide Wangen
+        translate([-1, ay, ax]) rotate([0, 90, 0])
+            cylinder(d = feder_achse_d, h = b + 2);
+        // Austrittsschlitz: das Federband läuft unten nach vorne in die Nut
+        translate([(b - feder_band_b - 0.8) / 2, -1, 3.2])
+            cube([feder_band_b + 0.8, d + 2, 3.0]);
+        // Gewicht sparen, oberhalb der Kammer
+        translate([10, -1, ax + feder_rolle_d / 2 + 10])
+            cube([b - 20, d + 2, h - ax - feder_rolle_d / 2 - 24]);
+    }
 }
 
 // ---------------------------------------------------------------------
 //  Ausgabe
 // ---------------------------------------------------------------------
 if (TEIL == "segment")       segment();
+else if (TEIL == "schieber") schieber();
 else if (TEIL == "verbinder") verbinder();
 else if (TEIL == "test")
     // Ebene darüber darf sich nicht mit dieser durchdringen
