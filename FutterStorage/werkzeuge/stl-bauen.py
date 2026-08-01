@@ -36,6 +36,12 @@ TEILE = [
     ("probe.stl",         {"TEIL": "probe"}),
 ]
 
+# Diese Prüfungen müssen leer bleiben: Ebenen und Spalten dürfen sich
+# nicht durchdringen.
+KOLLISION = [("test", "Ebene darüber"),
+             ("test_seite", "Spalte daneben"),
+             ("test_diagonal", "Nachbar schräg darüber")]
+
 
 def scad(ziel, werte):
     os.makedirs(os.path.dirname(ziel), exist_ok=True)
@@ -64,6 +70,18 @@ def main():
         for f in fehler:
             print("     ", f)
         schlecht += len(fehler)
+
+    for teil, was in KOLLISION:
+        ziel = os.path.join("/tmp", f"kollision-{teil}.stl")
+        scad(ziel, {"TEIL": teil})
+        # Eine leere oder volumenlose Datei bedeutet: keine Durchdringung.
+        gr = os.path.getsize(ziel) if os.path.exists(ziel) else 0
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from pruefen import lade, volumen
+        v = volumen(lade(ziel)) if gr > 200 else 0.0
+        print(f"  Kollision {was:<24}{v:8.3f} mm3" + ("  PROBLEM" if v > 0.01 else ""))
+        if v > 0.01:
+            schlecht += 1
 
     print()
     print("alle Bauteile erzeugt" if not schlecht
