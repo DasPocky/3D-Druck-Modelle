@@ -151,32 +151,35 @@ module sym_fisch_auge() {
 // ---------------------------------------------------------------------
 module sym_kaninchen() {
     // mittig gerückt, Wert von werkzeuge/symbole-pruefen.py
-    translate([0.35, -0.88])
+    translate([0.90, -1.10])
     union() {
         // Sitzender Rumpf, hinten hoch
         hull() {
-            translate([-1.6, -2.2]) scale([1.15, 1.0]) circle(r = 5.0);
-            translate([-3.0, 1.6]) circle(r = 4.0);
+            translate([-2.2, -3.4]) scale([1.15, 1.0]) circle(r = 4.6);
+            translate([-3.4, 0.2]) circle(r = 3.7);
         }
-        // Brust und Kopf
-        _strich([2.4, -1.0], [3.6, 3.6], 2.9, 2.6);
-        translate([4.0, 4.8]) scale([1.05, 0.95]) circle(r = 2.8);
+        // Brust zum Kopf
+        _strich([1.8, -2.4], [2.8, 1.4], 2.7, 2.3);
+        // Kopf - kleiner als vorher, damit die Ohren daneben Platz haben
+        translate([3.4, 2.6]) scale([1.05, 0.92]) circle(r = 2.3);
         // Schnauze
-        translate([6.2, 3.8]) circle(r = 1.5);
-        // Zwei Ohren, leicht gespreizt - das Erkennungsmerkmal
-        translate([3.0, 6.4]) rotate(-8)
-            scale([0.5, 1.0]) circle(r = 3.6);
-        translate([5.4, 6.6]) rotate(14)
-            scale([0.5, 1.0]) circle(r = 3.4);
+        translate([5.4, 1.8]) circle(r = 1.3);
+        // Zwei Ohren. Sie sind DAS Erkennungsmerkmal und müssen frei über
+        // dem Kopf stehen - vorher waren sie so breit und tief angesetzt,
+        // dass sie mit ihm zu einem Klumpen verschmolzen.
+        translate([2.4, 7.0]) rotate(-10)
+            scale([0.34, 1.0]) circle(r = 4.3);
+        translate([4.8, 6.8]) rotate(12)
+            scale([0.34, 1.0]) circle(r = 4.1);
         // Vorderlauf
-        _bein(3.4, -3.4, -7.4, 1.8, 3.2);
+        _bein(3.0, -4.6, -8.2, 1.7, 3.0);
         // Hinterlauf, angewinkelt
         hull() {
-            translate([-2.6, -5.4]) scale([1.5, 0.8]) circle(r = 3.0);
-            translate([1.0, -6.4]) circle(r = 1.8);
+            translate([-3.0, -6.4]) scale([1.5, 0.8]) circle(r = 2.8);
+            translate([0.6, -7.4]) circle(r = 1.7);
         }
         // Blume
-        translate([-6.4, 0.4]) circle(r = 2.0);
+        translate([-6.6, -0.8]) circle(r = 1.9);
     }
 }
 
