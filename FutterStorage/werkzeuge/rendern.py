@@ -239,3 +239,136 @@ elif SZENE in ("front", "mitte", "end"):
         (0, 0, 0), SCHWARZ)
     if SZENE == "front": schild_an()
 
+# --------------------------------------------------------------- Licht
+def area(loc, rot, size, energy, color=(1, 1, 1)):
+    bpy.ops.object.light_add(type='AREA', location=loc)
+    L = bpy.context.object.data
+    L.size = size; L.energy = energy; L.color = color
+    bpy.context.object.rotation_euler = rot
+
+# Bezugsgröße der Szene bestimmen
+objs = [o for o in bpy.context.scene.objects if o.type == 'MESH' and not o.hide_render]
+xs = [v[0] for o in objs for v in o.bound_box_world] if False else None
+import mathutils
+mn = mathutils.Vector((1e9, 1e9, 1e9)); mx = mathutils.Vector((-1e9, -1e9, -1e9))
+for o in objs:
+    for c in o.bound_box:
+        w = o.matrix_world @ mathutils.Vector(c)
+        mn = mathutils.Vector((min(mn[i], w[i]) for i in range(3)))
+        mx = mathutils.Vector((max(mx[i], w[i]) for i in range(3)))
+ctr = (mn + mx) / 2
+diag = (mx - mn).length
+
+area((ctr.x - 0.35 * diag, mn.y - 0.9 * diag, mx.z + 0.9 * diag),
+     (math.radians(30), 0, 0), diag * 1.3, diag * diag * 26)
+area((mx.x + 0.9 * diag, ctr.y, mx.z + 0.4 * diag),
+     (math.radians(70), 0, math.radians(-60)), diag * 0.8, diag * diag * 9,
+     (1.0, 0.95, 0.88))
+area((mn.x - 0.9 * diag, ctr.y + 0.3 * diag, mx.z + 0.3 * diag),
+     (math.radians(75), 0, math.radians(62)), diag * 0.8, diag * diag * 6,
+     (0.86, 0.91, 1.0))
+
+w = bpy.context.scene.world
+if w is None:
+    w = bpy.data.worlds.new("W"); bpy.context.scene.world = w
+w.use_nodes = True
+bg = w.node_tree.nodes["Background"]
+bg.inputs[0].default_value = (0.86, 0.88, 0.92, 1)
+bg.inputs[1].default_value = 1.5
+
+# --------------------------------------------------------------- Kamera
+bpy.ops.object.camera_add()
+cam = bpy.context.object
+cam.data.lens = 62
+cam.data.sensor_fit = 'HORIZONTAL'
+
+az = {"gesamt": 27, "ebene": 25, "kanal": 30, "gefuellt": 90,
+      "explosion": 22, "schild": 40, "schieber": 38}.get(SZENE, 34)
+el = {"gefuellt": 0, "gesamt": 28, "ebene": 27, "schild": 34}.get(SZENE, 25)
+
+a, e = math.radians(az), math.radians(el)
+richtung = mathutils.Vector((math.sin(a) * math.cos(e),
+                             -math.cos(a) * math.cos(e),
+                             math.sin(e)))
+cam.location = ctr + richtung * diag
+cam.rotation_euler = (ctr - mathutils.Vector(cam.location)).to_track_quat('-Z', 'Y').to_euler()
+bpy.context.view_layer.update()
+
+sichtbar = [o for o in bpy.context.scene.objects
+            if o.type == 'MESH' and not o.hide_render]
+
+def punkte_in_kamera(cam, objekte):
+    """Alle Vertices im Kamerakoordinatensystem, bezogen auf das Zentrum."""
+    R = cam.matrix_world.to_3x3().transposed()
+    out = []
+    for o in objekte:
+        m = o.matrix_world
+        me = o.data
+        quelle = me.vertices if len(me.vertices) else None
+        if quelle is not None:
+            out.extend(R @ ((m @ v.co) - ctr) for v in quelle)
+        else:
+            out.extend(R @ ((m @ mathutils.Vector(c)) - ctr) for c in o.bound_box)
+    return out
+
+# Silhouette messen und daraus das Bildformat ableiten, damit kein
+# Leerraum entsteht. Erst grob bei fester Distanz projizieren.
+P = punkte_in_kamera(cam, sichtbar)
+d0 = diag * 2.2
+sx = max(abs(v.x) / (d0 - v.z) for v in P)
+sy = max(abs(v.y) / (d0 - v.z) for v in P)
+seite = max(0.55, min(3.4, sx / sy))          # Breite zu Hoehe
+
+BASIS = 2_600_000                              # Zielflaeche in Pixeln
+ry = int(round((BASIS / seite) ** 0.5 / 2) * 2)
+rx = int(round(ry * seite / 2) * 2)
+sc0 = bpy.context.scene
+sc0.render.resolution_x, sc0.render.resolution_y = rx, ry
+
+# Abstand und Bildmitte gemeinsam bestimmen. Die Silhouette liegt selten
+# symmetrisch um das Objektzentrum - ohne Versatz klebt sie an einer Seite
+# und laesst auf der anderen Luft.
+tan_h = math.tan(cam.data.angle / 2)
+tan_v = tan_h / (rx / ry)
+
+d = max(max(abs(v.x) / tan_h + v.z, abs(v.y) / tan_v + v.z) for v in P) * 1.02
+for _ in range(6):
+    xs = [v.x / (d - v.z) for v in P]
+    ys = [v.y / (d - v.z) for v in P]
+    mx_, my_ = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+    hx, hy = (max(xs) - min(xs)) / 2, (max(ys) - min(ys)) / 2
+    # Abstand so, dass die halbe Ausdehnung genau ins Bild passt
+    d = d * max(hx / tan_h, hy / tan_v) * 1.02
+    if d <= 0:
+        break
+# endgueltige Lage der Silhouette bestimmen
+xs = [v.x / (d - v.z) for v in P]
+ys = [v.y / (d - v.z) for v in P]
+mx_, my_ = (min(xs) + max(xs)) / 2, (min(ys) + max(ys)) / 2
+cam.data.shift_x = mx_ / (2 * tan_h)
+cam.data.shift_y = my_ / (2 * tan_h)
+
+cam.location = ctr + richtung * d
+cam.data.clip_start = max(1.0, d / 200)
+cam.data.clip_end = d * 6
+bpy.context.scene.camera = cam
+print(f"FORMAT {rx}x{ry}  seite={seite:.2f}  abstand={d:.0f}")
+
+# --------------------------------------------------------------- Render
+sc = bpy.context.scene
+sc.render.engine = 'CYCLES'
+try:
+    prefs = bpy.context.preferences.addons['cycles'].preferences
+    prefs.compute_device_type = 'METAL'; prefs.get_devices()
+    for dv in prefs.devices: dv.use = True
+    sc.cycles.device = 'GPU'
+except Exception as ex:
+    print("CPU:", ex)
+sc.cycles.samples = 320
+sc.cycles.use_denoising = True
+sc.render.film_transparent = False
+sc.view_settings.look = 'None'
+sc.view_settings.exposure = 0.3
+sc.render.filepath = OUT
+bpy.ops.render.render(write_still=True)
+print("FERTIG", OUT)
