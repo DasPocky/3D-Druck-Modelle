@@ -82,3 +82,120 @@ s_txt   = imp("schild-text.stl")
 
 # Fuer die Uebersichtsbilder: jede Spalte bekommt eine andere Sorte, damit
 # man sieht, wofuer das Regal gedacht ist.
+def _sorten():
+    ordner = os.path.join(STL, "schilder")
+    if not os.path.isdir(ordner):
+        return []
+    platten = sorted(f for f in os.listdir(ordner)
+                     if f.endswith(".stl") and not f.endswith("-text.stl"))
+    paare, nach_name = [], {}
+    for pl in platten:
+        txt = pl[:-4] + "-text.stl"
+        if os.path.exists(os.path.join(ordner, txt)):
+            paar = (imp(os.path.join("schilder", pl)),
+                    imp(os.path.join("schilder", txt)))
+            paare.append(paar)
+            nach_name[pl[:-4]] = paar
+    return paare, nach_name
+
+SORTEN, SORTE_NACH_NAME = _sorten()
+
+def kanal(x=0, z=0, luecke=0, segmente=3):
+    put(s_front, (x, 0, z), SCHWARZ)
+    for i in range(1, segmente - 1):
+        put(s_mitte, (x, LF + i * (LM + luecke) - LM + luecke, z), SCHWARZ)
+    put(s_end, (x, LF + (segmente - 2) * LM + (segmente - 1) * luecke, z), SCHWARZ)
+
+def schild_an(x=0, z=0, nr=None):
+    # Grundplatte orange, Schrift schwarz - Schild steht senkrecht in der Tasche
+    pl, tx = SORTEN[nr % len(SORTEN)] if (nr is not None and SORTEN) else (s_schd, s_txt)
+    put(pl, (x + (AX - SCHILD_B) / 2, -0.5, z + 6),
+        ORANGE, rot=(math.radians(90), 0, 0), bevel=0.1)
+    put(tx, (x + (AX - SCHILD_B) / 2, -0.5 - 0.62, z + 6),
+        SCHWARZ, rot=(math.radians(90), 0, 0), bevel=0)
+
+def beutel_mesh(name="Beutel"):
+    """Baut die Beutelform als eigenes Netz.
+
+    Aus einem Wuerfel laesst sich das nicht formen: Die Kantenrundung
+    begrenzt sich je nach Geometrie selbst, dadurch geraten einzelne Beutel
+    anders als die uebrigen. Hier wird die Oberflaeche direkt gerechnet.
+
+    Die Dicke folgt zwei Kurven:
+      quer  - am Siegelrand null, zur Mitte hin voll
+      hoch  - unten die volle Dicke, nach oben duenn auslaufend,
+              wie auf den Fotos: oben sitzt die Naht, der Inhalt sackt.
+    """
+    NX, NZ = 26, 34
+    halb = (BD - 1.4) / 2
+
+    def quer(u):                       # u: 0 links .. 1 rechts
+        return math.sin(math.pi * u) ** 0.42
+
+    def hoch(v):                       # v: 0 unten .. 1 oben
+        if v < 0.12:                   # unterer Siegelrand, dann bauchig
+            return 0.34 + 0.66 * (v / 0.12) ** 0.6
+        # Der Beutel bleibt bis weit oben prall und knickt erst kurz vor der
+        # Siegelnaht ab. Eine Potenzkurve liefe kegelfoermig zu, deshalb eine
+        # S-Kurve mit Wendepunkt bei 75 % der Resthoehe.
+        w = (v - 0.12) / 0.88
+        g = lambda t: 1.0 / (1.0 + math.exp(8.0 * (t - 0.75)))
+        f = (g(w) - g(1.0)) / (g(0.0) - g(1.0))
+        return 0.032 + 0.968 * f
+
+    verts, faces = [], []
+    for seite in (1, -1):
+        basis = len(verts)
+        for iz in range(NZ):
+            v = iz / (NZ - 1)
+            for ix in range(NX):
+                u = ix / (NX - 1)
+                verts.append((( u - 0.5) * BB,
+                              seite * halb * quer(u) * hoch(v),
+                              (v - 0.5) * BH))
+        for iz in range(NZ - 1):
+            for ix in range(NX - 1):
+                a0 = basis + iz * NX + ix
+                quad = (a0, a0 + 1, a0 + NX + 1, a0 + NX)
+                faces.append(quad if seite > 0 else quad[::-1])
+
+    me = bpy.data.meshes.new(name)
+    me.from_pydata(verts, [], faces)
+    me.validate()
+    for poly in me.polygons:
+        poly.use_smooth = True
+    return me
+
+
+_BEUTEL_MESH = None
+
+
+def beutel(n, x=0, z=0):
+    """Setzt n Beutel hintereinander in den Kanal.
+
+    Sie stehen nicht exakt senkrecht: Weil der Schieber von hinten drueckt
+    und jeder Beutel sich am naechsten abstuetzt, lehnen sie leicht nach
+    vorne - mit ein paar Grad Streuung, wie ein Stapel es real tut.
+    """
+    global _BEUTEL_MESH
+    if _BEUTEL_MESH is None:
+        _BEUTEL_MESH = beutel_mesh()
+    abstand = BD - 1.0                      # minimaler Spalt, sie beruehren sich
+    for k in range(n):
+        o = bpy.data.objects.new(f"beutel_{x:.0f}_{z:.0f}_{k}", _BEUTEL_MESH)
+        # leichte Neigung nach vorne, deterministisch gestreut
+        kipp = 2.6 + ((k * 37) % 11) * 0.28
+        o.rotation_euler = (math.radians(-kipp), 0, 0)
+        # der Kippwinkel hebt die Oberkante nach vorne, unten bleibt der Fuss
+        o.location = (x + WAND + SPIEL / 2 + BB / 2,
+                      4 + k * abstand + (BD - 1.4) / 2
+                      + math.sin(math.radians(kipp)) * BH / 2,
+                      z + BODEN + BH / 2 * math.cos(math.radians(kipp)))
+        o.data.materials.clear()
+        o.data.materials.append(FOLIE)
+        bpy.context.collection.objects.link(o)
+
+
+def schieber_bei(n, x=0, z=0):
+    put(s_schb, (x + 1.8, 4 + n * BD + 1, z + BODEN), ORANGE)
+
