@@ -150,9 +150,15 @@ def verbindungen():
 # Was in den Kanal hineinmuss, und wieviel Luft es dort mindestens braucht.
 # Der Schieber gleitet, die Trommel liegt in seiner Kammer - beides darf
 # nicht klemmen.
+#
+# Die dritte Angabe ist die Achse, entlang derer gemessen wird. Sie ist
+# nicht bei allen Teilen dieselbe: Der Schieber steht im Kanal wie gedruckt,
+# seine Breite liegt in X. Die Trommel wird dagegen LIEGEND gedruckt, damit
+# die Bohrung rund wird - ihre Wickelbreite liegt deshalb in Z, waehrend X
+# und Y der Bordscheiben-Durchmesser sind.
 EINBAUTEILE = {
-    "schieber.stl": ("Kanal", 0.8),
-    "trommel.stl": ("Federkammer", 0.4),
+    "schieber.stl": ("Kanal", 0.8, 0),
+    "trommel.stl": ("Federkammer", 0.4, 2),
 }
 
 
@@ -169,11 +175,11 @@ def einbau():
     aufnahme = {"Kanal": innen_x, "Federkammer": kammer}
 
     fehler, zeilen = [], []
-    for datei, (wohin, luft) in EINBAUTEILE.items():
+    for datei, (wohin, luft, achse) in EINBAUTEILE.items():
         pfad = os.path.join(STL, datei)
         if not os.path.exists(pfad):
             continue
-        breit = kasten(lade(pfad))[0]
+        breit = kasten(lade(pfad))[achse]
         passt_in = aufnahme[wohin]
         rest = passt_in - breit
         zeilen.append((datei, wohin, breit, passt_in, rest))
