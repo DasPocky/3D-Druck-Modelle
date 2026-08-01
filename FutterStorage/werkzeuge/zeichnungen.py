@@ -682,9 +682,187 @@ def blatt5():
     return b.save("05-beutel-passung.svg")
 
 
+# =====================================================================
+def blatt6():
+    """Die beiden Steckverbindungen im Schnitt. Ohne sie stünde der Verbund
+    nur lose aufeinander."""
+    K = 7.0                       # starke Vergrösserung, es sind Detailmasse
+    b = Blatt()
+    W, BO = M["wand"] * K, M["boden"] * K
+    ZH, ZL = M["zapfen_h"] * K, M["zapfen_l"] * K
+    NT, NH, NL = M["nase_t"] * K, M["nase_h"] * K, M["nase_l"] * K
+
+    # ---------- Stapelzapfen, Schnitt quer zur Wand ----------
+    ox, oy = 150, 150
+    b.ansicht(ox, oy - 78, "STAPELZAPFEN — Schnitt quer zur Seitenwand")
+
+    # obere Ebene: Boden mit Tasche
+    P = M["passung"] * K
+    bb = 150                                    # gezeigte Bodenbreite je Seite
+    b.rect(ox - bb, oy, 2 * bb + W, BO, "#d8d3cb", LINIE, 1.2)
+    b.rect(ox - P, oy + BO - ZH * 1.5, W + 2 * P, ZH * 1.5, PAPIER, HILF, 1.0, "4 3")
+
+    # untere Ebene: Wandstück, oben als Zapfen verlängert
+    oyw = oy + BO + 2
+    wh = 92
+    b.rect(ox, oyw + ZH, W, wh, FLAECHE)
+    b.poly([(ox, oyw + ZH), (ox, oyw + 5), (ox + 5, oyw),
+            (ox + W - 5, oyw), (ox + W, oyw + 5), (ox + W, oyw + ZH)],
+           FLAECHE, LINIE, 1.2)
+    b.line(ox - bb, oyw, ox + bb + W, oyw, HILF, 0.7, "3 3")
+
+    b.pos(1, ox + W, oyw + ZH / 2, ox + 128, oyw + 46)
+    b.pos(2, ox + W + P, oy + BO - ZH, ox + 128, oy + 8)
+    b.pos(3, ox + 96, oy + BO, ox + 208, oy + BO + 52)
+
+    b.mv(oyw, oyw + ZH, ox - 34, f'{M["zapfen_h"]:.1f}'.replace(".", ","),
+         "Zapfen", von=ox)
+    b.mh(ox, ox + W, oyw + ZH + wh + 36, f'{M["wand"]:.1f}'.replace(".", ","),
+         "Wandstärke", von=oyw + ZH + wh)
+    b.mv(oy, oy + BO, ox - 90, f'{M["boden"]:.1f}'.replace(".", ","),
+         "Boden", von=ox - bb)
+
+    # ---------- Seitliche Nase, Schnitt durch den Boden ----------
+    ox3 = ox + 430
+    b.ansicht(ox3, oy - 78, "SEITENNASE — Schnitt durch den Boden")
+
+    oyn = oy + 24
+    b.rect(ox3, oyn, 132, BO, FLAECHE)                      # linke Spalte
+    b.poly([(ox3 + 132, oyn + BO), (ox3 + 132 + NT, oyn + BO),
+            (ox3 + 132 + NT, oyn + BO - NH + 9),
+            (ox3 + 132, oyn + BO - NH)], FLAECHE, LINIE, 1.2)
+    b.line(ox3 + 132, oyn, ox3 + 132, oyn + BO, HILF, 0.9, "4 3")
+    b.rect(ox3 + 132 + NT + 2, oyn, 132, BO, "#ded9d1")     # rechte Spalte
+    b.rect(ox3 + 132 + NT + 2, oyn + BO - NH - P, NT + P, NH + P,
+           PAPIER, HILF, 1.0, "4 3")
+
+    b.pos(4, ox3 + 132 + NT / 2, oyn + BO - NH + 5, ox3 + 74, oyn - 36)
+    b.pos(5, ox3 + 132 + NT + 2 + NT / 2, oyn + BO - NH - P + 9,
+          ox3 + 246, oyn - 36)
+
+    b.mh(ox3 + 132, ox3 + 132 + NT, oyn + BO + 38,
+         f'{M["nase_t"]:.1f}'.replace(".", ","), "Überstand", von=oyn + BO)
+    b.mv(oyn + BO - NH, oyn + BO, ox3 - 34, f'{M["nase_h"]:.1f}'.replace(".", ","),
+         "Nasenhöhe", von=ox3)
+
+    ly = oyw + ZH + wh + 92
+    for i, t in enumerate([
+            "Beide Verbindungen sind Materialfortsetzungen und drucken ohne Stützen.",
+            f'Ringsum {M["passung"]:.1f} mm Spiel'.replace(".", ",") + ' — bei strammem Sitz die Passung im '
+            "Modell erhöhen.",
+            "Die Nase der äußersten Spalte greift ins Leere und darf abgeschnitten werden."]):
+        b.txt(ox - 90, ly + i * 21, t, 10.5, "start", LINIE if i == 0 else GRAU)
+
+    b.legende(ox3 - 34, ly - 8, [
+        (1, "Zapfen, Fortsetzung der Seitenwand", f'{M["zapfen_l"]:.0f} lang'),
+        (2, "Tasche im Boden der Ebene darüber", "ringsum + Spiel"),
+        (3, "Die Ebenen liegen auf den Wänden auf", "nicht auf den Zapfen"),
+        (4, "Nase am Bodenrand", f'{M["nase_l"]:.0f} lang'),
+        (5, "Tasche in der Nachbarspalte", "unter dem Innenraum"),
+    ], spalten=1)
+
+    b.titel("Verbindungen", "Wie die Ebenen und die Spalten zusammengehalten werden",
+            "TEIL 07")
+    return b.save("06-verbindungen.svg")
+
+
+# =====================================================================
+def blatt7():
+    """Wie man an den Beutel kommt - und warum das auch dann geht, wenn eine
+    weitere Ebene darueber steht."""
+    K = 1.9
+    b = Blatt()
+    AZ, BO, W = M["aussen_z"] * K, M["boden"] * K, M["wand"] * K
+    AN = M["anschlag"] * K
+    BH, BD = M["beutel_h"] * K, M["beutel_d"] * K
+    MB, MT = M["mulde_b"] * K, (M["anschlag"] - M["mulde_bis"]) * K
+
+    ox, oy = 150, 150
+    b.ansicht(ox, oy - 78, "ZUGRIFF — Schnitt durch zwei Ebenen")
+
+    tiefe = 250
+    # --- untere Ebene ---
+    u = oy + AZ                                   # Oberkante der unteren Ebene
+    b.rect(ox, u, tiefe, BO, "#d8d3cb", LINIE, 1.2)          # Boden
+    fw_oben = u - BO - AN                                     # Oberkante Frontwand
+    b.rect(ox, fw_oben, 3 * K, AN + BO, "#3d3d43")            # Frontwand im Schnitt
+    # Beutel, leicht nach vorne geneigt
+    for i in range(6):
+        bx = ox + 4 * K + i * (BD - 1)
+        b.rect(bx, u - BO - BH, BD - 2, BH, "#cdd0d6", "#9aa0a8", 0.8)
+    # --- obere Ebene ---
+    o2 = oy - 6
+    b.rect(ox, o2, tiefe, BO, "#d8d3cb", LINIE, 1.2)
+    b.rect(ox, o2 - 26, 3 * K, 26, "#3d3d43")
+    b.txt(ox + tiefe / 2, o2 - 40, "Ebene dar&#252;ber", 10, "middle", GRAU)
+
+    # --- der Greifraum ---
+    gr_oben, gr_unten = o2 + BO, fw_oben
+    b.rect(ox - 4, gr_oben, 92, gr_unten - gr_oben, "#f6ddc8", MASSL, 1.3, "6 4")
+    b.txt(ox + 44, gr_oben + (gr_unten - gr_oben) / 2 + 4, "Greifraum",
+          10, "middle", MASSL, "700")
+
+    b.pos(1, ox + 3 * K, fw_oben + 6, ox + 300, fw_oben - 34)
+    b.pos(2, ox + 12, gr_oben + 16, ox + 300, gr_oben - 4)
+    b.pos(3, ox + 4 * K + 6, u - BO - BH + 52, ox + 300, u - BO - BH + 62)
+
+    b.mv(gr_oben, gr_unten, ox - 40,
+         f'{M["aussen_z"] - M["boden"] - M["anschlag"]:.0f}',
+         "freie H&#246;he", von=ox)
+    b.mv(u - BO - BH, fw_oben, ox - 96,
+         f'{M["beutel_h"] - M["anschlag"]:.0f}', "Beutel steht &#252;ber", von=ox)
+
+    # --- Frontwand von vorne, mit der Mulde ---
+    ox2 = ox + 470
+    b.ansicht(ox2, oy - 78, "FRONTWAND VON VORNE — die Mulde")
+    AXv = M["aussen_x"] * K
+    b.rect(ox2, oy + 40, AXv, AN + BO, FLAECHE, LINIE, 1.2)
+    mx = ox2 + AXv / 2 - MB / 2
+    fa = 11 * K
+    my = oy + 40 + MT
+    b.poly([(mx, oy + 40), (mx, my - fa), (mx + fa, my), (mx + MB - fa, my),
+            (mx + MB, my - fa), (mx + MB, oy + 40)], PAPIER, MASSL, 1.6)
+    # Schild darunter
+    sb, sh = M["schild_b"] * K, M["schild_h"] * K
+    sx = ox2 + AXv / 2 - sb / 2
+    b.rect(sx, oy + 40 + AN + BO - sh - 6 * K, sb, sh, "#f0d9c8", MASSL, 1.2)
+    b.txt(sx + sb / 2, oy + 40 + AN + BO - sh / 2 - 6 * K + 4, "Schild",
+          10, "middle", "#8a5a2a")
+
+    b.pos(4, mx + MB / 2, my - fa / 2, ox2 - 62, my + 18)
+    b.mh(mx, mx + MB, oy + 26, f'{M["mulde_b"]:.0f}', "Muldenbreite",
+         von=oy + 40, oben=True)
+    b.mv(oy + 40, my, ox2 + AXv + 40, f'{M["anschlag"] - M["mulde_bis"]:.0f}',
+         "Muldentiefe", von=ox2 + AXv)
+
+    ly = u + BO + 76
+    for i, t in enumerate([
+            "Die Mulde ist ein Einschnitt von OBEN in die Frontwand — "
+            "dort greift die Hand von vorne hinein.",
+            "Der Beutel wird nicht angehoben, sondern nach vorne "
+            "herausgezogen und dabei &#252;ber die Frontwand gekippt.",
+            "Deshalb bleibt der Zugriff auch dann frei, wenn eine "
+            "weitere Ebene direkt dar&#252;ber steht."]):
+        b.txt(ox - 96, ly + i * 21, t, 10.5, "start", LINIE if i == 0 else GRAU)
+
+    b.legende(ox2 - 40, ly + 58, [
+        (1, "Frontwand, h&#228;lt den Stapel", f'{M["anschlag"]:.0f} hoch'),
+        (2, "Greifraum bis zur Ebene dar&#252;ber",
+            f'{M["aussen_z"] - M["boden"] - M["anschlag"]:.0f} hoch'),
+        (3, "Beutel, steht &#252;ber die Wand",
+            f'{M["beutel_h"] - M["anschlag"]:.0f} frei'),
+        (4, "Griffmulde, von oben eingeschnitten",
+            f'{M["mulde_b"]:.0f} x {M["anschlag"] - M["mulde_bis"]:.0f}'),
+    ], spalten=1)
+
+    b.titel("Zugriff", "Wo die Hand hinkommt und warum die Ebenen sich nicht "
+            "gegenseitig blockieren", "TEIL 08")
+    return b.save("07-zugriff.svg")
+
 
 warnungen = []
-for f, k in (blatt1(), blatt2(), blatt3(), blatt4(), blatt5()):
+for f, k in (blatt1(), blatt2(), blatt3(), blatt4(), blatt5(), blatt6(),
+             blatt7()):
     print("  " + f)
     warnungen += k
 if warnungen:
