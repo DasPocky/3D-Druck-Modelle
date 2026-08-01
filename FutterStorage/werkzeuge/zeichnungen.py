@@ -556,9 +556,135 @@ def blatt3():
     return b.save("03-schieber-schild.svg")
 
 
+# =====================================================================
+def blatt4():
+    K = 1.0
+    b = Blatt(1560, 960)
+    SB, ST, SH = 540, 500, 520
+    ax, az, ay = M["aussen_x"], M["aussen_z"], 485
+
+    ox, oy = 128, 108
+    b.ansicht(ox, oy - 78, "SCHRANK VON VORNE")
+    b.rect(ox, oy, SB * K, SH * K, "none", HILF, 1.6, "8 5")
+    for e in range(3):
+        for i in range(5):
+            x, y = ox + i * ax * K, oy + SH * K - (e + 1) * az * K
+            b.rect(x, y, ax * K, az * K, FLAECHE)
+            b.rect(x, y + (M["innen_z"] - M["anschlag"]) * K,
+                   ax * K, (M["anschlag"] + M["boden"]) * K, "#ddd8d0")
+            sb = M["schild_b"] * K
+            b.rect(x + ax * K / 2 - sb / 2, y + az * K - 26 * K, sb, 18 * K,
+                   "#bd4d0a", MASSL, 0.8)
+    b.mh(ox, ox + 5 * ax * K, oy + SH * K + 40, "476", "5 Spalten belegt",
+         von=oy + SH * K)
+    b.mh(ox, ox + SB * K, oy + SH * K + 74, "540", "Schrankbreite nutzbar",
+         von=oy + SH * K)
+    b.mv(oy + SH * K - 3 * az * K, oy + SH * K, ox - 36, "434", "3 Ebenen belegt", von=ox)
+    b.mv(oy, oy + SH * K, ox - 84, "520", "Höhe ohne Regalboden", von=ox)
+    b.mh(ox, ox + ax * K, oy - 34, f'{M["aussen_x"]:.1f}'.replace(".", ","), "eine Spalte", von=oy + SH * K - 3 * az * K, oben=True)
+
+    ox2 = ox + SB * K + 200
+    b.ansicht(ox2, oy - 78, "SCHRANK VON DER SEITE")
+    b.rect(ox2, oy, ST * K, SH * K, "none", HILF, 1.6, "8 5")
+    for e in range(3):
+        y = oy + SH * K - (e + 1) * az * K
+        b.rect(ox2, y, ay * K, az * K, FLAECHE)
+        for g in (163, 323):
+            b.line(ox2 + g * K, y, ox2 + g * K, y + az * K, HILF, 0.9, "4 3")
+        n = [16, 11, 7][e]
+        for k in range(n):
+            bx = ox2 + (4 + k * M["beutel_d"]) * K
+            b.rect(bx, y + M["boden"] * K, (M["beutel_d"] - 2) * K,
+                   M["beutel_h"] * K, "#cdd0d6", "#9aa0a8", 0.5)
+        sx = ox2 + (4 + n * M["beutel_d"] + 1) * K
+        b.rect(sx, y + M["boden"] * K, 8 * K, (M["beutel_h"] - 8) * K,
+               "#bd4d0a", MASSL, 0.7)
+    b.mh(ox2, ox2 + ay * K, oy + SH * K + 40, "485", "Kanallänge", von=oy + SH * K)
+    b.mh(ox2, ox2 + ST * K, oy + SH * K + 74, "500", "Schranktiefe", von=oy + SH * K)
+    b.mh(ox2, ox2 + 163 * K, oy - 34, "163", "Frontsegment",
+         von=oy + SH * K - 3 * az * K, oben=True)
+    b.mh(ox2 + 163 * K, ox2 + 323 * K, oy - 34, "160", "Mittelsegment",
+         von=oy + SH * K - 3 * az * K, oben=True)
+    b.mh(ox2 + 323 * K, ox2 + ay * K, oy - 34, "162", "Endsegment",
+         von=oy + SH * K - 3 * az * K, oben=True)
+    b.mv(oy + SH * K - az * K, oy + SH * K, ox2 + ST * K + 40, f'{M["aussen_z"]:.1f}'.replace(".", ","), "eine Ebene",
+         von=ox2 + ay * K)
+
+    ly = oy + SH * K + 118
+    for i, t in enumerate([
+            "Ein Kanal = Frontsegment + Mittelsegment + Endsegment = 485 mm = 25 Beutel",
+            "Fünf Kanäle nebeneinander ergeben eine Ebene, drei Ebenen stehen direkt aufeinander",
+            "Ohne Regalboden: 15 Sorten. Bleibt der Boden drin, passt unten nur eine Ebene mit 5 Sorten"]):
+        b.txt(ox, ly + i * 20, t, 10.5, "start", LINIE if i == 0 else GRAU)
+
+    b.titel("Gesamtanordnung", "Aufbau im Schrank für 540 x 500 x 520 mm nutzbaren Raum",
+            "ÜBERSICHT")
+    return b.save("04-gesamtanordnung.svg")
+
+
+# =====================================================================
+def blatt5():
+    K = 2.3
+    b = Blatt(1380, 760)
+    ox, oy = 128, 108
+    bb, bh = M["beutel_b"] * K, M["beutel_h"] * K
+
+    b.ansicht(ox, oy - 78, "FUTTERBEUTEL — gemessen, ungequetscht")
+    b.rect(ox, oy, bb, bh, "#cdd0d6", "#9aa0a8", 1.2)
+    b.rect(ox + 8 * K, oy + 8 * K, bb - 16 * K, bh - 16 * K, "#dde0e5", "#9aa0a8", 0.9)
+    b.txt(ox + bb / 2, oy + bh / 2, "gefüllter Bereich", 10, "middle", "#5a6068")
+    b.pos(1, ox + 4 * K, oy + 4 * K, ox - 66, oy - 20)
+    b.mh(ox, ox + bb, oy + bh + 40, "88", "Breite von vorne", von=oy + bh)
+    b.mv(oy, oy + bh, ox - 36, "136", "Höhe", von=ox)
+
+    ox2 = ox + bb + 130
+    b.rect(ox2, oy, M["beutel_d"] * K, bh, "#cdd0d6", "#9aa0a8", 1.2)
+    b.mh(ox2, ox2 + M["beutel_d"] * K, oy + bh + 40, "19", "im Stapel gerechnet", von=oy + bh)
+    b.txt(ox2 + M["beutel_d"] * K + 30, oy + 20, "Maximal 20 mm, leicht zusammendrückbar.",
+          10.5, "start")
+    b.txt(ox2 + M["beutel_d"] * K + 30, oy + 38,
+          "Für die Kapazität mit 19 mm gerechnet.", 10.5, "start", GRAU)
+    b.txt(ox2 + M["beutel_d"] * K + 30, oy + 66,
+          "25 Beutel je Kanal bei 485 mm Kanallänge", 10.5, "start")
+
+    ox3 = ox + 700
+    K2 = 1.9
+    axx, azz = M["aussen_x"] * K2, M["aussen_z"] * K2
+    b.ansicht(ox3, oy - 78, "IM KANAL")
+    b.rect(ox3, oy, axx, azz, FLAECHE)
+    b.rect(ox3 + M["wand"] * K2, oy + M["boden"] * K2, M["innen_x"] * K2,
+           M["innen_z"] * K2, PAPIER, HILF, 0.9, "5 3")
+    bx = ox3 + (M["wand"] + 2) * K2
+    b.rect(bx, oy + M["boden"] * K2, M["beutel_b"] * K2, M["beutel_h"] * K2,
+           "#cdd0d6", "#9aa0a8", 1.0)
+    b.mh(ox3 + M["wand"] * K2, bx, oy - 34, "Luft 2", "", von=oy, oben=True)
+    b.mh(bx + M["beutel_b"] * K2, ox3 + axx - M["wand"] * K2, oy - 34, "Luft 2", "",
+         von=oy, oben=True)
+    b.mh(ox3, ox3 + axx, oy + azz + 40, f'{M["aussen_x"]:.1f}'.replace(".", ","), "Spaltenmaß", von=oy + azz)
+    b.mv(oy + M["boden"] * K2 + M["beutel_h"] * K2, oy + azz, ox3 + axx + 40,
+         f'{M["innen_z"] - M["beutel_h"]:.0f}', "Luft oben", von=ox3 + axx)
+    b.mv(oy, oy + azz, ox3 - 36, f'{M["aussen_z"]:.1f}'.replace(".", ","), "Ebenenmaß", von=ox3)
+
+    ly = oy + max(bh, azz) + 120
+    b.txt(ox, ly, "Die Beutelbreite bestimmt die Spaltenzahl: bei 88 mm passen fünf "
+          "Kanäle in 540 mm.", 10.5, "start")
+    b.txt(ox, ly + 20, "Die Beutelhöhe bestimmt die Ebenenhöhe: bei 136 mm passen "
+          "drei Ebenen in 520 mm.", 10.5, "start", GRAU)
+    b.txt(ox, ly + 40, "Vor dem Serienstart mit probe.stl prüfen — das Innenmaß ist "
+          "dort eingeprägt.", 10.5, "start", GRAU)
+
+    b.legende(ox + 700, ly - 10, [
+        (1, "Siegelrand ringsum, flach", "ca. 8 breit"),
+    ], spalten=1)
+
+    b.titel("Beutel und Passung", "Gemessene Beutelmaße und wie sie den Aufbau bestimmen",
+            "GRUNDLAGE")
+    return b.save("05-beutel-passung.svg")
+
+
 
 warnungen = []
-for f, k in (blatt1(), blatt2(), blatt3()):
+for f, k in (blatt1(), blatt2(), blatt3(), blatt4(), blatt5()):
     print("  " + f)
     warnungen += k
 if warnungen:
