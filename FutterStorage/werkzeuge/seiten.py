@@ -1379,11 +1379,110 @@ Millimetern</footer>
 </div>
 """
 
+# =====================================================================
+# Die Bildstrecke ist in Bloecke gegliedert: erst die Einzelteile, dann
+# die Baugruppen, zuletzt der Ausbau. Jeder Block ist eine eigene Galerie.
+BLOECKE = [
+    ("Einzelteile", "Was gedruckt wird - jedes Teil fuer sich",
+     ["b_front", "b_mitte", "b_end", "b_schieber", "b_schild"]),
+    ("Zusammengebaut", "Wie die Teile ineinandergreifen",
+     ["b_explosion", "b_kanal", "b_gefuellt"]),
+    ("Im Schrank", "Eine Ebene und der volle Ausbau",
+     ["b_ebene", "b_gesamt"]),
+]
+
+
+def _bild(n):
+    return (f'<figure>'
+            f'<button class="bild" data-gross="{V[n]}" data-was="{TITEL[n][0]}">'
+            f'<img src="{R[n]}" alt="{TITEL[n][0]}" loading="lazy"></button>'
+            f'<figcaption><h4>{TITEL[n][0]}</h4><p>{TITEL[n][1]}</p>'
+            f'<a class="roh" href="{V[n]}" download>{NAMEN[n]}.png &darr;</a>'
+            f'</figcaption></figure>')
+
+
+_gal = "".join(
+    f'<section class="block"><h2 data-nr="">{titel}</h2>'
+    f'<p class="unter">{unter}</p>'
+    f'<div class="gal">{"".join(_bild(n) for n in bilder)}</div></section>'
+    for titel, unter, bilder in BLOECKE)
+
+_schilder = ""
+_sv = os.path.join(PROJ, "bilder", "schilder")
+if os.path.isdir(_sv):
+    kacheln = []
+    for f in sorted(os.listdir(_sv)):
+        if not f.endswith(".png"):
+            continue
+        name = f[:-4]
+        sorte = name.split("-", 1)[1].replace("_", " ").upper()
+        sorte = {"GEFLUEGEL": "GEFL&Uuml;GEL"}.get(sorte, sorte)
+        kacheln.append(
+            f'<figure><button class="bild" data-gross="schilder/{f}" '
+            f'data-was="Schild {sorte}">'
+            f'<img src="schilder/{f}" alt="Schild {sorte}" loading="lazy"></button>'
+            f'<figcaption><h4>{sorte}</h4></figcaption></figure>')
+    if kacheln:
+        _schilder = (
+            '<section class="block"><h2 data-nr="">Sortenschilder</h2>'
+            '<p class="unter">Zwoelf fertige Schilder liegen im Paket. Weitere '
+            'Sorten entstehen durch eine Zeile in werkzeuge/schilder.py.</p>'
+            f'<div class="gal eng">{"".join(kacheln)}</div></section>')
+
+_pl = "".join(f"""
+  <figure>
+    <button class="blatt" data-gross="{Z[n]}" data-was="{ZTITEL[n][0]}">
+      <img src="{Z[n]}" alt="{ZTITEL[n][0]}" loading="lazy"></button>
+    <figcaption><b>{ZTITEL[n][0]}</b><span>{ZTITEL[n][1]}</span>
+      <a class="roh" href="{Z[n]}" download>{n}.svg &darr;</a></figcaption>
+  </figure>""" for n in ZTITEL)
+
+GALERIE = f"""
+<div class="wrap">
+<header>
+  <p class="eyebrow">Bildstrecke</p>
+  <h1>Alle Ansichten</h1>
+  <p class="lead">Nach Bloecken geordnet: erst die Einzelteile, dann die
+  Baugruppen, zuletzt der Ausbau im Schrank. Ein Klick vergroessert das Bild,
+  mit den Pfeiltasten blaettert man durch, der Link darunter laedt die volle
+  Aufloesung.</p>
+</header>
+
+{_gal}
+{_schilder}
+
+<footer>Alle Bilder mit Blender gerendert, direkt aus den STL-Dateien &middot;
+PNG in voller Aufloesung im Ordner bilder/</footer>
+</div>
+"""
+
+ZEICHNUNGEN = f"""
+<div class="wrap">
+<header>
+  <p class="eyebrow">Massblaetter</p>
+  <h1>Technische Zeichnungen</h1>
+  <p class="lead">Sieben bemasste Blaetter. Jede Masslinie nennt darunter, welches
+  Mass sie zeigt; die eingekreisten Ziffern verweisen auf die Liste am Blattrand.
+  Alle Blaetter sind Vektorgrafik und lassen sich beliebig gross ausdrucken.</p>
+</header>
+
+<section style="padding-top:34px">
+  <div class="plaene">{_pl}</div>
+</section>
+
+<footer>Erzeugt aus denselben Massen wie das Modell &middot; alle Masse in
+Millimetern</footer>
+</div>
+"""
+
 os.makedirs(PAKET, exist_ok=True)
 for datei, titel, inhalt in [
         ("index.html", "FutterStorage &mdash; Uebersicht", INDEX),
         ("bauanleitung.html", "Bauanleitung &mdash; FutterStorage", BAU),
-        ("technik.html", "Technische Umsetzung &mdash; FutterStorage", TECHNIK)]:
+        ("technik.html", "Technische Umsetzung &mdash; FutterStorage", TECHNIK),
+        ("zeichnungen.html", "Technische Zeichnungen &mdash; FutterStorage",
+         ZEICHNUNGEN),
+        ("galerie.html", "Alle Ansichten &mdash; FutterStorage", GALERIE)]:
     with open(os.path.join(PAKET, datei), "w", encoding="utf-8") as f:
         f.write(seite(titel, datei, inhalt))
     print(f"{datei:22s}{os.path.getsize(os.path.join(PAKET, datei))/1024:7.0f} kB")
