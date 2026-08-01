@@ -68,6 +68,9 @@ ebenen = 3;
 wand = 1.6;
 boden = 2.4;
 
+/* [Material sparen] */
+fenster = true;
+
 /* [FDM-Toleranzen] */
 // Spiel je Flanke bei Steckverbindungen. Mit einem Toleranztest von
 // MakerWorld ermitteln. 0.15 = stramm, 0.20 = Standard, 0.25 = leichtgängig.
@@ -187,6 +190,17 @@ module segment() {
         if (!ist_front)
             translate([wand, -1, boden_dick - zunge_h - passung])
                 cube([innen_x, zunge_l + 1, zunge_h + passung]);
+
+        // --- Fenster in den Seitenwänden ---
+        if (fenster) {
+            f_von = y0 + 14;
+            f_bis = y1 - 14;
+            f_b = f_bis - f_von;
+            if (f_b > 30)
+                for (xp = [-1, aussen_x - wand - 1])
+                    translate([xp, f_von, boden_dick + 14])
+                        fenster_yz(f_b, innen_z - 26, 7, wand + 2);
+        }
 
         // --- Sichtschlitz in der Rückwand ---
         if (ist_end)
