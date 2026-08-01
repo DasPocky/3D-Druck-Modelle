@@ -1,0 +1,19 @@
+# Zeilenenden im Repo einheitlich als LF ablegen
+* text=auto
+
+# Binaerdateien: nie umkodieren, nie als Text zu vergleichen versuchen
+*.stl   binary
+*.3mf   binary
+*.gcode binary
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.zip   binary
+
+# SVG ist zwar Text, wird aber maschinell erzeugt - ein Zeilenvergleich
+# bringt dort nichts
+*.svg   -diff
+
+# Das fertige Paket entsteht aus modell/ und werkzeuge/. Es soll die
+# Sprachstatistik nicht verfaelschen und in Vergleichen eingeklappt sein.
+**/paket/** linguist-generated

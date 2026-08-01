@@ -1,0 +1,25 @@
+# Fertige Pakete zum Verschicken - werden von den Skripten neu erzeugt
+*.zip
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Slicer-Ausgaben - geraetespezifisch und gross
+*.gcode
+*.gcode.3mf
+
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# OpenSCAD
+*.echo
+*.csglog
