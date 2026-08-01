@@ -73,13 +73,42 @@ feder_rolle_d = 15.5;  // Rolle außen
 Bandnut, Federkammer und Trommel rechnen sich daraus.
 `pruefen.py` schlägt an, wenn die Feder zu schwach, zu stark oder zu kurz ist.
 
-### Preis drücken
+### Der Preis ist der wunde Punkt — und es gibt eine Alternative
 
-Der Listenpreis von ~16 € gilt für Einzelabnahme und ist bei allen Größen
-etwa gleich — er ist ein Mindestpreis, kein Materialpreis. Wer 15 Kanäle
-baut, sollte **beim Hersteller nach Staffelpreisen fragen**. Auch
-Direktimport (AliExpress, Alibaba) führt dieselben Federn deutlich
-günstiger, bei entsprechender Lieferzeit und ohne geprüftes Datenblatt.
+16,20 € je Kanal sind beim Vollausbau **243 €**, und der Listenpreis ist bei
+allen Größen etwa gleich: Er ist ein Kleinmengen-Mindestpreis, kein
+Materialpreis.
+
+Dieselbe Bauart steckt in **Warenpushern für Ladenregale** — Massenware.
+Bei [Sommer International](https://www.sommer-handel.de/einhaengematerialzubehoer):
+
+| Artikel | Preis |
+|---|---|
+| Warenpusher **inkl. Feder**, ohne Haken und Adapter | **0,60 €** |
+| Warenpusher inkl. Feder, Haken 200 mm, Lochwandadapter | 1,69 € |
+| Warenpusher inkl. Feder, Haken 300 mm, Lochwandadapter | 1,81 € |
+| Warenpusher inkl. Feder, Haken 400 mm, Lochwandadapter | 1,94 € |
+
+Das ist **Faktor 27** gegenüber dem Federspezialisten. Für 15 Kanäle:
+9 € statt 243 €.
+
+**Was dafür noch zu klären ist.** Weder Zugkraft noch Auszugslänge stehen
+in den Shops; beide gibt es nur auf Anfrage. Aus dem Verwendungszweck
+lässt sich abschätzen:
+
+- Der Auszug muss zu den Hakenlängen passen, also mindestens **400 mm**.
+  Wir brauchen 470 mm — knapp, aber in der richtigen Größenordnung.
+- Die Kraft dürfte bei **2 bis 5 N** liegen (Blisterware auf Lochwandhaken).
+  Wir brauchen 8,3 N. Falls sie zu schwach ist: **zwei Federn parallel**,
+  ihre Kräfte addieren sich. Dann 18 € statt 9 €.
+
+**Vorgehen:** Bei 0,60 € kostet ein Zehnerpack 6 €. Bestellen, messen,
+dann entscheiden. Die Federkraft misst man ohne Werkzeug: Feder senkrecht
+an einer Küchenwaage ausziehen, angezeigte Masse in Gramm mal 0,00981
+ergibt Newton. 850 g Anzeige entsprechen 8,3 N.
+
+Das Modell ist auf einen Bereich von 8 bis 12 N ausgelegt und braucht nur
+vier geänderte Zahlen — es funktioniert mit jeder Feder, die passt.
 
 ## 2 · Achse Ø 3 mm
 

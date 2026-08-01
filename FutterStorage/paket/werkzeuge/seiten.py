@@ -1044,6 +1044,9 @@ BAU = f"""
       <li><a href="https://www.febrotec.de/de-DE/konstantkraftfedern-rollfedern"
         rel="noopener">Febrotec, Halver</a>
         <span class="klein">dieselben Federn, Preise auf Anfrage &mdash; bei 15 Stueck lohnt das</span></li>
+      <li><a href="https://www.sommer-handel.de/einhaengematerialzubehoer"
+        rel="noopener">Sommer International &mdash; Warenpusher inkl. Feder</a>
+        <span class="klein">0,60 &euro; &mdash; dieselbe Bauart als Massenware</span></li>
       <li><a href="https://www.stahl-shop24.de/Edelstahl/Edelstahl-rund/"
         rel="noopener">Stahl-Shop24 &mdash; Rundstab 3 mm</a>
         <span class="klein">fuer die Achse</span></li>
@@ -1053,10 +1056,23 @@ BAU = f"""
     halten, sie wickelt sich beim Loslassen schlagartig zurueck. Das Band nie
     knicken, kürzen oder ueber scharfe Kanten laufen lassen, und bei vollem
     Auszug müssen mindestens anderthalb Windungen auf der Trommel bleiben.</div>
-    <p>Der Listenpreis von rund 16 &euro; gilt für Einzelabnahme und ist bei
-    allen Größen etwa gleich &mdash; er ist ein Mindestpreis, kein
-    Materialpreis. Wer 15 Kanäle baut, sollte beim Hersteller nach
-    Staffelpreisen fragen.</p>
+    <h3>Es geht deutlich günstiger</h3>
+    <p>16,20 &euro; je Kanal sind beim Vollausbau <strong>243 &euro;</strong>.
+    Der Listenpreis ist bei allen Größen etwa gleich &mdash; ein
+    Kleinmengen-Mindestpreis, kein Materialpreis.</p>
+    <p>Dieselbe Bauart steckt in <strong>Warenpushern für Ladenregale</strong>,
+    und das ist Massenware: Ein Warenpusher <em>inklusive Feder</em> kostet
+    bei Sommer International <strong>0,60 &euro;</strong> &mdash; Faktor 27.
+    Für 15 Kanäle also 9 &euro; statt 243 &euro;.</p>
+    <div class="hinweis">Was dabei noch zu klären ist: Weder Zugkraft noch
+    Auszugslänge stehen in den Shops. Aus dem Verwendungszweck geschätzt
+    liegt der Auszug bei mindestens 400 mm (Hakenlängen bis 400 mm) und die
+    Kraft bei 2 bis 5 N. Gebraucht werden 470 mm und 8,3 N &mdash; bei zu
+    schwacher Feder helfen zwei parallel, ihre Kräfte addieren sich.</div>
+    <p>Bei 0,60 &euro; kostet ein Zehnerpack 6 &euro;: bestellen, messen,
+    entscheiden. Die Kraft misst man ohne Werkzeug &mdash; Feder senkrecht an
+    einer Küchenwaage ausziehen, angezeigte Gramm mal 0,00981 ergibt Newton.
+    850 g entsprechen 8,3 N.</p>
   </div>
 </section>
 
