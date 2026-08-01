@@ -1156,14 +1156,22 @@ BAU = f"""
     Fuge &mdash; so bleibt kein Beutel an einer Stufe haengen. Nichts verschrauben:
     Der Schieberdruck presst die Segmente gegeneinander.</p></li>
 
-    <li><h4>Feder in den Schieber einsetzen</h4>
-    <p>Im Fuss des Schiebers sitzt eine Kammer mit zwei Wangen. Federrolle hineinlegen,
-    den 3-mm-Stab durch beide Bohrungen schieben. Der Stab darf seitlich nicht
-    ueberstehen, sonst schleift er an der Kanalwand.</p></li>
+    <li><h4>Federgeh&auml;use in den Schieber setzen</h4>
+    <p>Im Fu&szlig; des Schiebers sitzt eine <strong>Wanne</strong> mit zwei
+    Seitenw&auml;nden. Das gekaufte Geh&auml;use von oben hineinlegen und mit
+    zwei Kabelbindern durch die Querschlitze festzurren. Die Wanne ist
+    bewusst gr&ouml;&szlig;er als n&ouml;tig &mdash; sie nimmt jedes
+    Geh&auml;use bis 46 &times; 30 &times; 26 mm auf, damit kein Ma&szlig;
+    stimmen muss.</p>
+    <div class="hinweis">Wer stattdessen eine lose Feder auf gedruckter
+    Trommel verwendet, stellt im Modell <code>feder_bauart = "rolle"</code>
+    ein. Dann entsteht die alte Kammer mit Achsbohrung, und
+    <code>stl-bauen.py</code> erzeugt zus&auml;tzlich
+    <code>trommel.stl</code>.</div></li>
 
     <li><h4>Band nach vorne fuehren</h4>
-    <p>Das Bandende tritt unten aus dem Schieber aus und laeuft in der 18 mm breiten
-    Nut mittig durch den Boden aller Segmente nach vorne.</p></li>
+    <p>Das Bandende tritt unten aus dem Schieber aus und laeuft in der 15 mm
+    breiten Nut mittig durch den Boden aller Segmente nach vorne.</p></li>
 
     <li><h4>Band vorne einhaengen</h4>
     <p>Im Frontsegment sitzt ein Quersteg in der Bodennut. Bandende dort einhaengen
@@ -1186,9 +1194,10 @@ BAU = f"""
     Segmentfuge einen <strong>Verbinder</strong> ein und schiebe die naechste
     Spalte dagegen, bis die Rastnoppe hoerbar einschnappt. Zum Loesen genuegt
     kraeftiger Zug &mdash; werkzeuglos.</p>
-    <p>Weil die Nase nicht angeformt ist, bleibt jede Aussenkante buendig:
-    Die aeusserste Spalte laesst ihre Tasche einfach leer, dort steht nichts
-    ueber.</p></li>
+    <p>An den <strong>Randspalten</strong> entf&auml;llt die &auml;u&szlig;ere
+    Tasche ganz &mdash; daf&uuml;r gibt es eigene Varianten
+    (<code>-links</code> und <code>-rechts</code>). So bleibt jede
+    Au&szlig;enkante geschlossen, und es f&auml;ngt sich dort kein Staub.</p></li>
 
     <li><h4>Ebenen stapeln</h4>
     <p>Auf den Oberkanten der Seitenwaende stehen vier Zapfen &uuml;ber, im Boden
@@ -1197,6 +1206,29 @@ BAU = f"""
     kein Kleber, kein Werkzeug.</p>
     <figure class="gross"><img src="{R['b_varianten']}" alt="Ebenenlagen"></figure>
     <figcaption>Dieselbe Tiefe in drei Ebenenlagen: unten, mitte, oben.</figcaption>
+
+    <p>Jedes Segment gibt es in <strong>drei Ebenenlagen</strong> und
+    <strong>drei Spaltenlagen</strong>. Mit den drei Tiefenlagen sind das
+    <strong>27 Varianten</strong>. Der Dateiname sagt, wohin das Teil
+    geh&ouml;rt &mdash; erste Stelle Tiefe, zweite Ebene, dritte Spalte:</p>
+
+    <div class="hinweis"><strong>Beispiel:</strong> Das vorderste Segment der
+    untersten Ebene ganz links au&szlig;en hei&szlig;t
+    <code>segmente/front-unten-links.stl</code>. Welche Variante an welche
+    Stelle geh&ouml;rt, zeigt Blatt 8 der
+    <a href="zeichnungen.html">Zeichnungen</a> als Positionsplan.</div>
+
+    <p>Der Vollausbau aus 5 Spalten und 3 Ebenen braucht <strong>45
+    Segmente</strong>; jede der 27 Varianten kommt mindestens einmal vor:</p>
+
+    <div class="tab"><table>
+      <thead><tr><th>Variante</th><th>St&uuml;ck</th><th>Variante</th>
+        <th>St&uuml;ck</th><th>Variante</th><th>St&uuml;ck</th></tr></thead>
+      <tbody>{STUECKLISTE}</tbody>
+    </table></div>
+    <p class="unter"><code>stl-bauen.py</code> gibt dieselbe Liste am Ende
+    seines Laufs aus &mdash; so laufen Druckliste und Dateibestand nicht
+    auseinander.</p>
 
     <p>Jedes Segment gibt es in drei Ebenenlagen: <code>unten</code> ohne
     Taschen im Boden, <code>mitte</code> mit beidem, <code>oben</code> ohne

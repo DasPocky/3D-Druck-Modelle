@@ -52,6 +52,9 @@ def _modellwerte():
         kammer_b=v["trommel_b"] + 2 * 1.2 + 1.2,
         bord_d=v["trommel_d"] + 3.0,
         auszug=v["feder_auszug"],
+        pusher_l=v.get("pusher_l", 46), pusher_b=v.get("pusher_b", 30),
+        pusher_h=v.get("pusher_h", 26),
+        binder_b=v.get("binder_b", 4.0),
         feder_d=v["feder_rolle_d"], feder_b=v["feder_band_b"],
         achse=v["feder_achse_d"],
         zapfen_h=v["zapfen_h"], zapfen_l=v["zapfen_l"], zapfen_rand=v["zapfen_rand"],
@@ -61,7 +64,21 @@ def _modellwerte():
         beutel_d=v["beutel_dicke"])
 
 
+def _bauart():
+    """Eingestellte Federaufnahme. Bei "pusher" gibt es weder gedruckte
+    Trommel noch Achse - ein Blatt, das sie zeigt, wäre schlicht falsch."""
+    quelle = os.path.join(PROJ, "modell", "katzenfutter-regal.scad")
+    if not os.path.exists(quelle):
+        quelle = os.path.join(PROJ, "katzenfutter-regal.scad")
+    for zeile in open(quelle, encoding="utf-8"):
+        t = zeile.split("//")[0].strip().rstrip(";")
+        if t.startswith("feder_bauart"):
+            return t.split("=")[1].strip().strip('"')
+    return "rolle"
+
+
 M = _modellwerte()
+BAUART = _bauart()
 
 LINIE, MASSL, HILF, GRAU, PAPIER = "#1a1a1e", "#bd4d0a", "#a8a29a", "#6e6a65", "#f7f5f2"
 FLAECHE = "#e9e5de"
@@ -484,36 +501,62 @@ def blatt3():
     rmax = max(M["feder_d"], M["bord_d"]) / 2
     ay_ = 4 * K + rmax * K
     axh = rmax * K + 4 * K
-    # aufgewickelte Feder, darunter die Trommel, darin die Achse
-    b.kreis(ox + ay_, oy + hh - axh, M["feder_d"] * K / 2, "#f0d9c8", MASSL, 1.5)
-    b.kreis(ox + ay_, oy + hh - axh, M["trommel_d"] * K / 2, "#e6cdb4", MASSL, 1.2)
-    b.kreis(ox + ay_, oy + hh - axh, M["achse"] * K / 2, MASSL, MASSL, 1.0)
+    if BAUART == "pusher":
+        # Gekauftes Federgehäuse in der Wanne, mit zwei Kabelbindern gehalten
+        gw, gh = M["pusher_l"] * K, M["pusher_h"] * K
+        b.rect(ox + 5 * K, oy + hh - 3 * K - gh, gw, gh, "#dcdde0", LINIE, 1.3)
+        b.txt(ox + 5 * K + gw / 2, oy + hh - 3 * K - gh / 2 + 4,
+              "Federgehäuse", 9.5, "middle", GRAU)
+        for xb in (ox + 5 * K + gw * 0.22, ox + 5 * K + gw * 0.78):
+            b.line(xb, oy + hh - 3 * K - gh - 6, xb, oy + hh + 4, MASSL, 1.6)
+        b.txt(ox + 5 * K + gw / 2, oy + hh + 22, "2 Kabelbinder",
+              9.5, "middle", MASSL)
+    else:
+        # aufgewickelte Feder, darunter die Trommel, darin die Achse
+        b.kreis(ox + ay_, oy + hh - axh, M["feder_d"] * K / 2, "#f0d9c8", MASSL, 1.5)
+        b.kreis(ox + ay_, oy + hh - axh, M["trommel_d"] * K / 2, "#e6cdb4", MASSL, 1.2)
+        b.kreis(ox + ay_, oy + hh - axh, M["achse"] * K / 2, MASSL, MASSL, 1.0)
     b.rect(ox, oy + hh - 3 * K - 3 * K, 2.6 * K + 4, 3 * K, "none", MASSL, 1.3)
 
-    b.pos(1, ox + ay_ + M["feder_d"] * K / 2 - 6, oy + hh - axh - 14,
-          ox + fu + 66, oy + 44)
-    b.pos(2, ox + ay_, oy + hh - axh, ox + fu + 66, oy + 92)
+    if BAUART == "pusher":
+        gwx = ox + 5 * K + M["pusher_l"] * K
+        b.pos(1, gwx - 12, oy + hh - 3 * K - M["pusher_h"] * K + 14,
+              ox + fu + 66, oy + 44)
+        b.pos(2, ox + 5 * K + M["pusher_l"] * K * 0.78, oy + hh - 2,
+              ox + fu + 66, oy + 92)
+    else:
+        b.pos(1, ox + ay_ + M["feder_d"] * K / 2 - 6, oy + hh - axh - 14,
+              ox + fu + 66, oy + 44)
+        b.pos(2, ox + ay_, oy + hh - axh, ox + fu + 66, oy + 92)
     b.pos(3, ox + 4, oy + hh - 5 * K, ox - 62, oy + hh + 34)
     b.pos(4, ox + fu / 2, oy + 14, ox + fu / 2, oy - 44)
 
     b.mh(ox, ox + fu, oy + hh + 44, "36", "Fußlänge", von=oy + hh)
     b.mv(oy, oy + hh, ox - 34, f'{M["beutel_h"] - 8:.0f}', "Schieberhöhe", von=ox)
-    b.mv(oy + hh - axh - M["feder_d"] * K / 2, oy + hh - axh + M["feder_d"] * K / 2,
-         ox + fu + 150, f'{M["feder_d"]:.0f}', "Feder aufgewickelt")
-    b.mv(oy + hh - axh - M["trommel_d"] * K / 2, oy + hh - axh + M["trommel_d"] * K / 2,
-         ox + fu + 216, f'{M["trommel_d"]:.1f}'.replace(".", ","), "Trommel")
+    if BAUART == "pusher":
+        b.mv(oy + hh - 3 * K - M["pusher_h"] * K, oy + hh - 3 * K,
+             ox + fu + 150, f'{M["pusher_h"]:.0f}', "Wannentiefe")
+    else:
+        b.mv(oy + hh - axh - M["feder_d"] * K / 2,
+             oy + hh - axh + M["feder_d"] * K / 2,
+             ox + fu + 150, f'{M["feder_d"]:.0f}', "Feder aufgewickelt")
+        b.mv(oy + hh - axh - M["trommel_d"] * K / 2,
+             oy + hh - axh + M["trommel_d"] * K / 2,
+             ox + fu + 216, f'{M["trommel_d"]:.1f}'.replace(".", ","), "Trommel")
 
     ox2 = ox + fu + 250
     b.ansicht(ox2, oy - 78, "SCHIEBER — VORDERANSICHT")
     b.rect(ox2, oy, bb, hh, FLAECHE)
-    kb = M["kammer_b"] * K
+    kb = (M["pusher_b"] + 0.8) * K if BAUART == "pusher" else M["kammer_b"] * K
     b.rect(ox2 + bb / 2 - kb / 2, oy + hh - (axh + M["feder_d"] * K / 2) - 4 * K,
            kb, axh + M["feder_d"] * K / 2, PAPIER, MASSL, 1.3, "5 3")
     b.mh(ox2, ox2 + bb, oy + hh + 44,
          f'{M["innen_x"] - 1.2:.1f}'.replace(".", ","),
          "Breite, gleitet im Kanal", von=oy + hh)
     b.mh(ox2 + bb / 2 - kb / 2, ox2 + bb / 2 + kb / 2, oy - 34,
-         f'{M["kammer_b"]:.1f}'.replace(".", ","), "Federkammer",
+         (f'{M["pusher_b"] + 0.8:.1f}' if BAUART == "pusher"
+          else f'{M["kammer_b"]:.1f}').replace(".", ","),
+         "Wanne für das Gehäuse" if BAUART == "pusher" else "Federkammer",
          von=oy + hh - (axh + M["feder_d"] * K / 2) - 4 * K, oben=True)
 
     # Schild
@@ -560,61 +603,79 @@ def blatt3():
 
     # Achse
     ox4 = ox + 520
-    b.ansicht(ox4, oy3 - 22, "ACHSE — Zukaufteil")
-    b.rect(ox4, oy3 + 12, 210, M["achse"] * Ks, "#d8d3cb")
-    b.mh(ox4, ox4 + 210, oy3 + 58, "ca. 90", "Länge, bündig kürzen", von=oy3 + 12 + M["achse"] * Ks)
-    b.txt(ox4, oy3 + 88, "Rundstab 3 mm, Edelstahl V2A (1.4301)", 10.5, "start")
-    b.txt(ox4, oy3 + 106, "Filament taugt nicht: 2,85 mm hat 0,15 mm Spiel",
-          10.5, "start", GRAU)
-    b.txt(ox4, oy3 + 124, "und kriecht unter Dauerlast.", 10.5, "start", GRAU)
+    if BAUART == "rolle":
+        b.ansicht(ox4, oy3 - 22, "ACHSE — Zukaufteil")
+        b.rect(ox4, oy3 + 12, 210, M["achse"] * Ks, "#d8d3cb")
+        b.mh(ox4, ox4 + 210, oy3 + 58, "ca. 90", "Länge, bündig kürzen", von=oy3 + 12 + M["achse"] * Ks)
+        b.txt(ox4, oy3 + 88, "Rundstab 3 mm, Edelstahl V2A (1.4301)", 10.5, "start")
+        b.txt(ox4, oy3 + 106, "Filament taugt nicht: 2,85 mm hat 0,15 mm Spiel",
+              10.5, "start", GRAU)
+        b.txt(ox4, oy3 + 124, "und kriecht unter Dauerlast.", 10.5, "start", GRAU)
 
-    # --- Trommel: das dritte Druckteil dieser Baugruppe ---------------
+    # --- Trommel: nur bei der Rollen-Bauart ein Druckteil -------------
     ox5 = ox + 810
     oy4 = oy3 + 118
-    b.ansicht(ox5, oy4 - 22, "TROMMEL — gedrucktes Teil")
-    Kt = 3.4
-    td, tb = M["trommel_d"] * Kt, M["trommel_b"] * Kt
-    bd, bb_ = M["bord_d"] * Kt, 1.2 * Kt
-    ty = oy4 + 52
-    # Seitenansicht: Wickelkörper zwischen zwei Bordscheiben
-    b.rect(ox5, ty + (bd - td) / 2, bb_, td, "#e6cdb4", MASSL, 1.2)
-    b.rect(ox5 + bb_, ty + (bd - td) / 2, tb, td, "#f0d9c8", MASSL, 1.3)
-    b.rect(ox5 + bb_ + tb, ty + (bd - td) / 2, bb_, td, "#e6cdb4", MASSL, 1.2)
-    # Bordscheiben ragen über den Wickelkörper hinaus
-    b.rect(ox5, ty, bb_, bd, "none", MASSL, 1.2)
-    b.rect(ox5 + bb_ + tb, ty, bb_, bd, "none", MASSL, 1.2)
-    # Achsbohrung
-    b.rect(ox5, ty + bd / 2 - M["achse"] * Kt / 2, 2 * bb_ + tb,
-           M["achse"] * Kt, PAPIER, MASSL, 1.0, "4 3")
-    b.mh(ox5, ox5 + 2 * bb_ + tb, ty + bd + 40,
-         f'{M["trommel_ganz"]:.1f}'.replace(".", ","), "Gesamtbreite",
-         von=ty + bd)
-    b.mh(ox5 + bb_, ox5 + bb_ + tb, ty - 34, f'{M["trommel_b"]:.0f}',
-         "Wickelbreite", von=ty + (bd - td) / 2, oben=True)
-    b.mv(ty + (bd - td) / 2, ty + (bd - td) / 2 + td, ox5 + 2 * bb_ + tb + 44,
-         f'{M["trommel_d"]:.1f}'.replace(".", ","), "Wickel-Durchmesser",
-         von=ox5 + 2 * bb_ + tb)
-    b.mv(ty, ty + bd, ox5 + 2 * bb_ + tb + 118,
-         f'{M["bord_d"]:.1f}'.replace(".", ","), "Bordscheiben", von=ox5 + 2 * bb_ + tb)
-    b.txt(ox5, ty + bd + 78, "Liegend drucken — dann ist die Bohrung rund "
-          "und es braucht keine Stützen.", 10.5, "start")
-    b.txt(ox5, ty + bd + 96, "Die Feder darf NICHT auf der 3-mm-Achse wickeln: "
-          "zu enger Wickel, zu hohe", 10.5, "start", GRAU)
-    b.txt(ox5, ty + bd + 114, "Biegespannung im Band.", 10.5, "start", GRAU)
+    if BAUART == "rolle":
+        b.ansicht(ox5, oy4 - 22, "TROMMEL — gedrucktes Teil")
+        Kt = 3.4
+        td, tb = M["trommel_d"] * Kt, M["trommel_b"] * Kt
+        bd, bb_ = M["bord_d"] * Kt, 1.2 * Kt
+        ty = oy4 + 52
+        # Seitenansicht: Wickelkörper zwischen zwei Bordscheiben
+        b.rect(ox5, ty + (bd - td) / 2, bb_, td, "#e6cdb4", MASSL, 1.2)
+        b.rect(ox5 + bb_, ty + (bd - td) / 2, tb, td, "#f0d9c8", MASSL, 1.3)
+        b.rect(ox5 + bb_ + tb, ty + (bd - td) / 2, bb_, td, "#e6cdb4", MASSL, 1.2)
+        # Bordscheiben ragen über den Wickelkörper hinaus
+        b.rect(ox5, ty, bb_, bd, "none", MASSL, 1.2)
+        b.rect(ox5 + bb_ + tb, ty, bb_, bd, "none", MASSL, 1.2)
+        # Achsbohrung
+        b.rect(ox5, ty + bd / 2 - M["achse"] * Kt / 2, 2 * bb_ + tb,
+               M["achse"] * Kt, PAPIER, MASSL, 1.0, "4 3")
+        b.mh(ox5, ox5 + 2 * bb_ + tb, ty + bd + 40,
+             f'{M["trommel_ganz"]:.1f}'.replace(".", ","), "Gesamtbreite",
+             von=ty + bd)
+        b.mh(ox5 + bb_, ox5 + bb_ + tb, ty - 34, f'{M["trommel_b"]:.0f}',
+             "Wickelbreite", von=ty + (bd - td) / 2, oben=True)
+        b.mv(ty + (bd - td) / 2, ty + (bd - td) / 2 + td, ox5 + 2 * bb_ + tb + 44,
+             f'{M["trommel_d"]:.1f}'.replace(".", ","), "Wickel-Durchmesser",
+             von=ox5 + 2 * bb_ + tb)
+        b.mv(ty, ty + bd, ox5 + 2 * bb_ + tb + 118,
+             f'{M["bord_d"]:.1f}'.replace(".", ","), "Bordscheiben", von=ox5 + 2 * bb_ + tb)
+        b.txt(ox5, ty + bd + 78, "Liegend drucken — dann ist die Bohrung rund "
+              "und es braucht keine Stützen.", 10.5, "start")
+        b.txt(ox5, ty + bd + 96, "Die Feder darf NICHT auf der 3-mm-Achse wickeln: "
+              "zu enger Wickel, zu hohe", 10.5, "start", GRAU)
+        b.txt(ox5, ty + bd + 114, "Biegespannung im Band.", 10.5, "start", GRAU)
 
-    b.legende(ox + 810, oy3 - 22, [
-        (1, "Kammer nimmt Trommel und Feder auf",
-            f'{M["kammer_b"]:.1f}'.replace(".", ",") + " breit"),
-        (2, "Achsbohrung durch beide Wangen",
-            f'{M["achse"]:.1f}'.replace(".", ",")),
-        (3, "Austritt des Federbands nach vorne",
-            f'{M["feder_b"] + 0.8:.1f}'.replace(".", ",") + " x 3"),
-        (4, "Grifflasche zum Zurückziehen", "32 breit"),
-    ], spalten=1)
+    if BAUART == "pusher":
+        eintraege = [
+            (1, "Wanne nimmt das gekaufte Gehäuse auf",
+                f'bis {M["pusher_l"]:.0f} x {M["pusher_b"]:.0f} x {M["pusher_h"]:.0f}'),
+            (2, "Querschlitze für zwei Kabelbinder",
+                f'{M["binder_b"]:.0f} mm breit'),
+            (3, "Austritt des Federbands nach vorne",
+                f'{M["feder_b"] + 0.8:.1f}'.replace(".", ",") + " x 3"),
+            (4, "Grifflasche zum Zurückziehen", "32 breit"),
+        ]
+        titel = ("Schieber, Schild und Achse",
+                 "Der Schieber nimmt das gekaufte Federgehäuse in einer Wanne auf",
+                 "TEIL 04 / 05")
+    else:
+        eintraege = [
+            (1, "Kammer nimmt Trommel und Feder auf",
+                f'{M["kammer_b"]:.1f}'.replace(".", ",") + " breit"),
+            (2, "Achsbohrung durch beide Wangen",
+                f'{M["achse"]:.1f}'.replace(".", ",")),
+            (3, "Austritt des Federbands nach vorne",
+                f'{M["feder_b"] + 0.8:.1f}'.replace(".", ",") + " x 3"),
+            (4, "Grifflasche zum Zurückziehen", "32 breit"),
+        ]
+        titel = ("Schieber, Schild, Trommel und Achse",
+                 "Der Schieber trägt die Feder auf einer gedruckten Trommel",
+                 "TEIL 04 / 05 / 06 / 07")
+    b.legende(ox + 810, oy3 - 22, eintraege, spalten=1)
 
-    b.titel("Schieber, Schild, Trommel und Achse",
-            "Der Schieber trägt die Feder auf einer gedruckten Trommel",
-            "TEIL 04 / 05 / 06 / 07")
+    b.titel(*titel)
     return b.save("03-schieber-schild.svg")
 
 

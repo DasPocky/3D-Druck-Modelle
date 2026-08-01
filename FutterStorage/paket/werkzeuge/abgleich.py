@@ -134,10 +134,13 @@ def main():
         # auf dem Zugriffsblatt stehen.
         "07-zugriff.svg": [f'{v["luft_oben"]:.0f}',
                            f'{v["anschlag_hoehe"]:.0f}'],
-        # Federkammer und Trommel gehoeren aufs Schieberblatt
-        "03-schieber-schild.svg": [
-            f'{v["trommel_d"]:.1f}'.replace(".", ","),
-            f'{v["schild_breite"]:.0f}'],
+        # Auf dem Schieberblatt steht je nach Bauart Verschiedenes: bei
+        # "rolle" die Trommel, bei "pusher" die Wanne fuer das Gehaeuse.
+        "03-schieber-schild.svg": (
+            [f'{v["trommel_d"]:.1f}'.replace(".", ","),
+             f'{v["schild_breite"]:.0f}'] if bauart(v) == "rolle"
+            else [f'{v.get("pusher_l", 46):.0f}',
+                  f'{v["schild_breite"]:.0f}']),
     }
     for datei, zahlen in erwartet.items():
         p = os.path.join(PROJ, "zeichnungen", datei)
