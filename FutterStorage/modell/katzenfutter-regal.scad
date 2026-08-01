@@ -17,6 +17,14 @@
 //  Alle Maße in mm.
 // =====================================================================
 
+/* [Was soll gerendert werden] */
+TEIL = "segment";  // [segment]
+
+// front = vorderstes Segment mit Anschlagkante und Schildhalter
+// mitte = beidseitig offenes Zwischenstück, beliebig oft
+// end   = hinterstes Segment mit Rückwand und Bandhaken
+segment_typ = "front";  // [front, mitte, end]
+
 /* [Beutel-Maße] */
 // Gemessen an einem echten 85-g-Beutel, ungequetscht.
 // Höhe des aufrecht stehenden Beutels
@@ -105,3 +113,91 @@ echo(str(">>> Kanal aus ", segment_anzahl, " Segmenten = ", kanal_laenge,
 echo(str(">>> Ausbau ", spalten, " x ", ebenen, " = ", spalten * ebenen,
          " Sorten, ", spalten * ebenen * kapazitaet, " Beutel"));
 
+// ---------------------------------------------------------------------
+//  Hilfsmodule
+// ---------------------------------------------------------------------
+
+// Loch mit verrundeten Ecken in einer Wand mit Normale X
+module fenster_yz(b, h, r, t) {
+    hull()
+        for (yp = [r, b - r], zp = [r, h - r])
+            translate([0, yp, zp]) rotate([0, 90, 0]) cylinder(r = r, h = t);
+}
+
+// Loch mit verrundeten Ecken in einer Wand mit Normale Y
+module fenster_xz(b, h, r, t) {
+    hull()
+        for (xp = [r, b - r], zp = [r, h - r])
+            translate([xp, 0, zp]) rotate([-90, 0, 0]) cylinder(r = r, h = t);
+}
+
+// Langloch senkrecht durch den Boden
+module langloch(b, l, r, h) {
+    hull()
+        for (px = [r, b - r], py = [r, l - r])
+            translate([px, py, 0]) cylinder(r = r, h = h);
+}
+
+// ---------------------------------------------------------------------
+//  Kanalsegment
+// ---------------------------------------------------------------------
+module segment() {
+    y0 = ist_front ? anschlag_dicke() : 0;   // Innenraum beginnt dahinter
+    y1 = aussen_y - (ist_end ? wand : 0);    // und endet davor
+
+    difference() {
+        union() {
+            // --- Grundkörper ---
+            cube([aussen_x, aussen_y, aussen_z]);
+
+            // --- Bodenzunge hinten: schiebt sich unter das Nachbarsegment ---
+            if (!ist_end)
+                translate([wand + 0.3, aussen_y, boden_dick - zunge_h])
+                    cube([innen_x - 0.6, zunge_l, zunge_h]);
+
+
+        }
+
+        // --- Innenraum ---
+        translate([wand, y0, boden_dick])
+            cube([innen_x, y1 - y0 + (ist_end ? 0 : zunge_l + 1), innen_z + 1]);
+
+        // --- Front: oberhalb der Wand offen, plus Griffmulde in der Mitte ---
+        if (ist_front) {
+            translate([wand, -1, boden_dick + anschlag_hoehe])
+                cube([innen_x, anschlag_dicke() + 1, innen_z + 1]);
+            // Mulde mit 45-Grad-Auslauf unten, damit sie stützenfrei druckt
+            cx = aussen_x / 2;
+            zt = boden_dick + mulde_bis;
+            fa = 11;
+            translate([0, anschlag_dicke() + 1, 0])
+                rotate([90, 0, 0])
+                    linear_extrude(height = anschlag_dicke() + 2)
+                        polygon([
+                            [cx - mulde_breite/2, boden_dick + anschlag_hoehe + 1],
+                            [cx + mulde_breite/2, boden_dick + anschlag_hoehe + 1],
+                            [cx + mulde_breite/2, zt + fa],
+                            [cx + mulde_breite/2 - fa, zt],
+                            [cx - mulde_breite/2 + fa, zt],
+                            [cx - mulde_breite/2, zt + fa]
+                        ]);
+        }
+
+        // --- Aufnahme für die Zunge des vorderen Nachbarn ---
+        if (!ist_front)
+            translate([wand, -1, boden_dick - zunge_h - passung])
+                cube([innen_x, zunge_l + 1, zunge_h + passung]);
+
+        // --- Sichtschlitz in der Rückwand ---
+        if (ist_end)
+            translate([(aussen_x - (innen_x - 24)) / 2, aussen_y - wand - 1,
+                       boden_dick + 16])
+                fenster_xz(innen_x - 24, innen_z - 34, 6, wand + 2);
+    }
+
+}
+
+// ---------------------------------------------------------------------
+//  Ausgabe
+// ---------------------------------------------------------------------
+if (TEIL == "segment")       segment();
