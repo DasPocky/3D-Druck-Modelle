@@ -18,8 +18,9 @@ MODELL = os.path.join(PROJ, "modell", "katzenfutter-regal.scad")
 if not os.path.exists(MODELL):
     MODELL = os.path.join(PROJ, "katzenfutter-regal.scad")
 
-# (Aufdruck, Symbol) - der Aufdruck darf bis zu zwölf Zeichen haben,
-# das Modell setzt längere Namen automatisch schmaler.
+# (Aufdruck, Symbol). Der Aufdruck steht so auf dem Schild, mit echten
+# Umlauten - der Symbolname daneben ist ein Bezeichner und bleibt ASCII,
+# weil er als Dateiname und im Modell verwendet wird.
 SORTEN = [
     ("HUHN",       "huhn"),
     ("RIND",       "rind"),
@@ -31,7 +32,7 @@ SORTEN = [
     ("LAMM",       "lamm"),
     ("WILD",       "wild"),
     ("FORELLE",    "forelle"),
-    ("GEFLUEGEL",  "gefluegel"),
+    ("GEFLÜGEL",   "gefluegel"),
     ("SEELACHS",   "fisch"),
 ]
 
@@ -57,7 +58,7 @@ def bauen(was):
 
         if was in ("stl", "beide"):
             ruf(os.path.join(stl, datei + ".stl"), "schild")
-            # Der erhabene Schriftkoerper fuer den Zweifarbdruck - und fuer
+            # Der erhabene Schriftkoerper für den Zweifarbdruck - und für
             # die Renderings, damit dort jede Spalte ihre Sorte zeigt.
             ruf(os.path.join(stl, datei + "-text.stl"), "schild_text")
         if was in ("png", "beide"):
