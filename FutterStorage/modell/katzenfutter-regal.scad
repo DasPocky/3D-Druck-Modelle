@@ -18,7 +18,10 @@
 // =====================================================================
 
 /* [Was soll gerendert werden] */
-TEIL = "segment";  // [segment, schieber, schild, schild_text, verbinder, test]
+// segment = Kanalsegment (Typ über segment_typ), schieber, schild,
+// probe = Passprobe, layout = Vorschau im Schrank, schnitt = Längsschnitt,
+// test = Kollisionsprüfung gestapelter Ebenen (Ergebnis muss leer sein)
+TEIL = "segment";  // [segment, schieber, schild, schild_text, verbinder, probe, layout, schnitt, test]
 
 // front = vorderstes Segment mit Anschlagkante und Schildhalter
 // mitte = beidseitig offenes Zwischenstück, beliebig oft
@@ -684,6 +687,136 @@ module schild() {
 }
 
 // ---------------------------------------------------------------------
+//  Passprobe: 35 mm Stück des Kanalprofils mit eingeprägtem Innenmaß.
+//  Vor dem großen Druck einen echten Beutel hineinstellen.
+// ---------------------------------------------------------------------
+module probe() {
+    pl = 35;
+    difference() {
+        cube([aussen_x, pl, boden_dick + anschlag_hoehe + 22]);
+        translate([wand, -1, boden_dick])
+            cube([innen_x, pl + 2, innen_z + 1]);
+        if (bandnut)
+            translate([(aussen_x - bandnut_breite) / 2, -1,
+                       boden_dick - bandnut_tiefe])
+                cube([bandnut_breite, pl + 2, bandnut_tiefe + 1]);
+        translate([aussen_x / 2, wand + 0.3, boden_dick + 11])
+            rotate([90, 0, 0]) rotate([0, 0, 180])
+                linear_extrude(height = 0.8)
+                    text(str(innen_x), size = 9, halign = "center",
+                         valign = "center");
+    }
+}
+
+// ---------------------------------------------------------------------
+//  Beutel-Attrappe
+// ---------------------------------------------------------------------
+module beutel_reihe(n, y_start = 6) {
+    for (k = [0 : n - 1])
+        translate([wand + spiel / 2, y_start + k * beutel_dicke, boden_dick])
+            cube([beutel_breit, beutel_dicke - 1.4, beutel_hoch]);
+}
+
+// Ein kompletter Kanal aus front + n x mitte + end
+module kanal_reihe(fuellung) {
+    // Front
+    segment_stueck("front", 0);
+    for (i = [1 : segment_anzahl - 2])
+        segment_stueck("mitte", anschlag_dicke() + i * segment_laenge
+                                - segment_laenge);
+    segment_stueck("end", anschlag_dicke() + (segment_anzahl - 1) * segment_laenge
+                          - segment_laenge);
+    color("Silver", 0.95)
+        translate([0, anschlag_dicke(), 0]) beutel_reihe(fuellung, 2);
+}
+
+// Hilfskonstrukt: ein Segment an Position y mit gegebenem Typ.
+// OpenSCAD kennt keine Parameterüberschreibung, daher wird die Geometrie
+// hier direkt nachgebildet, indem das Modul mit gesetzten Globals gerendert
+// und verschoben wird. Für die Vorschau genügt der einfache Quader-Umriss.
+module segment_stueck(typ, ypos) {
+    translate([0, ypos, 0]) segment();
+}
+
+// ---------------------------------------------------------------------
+//  Längsschnitt
+// ---------------------------------------------------------------------
+module schnitt() {
+    difference() {
+        union() {
+            color([0.17, 0.17, 0.19]) segment();
+            color("Silver", 0.95)
+                translate([0, ist_front ? anschlag_dicke() + 2 : 2, 0])
+                    beutel_reihe(floor((segment_laenge - 8) / beutel_dicke), 0);
+        }
+        translate([aussen_x / 2, -30, -10])
+            cube([aussen_x, aussen_y + 60, aussen_z + 40]);
+    }
+}
+
+// ---------------------------------------------------------------------
+//  Layout-Vorschau: Spalten x Ebenen im Schrank
+// ---------------------------------------------------------------------
+module layout() {
+    color("Tan", 0.22)
+        translate([-10, -10, -4]) cube([schrank_breite, schrank_tiefe, 4]);
+
+    fuell = [[46, 30, 18], [38, 46, 12], [22, 34, 46]];
+
+    for (e = [0 : ebenen - 1], sx = [0 : spalten - 1])
+        translate([sx * aussen_x, 0, e * aussen_z]) {
+            color([0.17, 0.17, 0.19]) kanal_vorschau();
+            if (sx < 3)
+                color(sx == 0 ? "Silver"
+                              : (sx == 1 ? [0.74, 0.74, 0.78] : [0.62, 0.62, 0.66]))
+                    translate([0, anschlag_dicke(), 0])
+                        beutel_reihe(fuell[e][sx], 2);
+        }
+}
+
+// Vereinfachter Kanalumriss über die volle Länge für die Vorschau
+module kanal_vorschau() {
+    L = kanal_laenge + anschlag_dicke() + wand;
+    difference() {
+        cube([aussen_x, L, aussen_z]);
+        // Innenraum
+        translate([wand, anschlag_dicke(), boden_dick])
+            cube([innen_x, L - anschlag_dicke() - wand, innen_z + 1]);
+        // Front oberhalb der Wand offen, plus Griffmulde
+        translate([wand, -1, boden_dick + anschlag_hoehe])
+            cube([innen_x, anschlag_dicke() + 1, innen_z + 1]);
+        translate([0, anschlag_dicke() + 1, 0])
+            rotate([90, 0, 0])
+                linear_extrude(height = anschlag_dicke() + 2)
+                    polygon([
+                        [aussen_x/2 - mulde_breite/2, boden_dick + anschlag_hoehe + 1],
+                        [aussen_x/2 + mulde_breite/2, boden_dick + anschlag_hoehe + 1],
+                        [aussen_x/2 + mulde_breite/2, boden_dick + mulde_bis + 11],
+                        [aussen_x/2 + mulde_breite/2 - 11, boden_dick + mulde_bis],
+                        [aussen_x/2 - mulde_breite/2 + 11, boden_dick + mulde_bis],
+                        [aussen_x/2 - mulde_breite/2, boden_dick + mulde_bis + 11]
+                    ]);
+        // Bandnut
+        if (bandnut)
+            translate([(aussen_x - bandnut_breite) / 2, -1,
+                       boden_dick - bandnut_tiefe])
+                cube([bandnut_breite, L + 2, bandnut_tiefe + 1]);
+        // Fenster je Segment
+        for (i = [0 : segment_anzahl - 1]) {
+            f_von = anschlag_dicke() + i * segment_laenge + 14;
+            f_b = segment_laenge - 28;
+            for (xp = [-1, aussen_x - wand - 1])
+                translate([xp, f_von, boden_dick + 14])
+                    fenster_yz(f_b, innen_z - 26, 7, wand + 2);
+        }
+        // Sichtschlitz hinten
+        translate([(aussen_x - (innen_x - 24)) / 2, L - wand - 1, boden_dick + 16])
+            fenster_xz(innen_x - 24, innen_z - 34, 6, wand + 2);
+    }
+    schildhalter();
+}
+
+// ---------------------------------------------------------------------
 //  Ausgabe
 // ---------------------------------------------------------------------
 if (TEIL == "segment")       segment();
@@ -691,6 +824,9 @@ else if (TEIL == "schieber") schieber();
 else if (TEIL == "schild")   schild();
 else if (TEIL == "verbinder") verbinder();
 else if (TEIL == "schild_text") schild_schrift();
+else if (TEIL == "probe")    probe();
+else if (TEIL == "schnitt")  schnitt();
+else if (TEIL == "layout")   layout();
 else if (TEIL == "test")
     // Ebene darüber darf sich nicht mit dieser durchdringen
     intersection() {
