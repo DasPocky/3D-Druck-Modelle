@@ -670,3 +670,111 @@ def _inhaltsverzeichnis(inhalt):
     return inhalt.replace("</header>", "</header>\n" + toc, 1)
 
 
+# =====================================================================
+INDEX = f"""
+<div class="wrap">
+<header>
+  <p class="eyebrow">Projektuebersicht</p>
+  <h1>FutterStorage</h1>
+  <p class="lead">Ein gedrucktes Regalsystem fuer 85-g-Nassfutterbeutel. Waagerechte
+  Kanaele ueber die volle Schranktiefe, eine Feder schiebt die Beutel nach vorne,
+  entnommen wird immer der vorderste. Die Ebenen stapeln direkt aufeinander.</p>
+  <div class="kz-reihe">
+    <div class="kz"><b>15</b><span>Sorten</span></div>
+    <div class="kz"><b>375</b><span>Beutel maximal</span></div>
+    <div class="kz"><b>5&times;3</b><span>Spalten &times; Ebenen</span></div>
+    <div class="kz"><b>0 L</b><span>toter Raum</span></div>
+    <div class="kz"><b>8</b><span>Teiletypen</span></div>
+  </div>
+</header>
+
+<section>
+  <h2 data-nr="">Wo es weitergeht</h2>
+  <div class="kachel">
+    <a href="bauanleitung.html">
+      <div class="nr">Dokument 1</div>
+      <h3>Bauanleitung</h3>
+      <p>Was gedruckt wird, was gekauft werden muss, wie es zusammengesetzt wird.
+      Mit Teileliste, Druckeinstellungen und Schritt-fuer-Schritt-Montage.</p>
+    </a>
+    <a href="technik.html">
+      <div class="nr">Dokument 2</div>
+      <h3>Technische Umsetzung</h3>
+      <p>Wie das Modell entstanden ist: welche Programme, welcher Code, wie die
+      Pruefungen laufen und wo die Fallstricke lagen.</p>
+    </a>
+    <a href="zeichnungen.html">
+      <div class="nr">Anhang</div>
+      <h3>Zeichnungen</h3>
+      <p>Sieben bemasste Blaetter mit allen Massen, Positionsnummern und
+      Erklaerung, welches Mass wofuer steht.</p>
+    </a>
+    <a href="galerie.html">
+      <div class="nr">Anhang</div>
+      <h3>Bilder</h3>
+      <p>Zehn Renderings vom Einzelteil bis zum vollen Schrank, klickbar in
+      voller Aufloesung.</p>
+    </a>
+  </div>
+</section>
+
+<section>
+  <h2 data-nr="">Das fertige Regal</h2>
+  <figure class="gross"><img src="{R['b_gesamt']}" alt="Das komplette Regal"></figure>
+  <figcaption>Fuenf Kanaele nebeneinander, drei Ebenen uebereinander. Jeder Kanal
+  fasst 25 Beutel einer Sorte.</figcaption>
+</section>
+
+<section>
+  <h2 data-nr="">Was im Paket liegt</h2>
+  <div class="tab"><table>
+    <thead><tr><th>Ordner</th><th>Inhalt</th></tr></thead>
+    <tbody>
+      <tr><td class="num">stl/</td><td class="w">Sieben druckfertige Dateien &mdash;
+        die drei Segmenttypen, Schieber, Schild, Schildtext und die Passprobe</td></tr>
+      <tr><td class="num">zeichnungen/</td><td class="w">Sechs bemasste Zeichnungsblaetter
+        als SVG, beliebig skalierbar und druckbar</td></tr>
+      <tr><td class="num">bilder/</td><td class="w">Zehn Renderings in voller
+        Aufloesung</td></tr>
+      <tr><td class="num">modell/</td><td class="w">Die OpenSCAD-Quelldatei &mdash;
+        alle Masse parametrisch aenderbar</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2 data-nr="">Die Ausgangslage</h2>
+  <div class="text">
+    <div class="tab"><table>
+      <thead><tr><th></th><th>Mass</th></tr></thead>
+      <tbody>
+        <tr><td>Schrankbreite nutzbar</td><td class="num">540 mm</td></tr>
+        <tr><td>Schranktiefe</td><td class="num">500 mm</td></tr>
+        <tr><td>Hoehe ohne Regalboden</td><td class="num">520 mm</td></tr>
+        <tr><td>Beutel (gemessen)</td><td class="num">88 &times; 136 &times; 20 mm</td></tr>
+      </tbody>
+    </table></div>
+    <p>Der Regalboden laesst sich herausnehmen. Bleibt er drin, passt in das untere
+    Fach nur eine Ebene mit fuenf Sorten &mdash; ohne ihn sind es drei Ebenen mit
+    fuenfzehn.</p>
+  </div>
+</section>
+
+<footer>Erstellt mit OpenSCAD und Blender &middot; alle Masse in Millimetern</footer>
+</div>
+"""
+
+os.makedirs(PAKET, exist_ok=True)
+for datei, titel, inhalt in [
+        ("index.html", "FutterStorage &mdash; Uebersicht", INDEX)]:
+    with open(os.path.join(PAKET, datei), "w", encoding="utf-8") as f:
+        f.write(seite(titel, datei, inhalt))
+    print(f"{datei:22s}{os.path.getsize(os.path.join(PAKET, datei))/1024:7.0f} kB")
+
+if FUNDE:
+    print("\nASCII-UMSCHRIFT STATT UMLAUT:")
+    for f in FUNDE:
+        print("  ! " + f)
+else:
+    print("\nSchreibung geprueft: alle Umlaute gesetzt")
+
