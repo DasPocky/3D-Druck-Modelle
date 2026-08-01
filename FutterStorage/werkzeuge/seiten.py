@@ -125,6 +125,87 @@ RECHT = {
  "schliesst": "schließt", "hoerbar": "hörbar", "buendig": "bündig", "Bodenraendern": "Bodenrändern", "genuegt": "genügt", "Aussenkante": "Außenkante", "Aussenkanten": "Außenkanten", "kraeftiger": "kräftiger", "Loesen": "Lösen", "stoeren": "stören", "Bloecken": "Blöcken", "Bloecke": "Blöcke", "Zwoelf": "Zwölf",
  "blaettert": "blättert", "Sortenschilder": "Sortenschilder",
 }
+# ---------------------------------------------------------------- Code
+# Syntaxhervorhebung ohne Fremdbibliothek: der Text wird einmal zerlegt und
+# jedes Stueck bekommt eine Klasse. Kommentare und Zeichenketten werden
+# zuerst gefasst, damit darin keine Schluesselwoerter markiert werden.
+SCHLUESSEL = {
+    "openscad": r"\b(module|function|if|else|for|let|include|use|true|false|"
+                r"union|difference|intersection|hull|translate|rotate|scale|"
+                r"mirror|linear_extrude|rotate_extrude|cube|cylinder|sphere|"
+                r"circle|square|polygon|text|echo|str|min|max|len|floor|sin|cos)\b",
+    "python":   r"\b(def|class|return|if|elif|else|for|while|in|not|and|or|"
+                r"import|from|as|with|try|except|finally|lambda|None|True|False|"
+                r"yield|break|continue|pass|raise|global)\b",
+    "bash":     r"\b(for|do|done|if|then|fi|else|in|while|case|esac|function|"
+                r"export|echo|cd|mkdir|python3|openscad|blender)\b",
+}
+_KOM = {"openscad": r"//[^\n]*|/\*.*?\*/", "python": r"#[^\n]*", "bash": r"#[^\n]*"}
+
+
+def code(text, sprache="openscad"):
+    """Gibt den Text als hervorgehobenen <pre>-Block zurueck."""
+    stuecke, rest = [], text
+    muster = re.compile(
+        f'(?P<kom>{_KOM.get(sprache, "#[^\\n]*")})'
+        r'|(?P<str>"[^"\n]*"|\'[^\'\n]*\')'
+        r"|(?P<zahl>\b\d+(?:\.\d+)?\b)"
+        f'|(?P<key>{SCHLUESSEL.get(sprache, "")})'
+        r"|(?P<fn>\b[a-zA-Z_][\w]*(?=\())", re.S)
+    pos = 0
+    for m in muster.finditer(text):
+        if m.start() > pos:
+            stuecke.append(_esc(text[pos:m.start()]))
+        art = m.lastgroup
+        stuecke.append(f'<span class="c-{art}">{_esc(m.group(0))}</span>')
+        pos = m.end()
+    stuecke.append(_esc(text[pos:]))
+    kopf = ('<div class="kopf"><span class="punkt"></span><span class="punkt">'
+            '</span><span class="punkt"></span>'
+            f'<span class="spr">{sprache}</span></div>')
+    return (f'<figure class="cd">{kopf}<pre><code>' + "".join(stuecke)
+            + "</code></pre></figure>")
+
+
+def _esc(t):
+    return t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def diagramm(titel, knoten, breite=760):
+    """Ein schlichtes Flussdiagramm als SVG - ersetzt die frueheren
+    ASCII-Kaesten, die je nach Schriftart auseinanderfielen.
+    knoten: Liste aus (Text, Unterzeile, Spalte, Zeile)."""
+    zh, zb, lu = 66, 200, 34
+    zeilen = max(k[3] for k in knoten) + 1
+    spalten = max(k[2] for k in knoten) + 1
+    h = zeilen * zh + (zeilen - 1) * lu + 20
+    b = max(breite, spalten * (zb + 40))
+    el = [f'<svg viewBox="0 0 {b} {h}" width="100%" role="img" '
+          f'aria-label="{titel}" style="max-width:{b}px">']
+    mitte = {}
+    for text, unter, sp, ze in knoten:
+        x = (b - (spalten * zb + (spalten - 1) * 40)) / 2 + sp * (zb + 40)
+        y = 10 + ze * (zh + lu)
+        mitte[(sp, ze)] = (x + zb / 2, y, y + zh)
+        el.append(
+            f'<rect x="{x}" y="{y}" width="{zb}" height="{zh}" rx="2" '
+            f'fill="var(--paper2)" stroke="var(--linie)" stroke-width="1.5"/>'
+            f'<text x="{x+zb/2}" y="{y+27}" text-anchor="middle" font-size="14" '
+            f'font-weight="650" fill="var(--ink)" '
+            f'font-family="var(--sans)">{text}</text>'
+            f'<text x="{x+zb/2}" y="{y+47}" text-anchor="middle" font-size="11.5" '
+            f'fill="var(--grau)" font-family="var(--mono)">{unter}</text>')
+    for (sp, ze), (cx, oben, unten) in mitte.items():
+        if (sp, ze + 1) in mitte:
+            zx = mitte[(sp, ze + 1)][0]
+            el.append(f'<path d="M{cx} {unten} L{cx} {unten+lu-9}" '
+                      f'stroke="var(--akzent)" stroke-width="1.6" fill="none"/>'
+                      f'<path d="M{zx-4.5} {unten+lu-9} L{zx+4.5} {unten+lu-9} '
+                      f'L{zx} {unten+lu-1} z" fill="var(--akzent)"/>')
+    el.append("</svg>")
+    return f'<figure class="dia">{"".join(el)}<figcaption>{titel}</figcaption></figure>'
+
+
 _WORT = re.compile(r"[A-Za-z][A-Za-z-]*")
 # Attributwerte, CSS, Skript und Codebeispiele bleiben unangetastet - dort
 # stehen Klassennamen und Dateinamen, die nicht "korrigiert" werden duerfen.
