@@ -373,6 +373,20 @@ elif SZENE == "greifraum":
     put(seg("front", "oben", "mitte"), (0, 0, AZ), SCHWARZ)
     schild_an()
     beutel(8)
+elif SZENE == "wanne":
+    # Blick von hinten oben in den Schieberfuss: dort sitzt die Wanne mit
+    # dem gekauften Federgehaeuse. Ohne eigenes Bild musste sich die
+    # Teileuebersicht bisher das Schieberbild teilen - zwei verschiedene
+    # Teile mit derselben Abbildung.
+    put(s_schb, (0, 0, 0), ORANGE)
+    if BAUART == "pusher":
+        bpy.ops.mesh.primitive_cube_add(size=1)
+        o = bpy.context.object
+        o.scale = (PUSH_B, PUSH_L, PUSH_H)
+        o.location = ((BB + SPIEL) / 2, 4 + PUSH_L / 2, 3.0 + PUSH_H / 2)
+        o.name = "federgehaeuse"
+        o.data.materials.clear()
+        o.data.materials.append(GEHAEUSE)
 elif SZENE == "varianten":
     # Die drei Ebenenlagen nebeneinander. Der Unterschied sitzt oben und
     # unten: unten ohne Taschen im Boden, oben ohne Zapfen, mitte mit

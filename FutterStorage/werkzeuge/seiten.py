@@ -13,9 +13,10 @@ NAMEN = {"b_front": "01-segment-front", "b_mitte": "02-segment-mitte",
          "b_schild": "05-schild", "b_kanal": "06-kanal-komplett",
          "b_explosion": "07-explosion", "b_gefuellt": "08-funktionsprinzip",
          "b_greifraum": "09-greifraum", "b_entnahme": "10-entnahme",
-         "b_varianten": "11-varianten-ebene",
-         "b_varianten_spalte": "12-varianten-spalte",
-         "b_ebene": "13-eine-ebene", "b_gesamt": "14-vollausbau"}
+         "b_wanne": "11-federaufnahme",
+         "b_varianten": "12-varianten-ebene",
+         "b_varianten_spalte": "13-varianten-spalte",
+         "b_ebene": "14-eine-ebene", "b_gesamt": "15-vollausbau"}
 
 TITEL = {"b_front": ("Frontsegment", "Vorderstes Kanalstueck mit Frontwand "
                      "und Schildtasche"),
@@ -31,6 +32,8 @@ TITEL = {"b_front": ("Frontsegment", "Vorderstes Kanalstueck mit Frontwand "
                          "fasst die Hand zu"),
          "b_entnahme": ("Entnahme", "Der vorderste Beutel wird an der Oberkante "
                         "gefasst und nach vorne herausgezogen"),
+         "b_wanne": ("Federaufnahme", "Blick in den Schieberfuss: die Wanne "
+                     "nimmt das gekaufte Federgehaeuse auf"),
          "b_varianten": ("Ebenenlagen", "unten, mitte und oben - oben ohne "
                          "Stapelzapfen, unten ohne Taschen im Boden"),
          "b_varianten_spalte": ("Spaltenlagen", "links, mitte und rechts - "
@@ -895,7 +898,7 @@ BAU = f"""
 
 <section>
   <h2 data-nr="03">Die Teile</h2>
-  <p class="unter">Sieben Teiletypen. Die Mengen gelten je Kanal &mdash; und ein Kanal
+  <p class="unter">Sechs gedruckte Teile und ein Zukaufteil. Die Mengen gelten je Kanal &mdash; und ein Kanal
   ist eine Sorte.</p>
   <div class="hinweis">Die drei Segmente gibt es in je neun Ausf&uuml;hrungen:
   drei Ebenenlagen (<code>unten</code>, <code>mitte</code>, <code>oben</code>)
@@ -947,13 +950,15 @@ BAU = f"""
       <code>schild-text.stl</code> in Schwarz drucken und einkleben.</p></div>
     </article>
     <article class="karte">
-      <figure><img src="{R['b_schieber']}" alt="Wickeltrommel"></figure>
-      <div class="txt"><span class="anz">1&times; je Kanal</span>
-      <h4>Wickeltrommel</h4>
-      <div class="dat">18 &times; 18 &times; 17 mm &middot; 4 g</div>
-      <p>Darauf wickelt die Feder. Sie darf <strong>nicht</strong> auf der
-      3-mm-Achse laufen &mdash; zu enger Wickel, zu hohe Biegespannung im
-      Band. Liegend drucken, dann wird die Bohrung rund.</p></div>
+      <figure><img src="{R['b_wanne']}" alt="Federaufnahme im Schieberfuss"></figure>
+      <div class="txt"><span class="anz">Zukaufteil</span>
+      <h4>Federgeh&auml;use</h4>
+      <div class="dat">0,60 &euro; &middot; nicht gedruckt</div>
+      <p>Kommt aus einem Warenpusher f&uuml;r Ladenregale und bringt die
+      Konstantkraftfeder fertig mit. Es liegt in der <strong>Wanne</strong>
+      im Schieberfu&szlig; und wird mit zwei Kabelbindern gehalten &mdash;
+      die Wanne ist gr&ouml;&szlig;er als n&ouml;tig, damit kein Ma&szlig;
+      stimmen muss.</p></div>
     </article>
     <article class="karte">
       <figure><img src="{R['b_kanal']}" alt="Fertiger Kanal"></figure>
@@ -1761,6 +1766,30 @@ for alt, neu in NAMEN.items():
     w = os.path.join(PROJ, "bilder", "web", alt + ".jpg")
     if os.path.exists(w):
         shutil.copy2(w, os.path.join(PAKET, "web", neu + ".jpg"))
+
+# Ueberzaehlige Dateien entfernen. Der Kopierlauf legt nur an, er raeumt
+# nicht auf - nach einer Umnummerierung blieben deshalb die alten Namen
+# liegen. Das Paket wuchs so von 50 auf 64 MB und lieferte veraltete
+# Bilder mit aus. Gezielt loeschen statt den Ordner zu ersetzen: er wird
+# waehrenddessen womoeglich von einem Webserver ausgeliefert.
+def _aufraeumen(ordner, erwartet, endung):
+    weg = [f for f in os.listdir(ordner)
+           if f.endswith(endung) and f not in erwartet]
+    for f in sorted(weg):
+        os.remove(os.path.join(ordner, f))
+        print(f"  entfernt: {os.path.basename(ordner)}/{f}")
+    return len(weg)
+
+
+_alt = 0
+_alt += _aufraeumen(os.path.join(PAKET, "bilder"),
+                    {n + ".png" for n in NAMEN.values()}, ".png")
+_alt += _aufraeumen(os.path.join(PAKET, "web"),
+                    {n + ".jpg" for n in NAMEN.values()}, ".jpg")
+_alt += _aufraeumen(os.path.join(PAKET, "zeichnungen"),
+                    {n + ".svg" for n in ZTITEL}, ".svg")
+if _alt:
+    print(f"  {_alt} veraltete Dateien aus dem Paket entfernt")
 
 shutil.copy2(os.path.join(PROJ, "modell", "katzenfutter-regal.scad"),
              os.path.join(PAKET, "modell", "katzenfutter-regal.scad"))
