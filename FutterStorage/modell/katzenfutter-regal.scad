@@ -39,8 +39,12 @@ beutel_breit = 88;
 beutel_dicke = 19;
 // Luft in der Breite
 spiel = 4;
-// Luft über dem Beutel
-luft_oben = 28;
+// Luft über dem Beutel. Das ist der Greifraum: Entnommen wird, indem man
+// den Beutel an seiner Oberkante fasst und nach vorne herauszieht. Dafür
+// müssen zwei Finger neben die Beutelkante passen - unter 40 mm wird das
+// zur Fummelei. 42 mm ergibt eine Ebenenhöhe von 182,8 mm; drei Ebenen
+// brauchen damit 548,4 mm Fachhöhe.
+luft_oben = 42;
 
 /* [Kanal] */
 // Länge eines Segments. 160 mm passt auf ein 180er Druckbett.
@@ -60,9 +64,12 @@ mulde_bis = 66;
 // Nutzbare Breite: 545 mm abzüglich Scharnier, sicherheitshalber 540
 schrank_breite = 540;
 schrank_tiefe = 500;
-// Höhe ohne Regalboden. Mit Boden wären es 220 mm unten bzw. 280 mm im Fach
-// darüber - dann passt nur eine Ebene.
-schrank_hoehe = 520;
+// Fachhöhe von der Standfläche bis zur Unterkante dessen, was darüber kommt.
+// Der Regalboden wird dafür höher gesetzt: 550 mm reichen für drei Ebenen
+// à 182,8 mm (548,4 mm) und lassen jeder Ebene 42 mm Greifraum über dem
+// Beutel. Mit den ursprünglichen 520 mm blieben nur 28 mm - zu wenig, um
+// den Beutel oben zu fassen.
+schrank_hoehe = 550;
 // nur für die layout-Vorschau
 spalten = 5;
 ebenen = 3;
