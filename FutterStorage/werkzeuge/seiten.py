@@ -1475,9 +1475,89 @@ Millimetern</footer>
 </div>
 """
 
+PROJEKT = f"""
+<div class="wrap">
+<header>
+  <p class="eyebrow">Projektaufbau</p>
+  <h1>Wie das Projekt aufgebaut ist</h1>
+  <p class="lead">Eine Quelldatei, fuenf Skripte, der Rest ist erzeugt. Wer eine
+  Zahl im Modell aendert, laesst die Skripte laufen und bekommt neue STLs,
+  neue Zeichnungen, neue Bilder und diese Seiten &mdash; alles wieder zueinander
+  passend.</p>
+</header>
+
+<section>
+  <h2 data-nr="01">Der Verzeichnisbaum</h2>
+  <p class="unter">Direkt aus dem Projektordner gelesen &mdash; was hier steht,
+  liegt auch wirklich dort.</p>
+  {dateibaum(PROJ)}
+</section>
+
+<section>
+  <h2 data-nr="02">Erzeugt und von Hand geschrieben</h2>
+  <div class="text">
+    <p>Nur zwei Dinge sind handgeschrieben: das Modell und die Skripte. Alles
+    andere entsteht daraus. Das ist der Grund, warum eine Massaenderung nicht
+    an zehn Stellen nachgezogen werden muss.</p>
+  </div>
+  <div class="tab"><table>
+    <thead><tr><th>Ordner</th><th>Herkunft</th><th>Was passiert, wenn das Modell
+      sich aendert</th></tr></thead>
+    <tbody>
+      <tr><td class="num">modell/</td><td>von Hand</td>
+        <td class="w">hier wird geaendert</td></tr>
+      <tr><td class="num">werkzeuge/</td><td>von Hand</td>
+        <td class="w">bleibt gleich</td></tr>
+      <tr><td class="num">stl/</td><td>erzeugt</td>
+        <td class="w">neu bauen mit stl-bauen.py</td></tr>
+      <tr><td class="num">zeichnungen/</td><td>erzeugt</td>
+        <td class="w">Masse werden aus dem Modell gelesen, nur neu laufen lassen</td></tr>
+      <tr><td class="num">bilder/</td><td>erzeugt</td>
+        <td class="w">Blender liest die neuen STLs</td></tr>
+      <tr><td class="num">paket/</td><td>erzeugt</td>
+        <td class="w">seiten.py baut alles neu zusammen</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2 data-nr="03">Alles neu bauen</h2>
+  <div class="text">
+    <p>Die Reihenfolge ist wichtig: erst die Geometrie, dann die Pruefung, dann
+    was daraus abgeleitet wird.</p>
+    {code('''# 1. Bauteile aus dem Modell erzeugen
+python3 werkzeuge/stl-bauen.py
+
+# 2. pruefen, bevor irgendwas darauf aufbaut
+python3 werkzeuge/pruefen.py
+
+# 3. Schilder fuer alle Sorten
+python3 werkzeuge/schilder.py beide
+
+# 4. bemasste Blaetter
+python3 werkzeuge/zeichnungen.py
+
+# 5. Bilder, je Szene ein Aufruf
+for s in front mitte end schieber schild kanal explosion gefuellt ebene gesamt; do
+    blender -b -P werkzeuge/rendern.py -- $s bilder/b_$s.png
+done
+
+# 6. Seiten und ZIP
+python3 werkzeuge/seiten.py''', 'bash')}
+    <div class="hinweis">Schritt 2 bricht mit einem Fehlercode ab, wenn ein Bauteil
+    undicht ist, nicht aufs Druckbett passt oder eine Steckverbindung klemmt.
+    Damit faellt ein Fehler auf, bevor Stunden Druckzeit darauf gehen.</div>
+  </div>
+</section>
+
+<footer>Der Baum wird bei jedem Bau dieser Seite neu eingelesen</footer>
+</div>
+"""
+
 os.makedirs(PAKET, exist_ok=True)
 for datei, titel, inhalt in [
         ("index.html", "FutterStorage &mdash; Uebersicht", INDEX),
+        ("projekt.html", "Projektaufbau &mdash; FutterStorage", PROJEKT),
         ("bauanleitung.html", "Bauanleitung &mdash; FutterStorage", BAU),
         ("technik.html", "Technische Umsetzung &mdash; FutterStorage", TECHNIK),
         ("zeichnungen.html", "Technische Zeichnungen &mdash; FutterStorage",
